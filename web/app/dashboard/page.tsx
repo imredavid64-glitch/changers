@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 
@@ -13,7 +12,7 @@ export default function DashboardPage() {
         <div className="auth-card">
           <h1>Dashboard</h1>
           <p className="muted">Sign in to view your dashboard.</p>
-          <Link href="/sign-in" className="primary" style={{ textAlign: "center", display: "block", padding: "12px", borderRadius: 999 }}>
+          <Link href="/sign-in" className="primary" style={{ textAlign: "center", display: "block", padding: 12, borderRadius: 999, textDecoration: "none" }}>
             Sign in
           </Link>
         </div>
@@ -33,8 +32,8 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div style={{ padding: "24px 0" }}>
-      <div className="card hero" style={{ marginBottom: 24 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <div className="card hero" style={{ padding: 32 }}>
         <div>
           <p className="eyebrow">Welcome back</p>
           <h1 style={{ fontFamily: "var(--font-head)" }}>
@@ -60,34 +59,34 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <h3 style={{ marginBottom: 16, fontFamily: "var(--font-head)" }}>Quick access</h3>
-      <div className="feature-grid" style={{ marginBottom: 32 }}>
+      <h3 style={{ fontFamily: "var(--font-head)", marginBottom: 8 }}>Quick access</h3>
+      <div className="feature-grid" style={{ marginBottom: 16 }}>
         {quickLinks.map((link) => (
           <Link
             key={link.href}
             href={link.href}
             className="collab-card hover-lift"
-            style={{ textDecoration: "none" }}
+            style={{ textDecoration: "none", display: "block" }}
           >
             <div style={{ fontSize: "2rem", marginBottom: 8 }}>{link.emoji}</div>
-            <h4 style={{ fontSize: "1rem" }}>{link.label}</h4>
+            <div className="collab-title">{link.label}</div>
           </Link>
         ))}
       </div>
 
       <div className="card" style={{ background: "linear-gradient(135deg, rgba(44,138,125,0.08), rgba(244,184,96,0.08))" }}>
-        <h3 style={{ marginBottom: 8 }}>🌱 Your changemaker journey</h3>
+        <h3 style={{ marginBottom: 8, fontFamily: "var(--font-head)" }}>🌱 Your changemaker journey</h3>
         <p className="muted" style={{ marginBottom: 16 }}>
           Start by creating a project, joining a room, or writing your first document.
         </p>
         <div className="hero-actions">
-          <Link href="/projects" className="primary" style={{ padding: "10px 20px", borderRadius: 999 }}>
+          <Link href="/projects" className="primary" style={{ padding: "10px 20px", borderRadius: 999, textDecoration: "none" }}>
             Browse projects
           </Link>
-          <Link href="/documents/new" className="ghost" style={{ padding: "10px 20px", borderRadius: 999 }}>
+          <Link href="/documents/new" className="ghost" style={{ padding: "10px 20px", borderRadius: 999, textDecoration: "none" }}>
             Write a document
           </Link>
-          <Link href="/rooms" className="ghost" style={{ padding: "10px 20px", borderRadius: 999 }}>
+          <Link href="/rooms" className="ghost" style={{ padding: "10px 20px", borderRadius: 999, textDecoration: "none" }}>
             Find a room
           </Link>
         </div>

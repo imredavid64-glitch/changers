@@ -7,7 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 
 export default function WelcomePage() {
   const router = useRouter();
-  const { user, profile, loading } = useAuth();
+  const { user, loading } = useAuth();
   const [showDemo, setShowDemo] = useState(false);
 
   useEffect(() => {
@@ -18,10 +18,10 @@ export default function WelcomePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4" />
-          <p className="text-emerald-700">Loading Changers...</p>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: "var(--sand)" }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ width: 48, height: 48, borderRadius: "50%", border: "3px solid var(--teal)", borderTopColor: "transparent", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+          <p style={{ color: "var(--moss)" }}>Loading Changers...</p>
         </div>
       </div>
     );
@@ -32,129 +32,86 @@ export default function WelcomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
-      {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-emerald-100 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <span className="text-3xl">🌿</span>
-              <span className="text-xl font-bold text-emerald-800">Changers</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/sign-in" className="text-emerald-600 hover:text-emerald-800 font-medium">
-                Sign in
-              </Link>
-              <Link
-                href="/sign-up"
-                className="bg-emerald-600 text-white px-6 py-2 rounded-full hover:bg-emerald-700 transition-all shadow-md hover:shadow-lg font-medium"
-              >
-                Get started
-              </Link>
-            </div>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f0faf5, #ecfdf5, #f0fdfa)" }}>
+      <nav style={{
+        position: "sticky", top: 0, zIndex: 50,
+        background: "rgba(255,255,255,0.8)", backdropFilter: "blur(12px)",
+        borderBottom: "1px solid rgba(16,24,32,0.08)",
+      }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "16px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: "1.5rem" }}>🌿</span>
+            <span className="logo">Changers</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <Link href="/sign-in" className="ghost" style={{ padding: "10px 20px", borderRadius: 999, textDecoration: "none" }}>Sign in</Link>
+            <Link href="/sign-up" className="primary" style={{ padding: "10px 24px", borderRadius: 999, textDecoration: "none" }}>Get started</Link>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
-        <div className="text-center max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-8">
-            <span>🌱</span>
-            <span>A changemaker community for students & young leaders</span>
-          </div>
-          <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-8 leading-tight">
-            Build projects that
-            <span className="text-emerald-600"> change the world</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-600 mb-12 leading-relaxed max-w-3xl mx-auto">
-            A collaboration-first platform for changemakers. Share ideas, build projects,
-            create impact — without addictive feeds.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/sign-up"
-              className="bg-emerald-600 text-white px-10 py-4 rounded-full text-lg font-semibold hover:bg-emerald-700 transition-all shadow-lg hover:shadow-xl"
-            >
-              Start building — it's free
-            </Link>
-            <button
-              onClick={() => setShowDemo(!showDemo)}
-              className="border-2 border-emerald-600 text-emerald-600 px-10 py-4 rounded-full text-lg font-semibold hover:bg-emerald-50 transition-all"
-            >
-              {showDemo ? "Close" : "See how it works"}
-            </button>
-          </div>
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(31,94,84,0.1)", color: "var(--moss)", padding: "8px 20px", borderRadius: 999, fontSize: "0.85rem", fontWeight: 600, marginBottom: 32 }}>
+          <span>🌱</span>
+          <span>A changemaker community for students & young leaders</span>
+        </div>
+        <h1 style={{ fontSize: "clamp(2.5rem, 5vw, 4.5rem)", fontFamily: "var(--font-head)", color: "var(--ink)", marginBottom: 24, lineHeight: 1.15 }}>
+          Build projects that{" "}
+          <span style={{ color: "var(--teal)" }}>change the world</span>
+        </h1>
+        <p style={{ fontSize: "clamp(1.1rem, 2vw, 1.4rem)", color: "rgba(16,24,32,0.7)", marginBottom: 40, maxWidth: 640, margin: "0 auto 40px", lineHeight: 1.7 }}>
+          A collaboration-first platform for changemakers. Share ideas, build projects, create impact — without addictive feeds.
+        </p>
+        <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
+          <Link href="/sign-up" className="primary" style={{ padding: "16px 40px", borderRadius: 999, fontSize: "1.1rem", textDecoration: "none" }}>
+            Start building — it&apos;s free
+          </Link>
+          <button className="ghost" onClick={() => setShowDemo(!showDemo)} style={{ padding: "16px 40px", borderRadius: 999, fontSize: "1.1rem" }}>
+            {showDemo ? "Close" : "See how it works"}
+          </button>
         </div>
       </section>
 
-      {/* Demo Overlay */}
       {showDemo && (
-        <section className="max-w-5xl mx-auto px-4 pb-20">
-          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
+        <section style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px 80px" }}>
+          <div className="card" style={{ padding: "40px 48px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">How Changers works</h3>
-                <ul className="space-y-4">
-                  <li className="flex gap-3">
-                    <span className="text-emerald-600 text-xl">1</span>
+                <h3 style={{ fontSize: "1.5rem", fontFamily: "var(--font-head)", marginBottom: 20 }}>How Changers works</h3>
+                {[
+                  ["1", "Create your profile", "Show your interests and what you want to work on."],
+                  ["2", "Join or start a Base", "Collaborative project spaces with AI tools."],
+                  ["3", "Use AI-powered tools", "Document editor, slideshow maker, research assistant."],
+                  ["4", "Track your impact", "See your sustainability metrics and project progress."],
+                ].map(([num, title, desc]) => (
+                  <div key={num} style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+                    <div style={{ color: "var(--teal)", fontWeight: 700, fontSize: "1.2rem", minWidth: 24 }}>{num}</div>
                     <div>
-                      <p className="font-semibold text-gray-900">Create your profile</p>
-                      <p className="text-gray-600 text-sm">Show your interests and what you want to work on.</p>
+                      <p style={{ fontWeight: 600, color: "var(--ink)" }}>{title}</p>
+                      <p className="muted" style={{ fontSize: "0.9rem" }}>{desc}</p>
                     </div>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="text-emerald-600 text-xl">2</span>
-                    <div>
-                      <p className="font-semibold text-gray-900">Join or start a Base</p>
-                      <p className="text-gray-600 text-sm">Collaborative project spaces with AI tools.</p>
-                    </div>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="text-emerald-600 text-xl">3</span>
-                    <div>
-                      <p className="font-semibold text-gray-900">Use AI-powered tools</p>
-                      <p className="text-gray-600 text-sm">Document editor, slideshow maker, research assistant.</p>
-                    </div>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="text-emerald-600 text-xl">4</span>
-                    <div>
-                      <p className="font-semibold text-gray-900">Track your impact</p>
-                      <p className="text-gray-600 text-sm">See your sustainability metrics and project progress.</p>
-                    </div>
-                  </li>
-                </ul>
-                <Link
-                  href="/sign-up"
-                  className="inline-block mt-6 bg-emerald-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-emerald-700 transition-all"
-                >
-                  Get started
-                </Link>
+                  </div>
+                ))}
               </div>
-              <div className="bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl p-8">
-                <div className="bg-white rounded-xl shadow-lg p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold">Y</div>
+              <div style={{ background: "linear-gradient(135deg, rgba(31,94,84,0.1), rgba(155,199,177,0.15))", borderRadius: 20, padding: 32 }}>
+                <div className="card" style={{ padding: 24 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--teal)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: "1.1rem" }}>Y</div>
                     <div>
-                      <p className="font-semibold text-sm">Your Base</p>
-                      <p className="text-xs text-gray-500">Climate Action Project</p>
+                      <p style={{ fontWeight: 600, fontSize: "0.9rem" }}>Your Base</p>
+                      <p className="muted" style={{ fontSize: "0.8rem" }}>Climate Action Project</p>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <div className="bg-emerald-50 rounded-lg p-3">
-                      <p className="text-sm font-medium">📄 Project Proposal</p>
-                      <p className="text-xs text-gray-500">Last edited 2m ago • AI-assisted</p>
+                  {[
+                    ["📄", "Project Proposal", "Last edited 2m ago"],
+                    ["📊", "Impact Dashboard", "12 kg CO₂ saved this week"],
+                    ["💬", "Team Discussion", "4 new messages"],
+                  ].map(([icon, title, meta]) => (
+                    <div key={title} style={{ background: "rgba(31,94,84,0.06)", borderRadius: 12, padding: 12, marginBottom: 8 }}>
+                      <p style={{ fontWeight: 600, fontSize: "0.9rem" }}>{icon} {title}</p>
+                      <p className="muted" style={{ fontSize: "0.8rem" }}>{meta}</p>
                     </div>
-                    <div className="bg-emerald-50 rounded-lg p-3">
-                      <p className="text-sm font-medium">📊 Impact Dashboard</p>
-                      <p className="text-xs text-gray-500">12 kg CO₂ saved this week</p>
-                    </div>
-                    <div className="bg-emerald-50 rounded-lg p-3">
-                      <p className="text-sm font-medium">💬 Team Discussion</p>
-                      <p className="text-xs text-gray-500">4 new messages</p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -162,155 +119,95 @@ export default function WelcomePage() {
         </section>
       )}
 
-      {/* Features Section */}
-      <section className="bg-white py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Built for changemakers, not for addiction
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              No infinite scroll. No algorithmic feeds. Just tools to collaborate, create, and track your impact.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-emerald-50 rounded-2xl p-8 hover:shadow-lg transition-shadow">
-              <div className="text-4xl mb-4">🏢</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Bases</h3>
-              <p className="text-gray-600 mb-4">
-                Collaborative project spaces with built-in AI tools, document editing, version control, and real-time team chat.
-              </p>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li>✓ AI-powered document editor</li>
-                <li>✓ Slideshow maker & templates</li>
-                <li>✓ Project boards & tracking</li>
-                <li>✓ Real-time collaboration</li>
-              </ul>
-            </div>
-
-            <div className="bg-teal-50 rounded-2xl p-8 hover:shadow-lg transition-shadow">
-              <div className="text-4xl mb-4">🤖</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">AI Tools</h3>
-              <p className="text-gray-600 mb-4">
-                Smart assistants that help you write, research, brainstorm, and organize — without taking over.
-              </p>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li>✓ Research assistant</li>
-                <li>✓ Content generation</li>
-                <li>✓ Project suggestions</li>
-                <li>✓ Impact analysis</li>
-              </ul>
-            </div>
-
-            <div className="bg-cyan-50 rounded-2xl p-8 hover:shadow-lg transition-shadow">
-              <div className="text-4xl mb-4">🌱</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Impact Tracking</h3>
-              <p className="text-gray-600 mb-4">
-                See your real environmental impact, project progress, and contribution to the community.
-              </p>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li>✓ Sustainability dashboard</li>
-                <li>✓ Project milestones</li>
-                <li>✓ Community contributions</li>
-                <li>✓ Personal growth tracking</li>
-              </ul>
-            </div>
+      <section style={{ background: "white", padding: "80px 24px" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", textAlign: "center" }}>
+          <h2 style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)", fontFamily: "var(--font-head)", color: "var(--ink)", marginBottom: 12 }}>
+            Built for changemakers, not for addiction
+          </h2>
+          <p className="muted" style={{ fontSize: "1.1rem", maxWidth: 640, margin: "0 auto 48px" }}>
+            No infinite scroll. No algorithmic feeds. Just tools to collaborate, create, and track your impact.
+          </p>
+          <div className="feature-grid" style={{ textAlign: "left" }}>
+            {[
+              ["🏢", "Bases", "Collaborative project spaces with AI tools, document editing, version control, and real-time team chat."],
+              ["🤖", "AI Tools", "Smart assistants that help you write, research, brainstorm, and organize — without taking over."],
+              ["🌱", "Impact Tracking", "See your real environmental impact, project progress, and contribution to the community."],
+            ].map(([emoji, title, desc]) => (
+              <div key={title} className="feature" style={{ background: "rgba(31,94,84,0.05)", borderRadius: 20, padding: 32 }}>
+                <div style={{ fontSize: "2.5rem", marginBottom: 16 }}>{emoji}</div>
+                <h3 style={{ fontSize: "1.3rem", fontFamily: "var(--font-head)", marginBottom: 8 }}>{title}</h3>
+                <p className="muted" style={{ lineHeight: 1.7 }}>{desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Social Proof */}
-      <section className="py-20 bg-gradient-to-r from-emerald-600 to-teal-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6">
+      <section style={{ background: "linear-gradient(135deg, var(--moss), var(--teal))", padding: "80px 24px", color: "white", textAlign: "center" }}>
+        <div style={{ maxWidth: 640, margin: "0 auto" }}>
+          <h2 style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)", fontFamily: "var(--font-head)", marginBottom: 16 }}>
             Join a community that&apos;s building something better
           </h2>
-          <p className="text-xl mb-12 opacity-90 max-w-3xl mx-auto">
+          <p style={{ fontSize: "1.1rem", opacity: 0.9, marginBottom: 40, lineHeight: 1.7 }}>
             No ads. No algorithms. No dopamine loops. Just real tools for real change.
           </p>
-          <div className="grid md:grid-cols-3 gap-8 max-w-3xl mx-auto">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
-              <div className="text-4xl font-bold mb-2">0</div>
-              <div className="text-emerald-100">Active changemakers</div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
-              <div className="text-4xl font-bold mb-2">0</div>
-              <div className="text-emerald-100">Projects launched</div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
-              <div className="text-4xl font-bold mb-2">0</div>
-              <div className="text-emerald-100">kg CO₂ tracked</div>
-            </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24, maxWidth: 480, margin: "0 auto" }}>
+            {[["Active changemakers", "0"], ["Projects launched", "0"], ["kg CO₂ tracked", "0"]].map(([label, value]) => (
+              <div key={label} style={{ background: "rgba(255,255,255,0.1)", borderRadius: 20, padding: 24, backdropFilter: "blur(8px)" }}>
+                <div style={{ fontSize: "2rem", fontWeight: 700, marginBottom: 4 }}>{value}</div>
+                <div style={{ fontSize: "0.85rem", opacity: 0.8 }}>{label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">
+      <section style={{ background: "white", padding: "80px 24px", textAlign: "center" }}>
+        <div style={{ maxWidth: 640, margin: "0 auto" }}>
+          <h2 style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)", fontFamily: "var(--font-head)", marginBottom: 16 }}>
             Ready to start building?
           </h2>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="muted" style={{ fontSize: "1.1rem", marginBottom: 32 }}>
             Create your changemaker profile in under a minute. No email verification required.
           </p>
-          <Link
-            href="/sign-up"
-            className="bg-emerald-600 text-white px-10 py-4 rounded-full text-lg font-semibold hover:bg-emerald-700 transition-all shadow-lg hover:shadow-xl inline-block"
-          >
+          <Link href="/sign-up" className="primary" style={{ padding: "16px 40px", borderRadius: 999, fontSize: "1.1rem", textDecoration: "none", display: "inline-block" }}>
             Create your account
           </Link>
-          <p className="mt-4 text-sm text-gray-500">
-            Already have one? <Link href="/sign-in" className="text-emerald-600 hover:underline">Sign in</Link>
+          <p className="muted" style={{ marginTop: 16, fontSize: "0.9rem" }}>
+            Already have one? <Link href="/sign-in" style={{ color: "var(--moss)", fontWeight: 600 }}>Sign in</Link>
           </p>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
+      <footer className="footer" style={{ background: "var(--ink)", color: "rgba(255,255,255,0.6)", padding: "48px 24px" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 32, marginBottom: 32 }}>
             <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <span className="text-2xl">🌿</span>
-                <span className="text-white font-bold text-lg">Changers</span>
+              <p style={{ fontSize: "1.2rem", fontFamily: "var(--font-head)", color: "white", marginBottom: 8 }}>🌿 Changers</p>
+              <p style={{ fontSize: "0.85rem" }}>A changemaker community platform. Built for students, by changemakers.</p>
+            </div>
+            {[["Platform", ["Dashboard", "Projects", "Documents", "Events"]], ["Resources", ["About", "Privacy", "Terms"]]].map(([title, links]) => (
+              <div key={title}>
+                <p style={{ color: "white", fontWeight: 600, marginBottom: 12, fontSize: "0.9rem" }}>{title}</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {(links as string[]).map(link => (
+                    <Link key={link} href={`/${link.toLowerCase()}`} style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.6)" }}>{link}</Link>
+                  ))}
+                </div>
               </div>
-              <p className="text-sm">
-                A changemaker community platform. Built for students, by changemakers.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Platform</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/bases" className="hover:text-white">Bases</Link></li>
-                <li><Link href="/projects" className="hover:text-white">Projects</Link></li>
-                <li><Link href="/dashboard" className="hover:text-white">Dashboard</Link></li>
-                <li><Link href="/events" className="hover:text-white">Events</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Resources</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/about" className="hover:text-white">About</Link></li>
-                <li><Link href="/privacy" className="hover:text-white">Privacy</Link></li>
-                <li><Link href="/terms" className="hover:text-white">Terms</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Connect</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">GitHub</a></li>
-                <li><a href="#" className="hover:text-white">Discord</a></li>
-                <li><a href="#" className="hover:text-white">Twitter</a></li>
-              </ul>
-            </div>
+            ))}
           </div>
-          <div className="border-t border-gray-800 pt-8 text-center text-sm">
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 24, textAlign: "center", fontSize: "0.85rem" }}>
             &copy; {new Date().getFullYear()} Changers. Built for sustainable impact.
           </div>
         </div>
       </footer>
+
+      <style jsx>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

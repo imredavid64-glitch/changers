@@ -4,10 +4,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
-import {
-  generateDocumentSuggestions,
-  AISuggestion,
-} from "@/lib/ai/tools";
+import { generateDocumentSuggestions, AISuggestion } from "@/lib/ai/tools";
 
 export default function NewDocumentPage() {
   const router = useRouter();
@@ -30,7 +27,7 @@ export default function NewDocumentPage() {
         <div className="auth-card">
           <h1>New document</h1>
           <p className="muted">Sign in to create documents.</p>
-          <Link href="/sign-in" className="primary" style={{ textAlign: "center", display: "block", padding: "12px", borderRadius: 999 }}>
+          <Link href="/sign-in" className="primary" style={{ textAlign: "center", display: "block", padding: 12, borderRadius: 999, textDecoration: "none" }}>
             Sign in
           </Link>
         </div>
@@ -47,7 +44,7 @@ export default function NewDocumentPage() {
   }
 
   return (
-    <div style={{ padding: "24px 0", maxWidth: 800, margin: "0 auto" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 800, margin: "0 auto" }}>
       <div className="section-header">
         <div>
           <p className="eyebrow">Collaborative documents</p>
@@ -74,7 +71,6 @@ export default function NewDocumentPage() {
             outline: "none",
           }}
         />
-
         <textarea
           placeholder="Start writing your document... Use AI suggestions to improve your content."
           value={body}
@@ -91,7 +87,6 @@ export default function NewDocumentPage() {
             resize: "vertical",
           }}
         />
-
         <div style={{ display: "flex", gap: 12, marginTop: 24, flexWrap: "wrap" }}>
           <button className="primary" onClick={analyzeDocument} disabled={!title.trim()}>
             Analyze with AI
@@ -103,12 +98,10 @@ export default function NewDocumentPage() {
       </div>
 
       {showSuggestions && suggestions.length > 0 && (
-        <div className="card" style={{ marginTop: 16 }}>
+        <div className="card">
           <div className="section-header">
-            <h3>AI suggestions</h3>
-            <button className="ghost" onClick={() => setShowSuggestions(false)}>
-              Dismiss
-            </button>
+            <h3 style={{ fontFamily: "var(--font-head)" }}>AI suggestions</h3>
+            <button className="ghost" onClick={() => setShowSuggestions(false)}>Dismiss</button>
           </div>
           <div style={{ display: "grid", gap: 12 }}>
             {suggestions.map((s) => (
@@ -123,15 +116,12 @@ export default function NewDocumentPage() {
                       : s.type === "rewrite"
                         ? "rgba(244, 184, 96, 0.12)"
                         : "rgba(255, 111, 79, 0.1)",
+                  border: "1px solid rgba(16,24,32,0.06)",
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: 1, color: "var(--moss)" }}>
-                    {s.type}
-                  </span>
-                  <span style={{ fontSize: "0.75rem", color: "var(--moss)" }}>
-                    {s.context}
-                  </span>
+                  <span className="eyebrow" style={{ margin: 0 }}>{s.type}</span>
+                  <span className="muted" style={{ fontSize: "0.75rem" }}>{s.context}</span>
                 </div>
                 <p style={{ fontSize: "0.95rem", lineHeight: 1.5 }}>{s.text}</p>
               </div>
