@@ -1,0 +1,33 @@
+export const appwriteConfig = {
+  endpoint: process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT?.replace(/\/$/, "") || "",
+  projectId: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || "",
+  databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || "changers",
+  mediaBucketId: process.env.NEXT_PUBLIC_APPWRITE_MEDIA_BUCKET_ID || "changers-media",
+  collections: {
+    profiles: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_PROFILES || "profiles",
+    posts: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_POSTS || "posts",
+    comments: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_COMMENTS || "comments",
+    notifications:
+      process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_NOTIFICATIONS || "notifications",
+    follows: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_FOLLOWS || "follows",
+    savedPosts: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_SAVED_POSTS || "saved-posts",
+    rooms: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ROOMS || "rooms",
+    roomMessages:
+      process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ROOM_MESSAGES || "room-messages",
+    threads: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_THREADS || "threads",
+    threadMessages:
+      process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_THREAD_MESSAGES || "thread-messages",
+    blocks: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_BLOCKS || "blocks",
+    privacySettings:
+      process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_PRIVACY_SETTINGS || "privacy-settings",
+    projects: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_PROJECTS || "projects",
+    projectMembers:
+      process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_PROJECT_MEMBERS || "project-members",
+    events: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EVENTS || "events",
+    eventRsvps: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EVENT_RSVPS || "event-rsvps",
+  },
+};
+
+export const appwriteEnabled = Boolean(
+  appwriteConfig.endpoint && appwriteConfig.projectId && appwriteConfig.databaseId,
+);
