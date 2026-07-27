@@ -1,0 +1,54 @@
+name: changers
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-changers}
+      POSTGRES_USER: ${POSTGRES_USER:-changers}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env.dell}
+    volumes:
+      - ${HOST_POSTGRES_DATA:-./postgres-data}:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-changers} -d ${POSTGRES_DB:-changers}"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+
+  web:
+    build:
+      context: ./web
+    restart: unless-stopped
+    env_file:
+      - .env.dell
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-changers}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-changers}
+      MEDIA_ROOT: /srv/changers/media
+      MEDIA_PUBLIC_PREFIX: media
+      NEXT_TELEMETRY_DISABLED: "1"
+    volumes:
+      - ${HOST_MEDIA_ROOT:-./.changers-media}:/srv/changers/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      CHANGERS_DOMAIN: ${CHANGERS_DOMAIN:?Set CHANGERS_DOMAIN in .env.dell}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${HOST_MEDIA_ROOT:-./.changers-media}:/srv/changers/media:ro
+      - changers-caddy-data:/data
+      - changers-caddy-config:/config
+    depends_on:
+      - web
+
+volumes:
+  changers-caddy-data:
+  changers-caddy-config:

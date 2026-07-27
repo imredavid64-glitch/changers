@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bridge - Changemakers Social Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <header class="topbar">
+      <div class="logo">
+        <span class="logo-mark"></span>
+        Bridge
+      </div>
+      <div class="top-search">
+        <input type="search" placeholder="Search people, projects, and ideas" />
+      </div>
+      <div class="top-actions">
+        <button class="ghost">Start an Idea</button>
+        <button class="primary">Create Post</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="side-nav">
+        <div class="nav-group">
+          <p class="nav-title">Explore</p>
+          <a href="#feed" class="nav-link active">Home Feed</a>
+          <a href="#ideas" class="nav-link">Idea Forge</a>
+          <a href="#collab" class="nav-link">Co-Lab Rooms</a>
+          <a href="#projects" class="nav-link">Projects</a>
+          <a href="#impact" class="nav-link">Impact Map</a>
+        </div>
+        <div class="nav-group">
+          <p class="nav-title">Community</p>
+          <a href="#events" class="nav-link">Events</a>
+          <a href="#zine" class="nav-link">Zine</a>
+          <a href="#bridges" class="nav-link">Bridge Cards</a>
+          <a href="#mentors" class="nav-link">Mentors</a>
+        </div>
+        <div class="nav-card">
+          <p class="eyebrow">Bridge to Impact</p>
+          <h3>Bridges all the way down</h3>
+          <p class="muted">
+            A student-led platform inspired by the Changemaker Conference 2026.
+          </p>
+          <button class="primary full">Join the Network</button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section class="hero card" id="feed">
+          <div class="hero-content">
+            <p class="eyebrow">Bridge to Impact</p>
+            <h1>Build the change together.</h1>
+            <p class="lead">
+              Bridge is a social platform for changemakers to collaborate, build
+              ideas, share stories, and move projects from spark to action.
+            </p>
+            <div class="hero-meta">
+              <div>
+                <p class="meta-label">Conference 2026</p>
+                <p class="meta-value">March 5-7, 2026 - Dusseldorf</p>
+              </div>
+              <div>
+                <p class="meta-label">Host School</p>
+                <p class="meta-value">International School of Dusseldorf</p>
+              </div>
+              <div>
+                <p class="meta-label">Participating Schools</p>
+                <p class="meta-value">26 schools</p>
+              </div>
+            </div>
+            <div class="hero-actions">
+              <button class="primary">Start a Project Room</button>
+              <button class="ghost">Find collaborators</button>
+            </div>
+          </div>
+          <div class="hero-visual">
+            <div class="bridge-arc"></div>
+            <div class="hero-cards">
+              <div class="mini-card">
+                <p class="mini-title">Idea Sprint</p>
+                <p>48 hours to move from question to prototype.</p>
+              </div>
+              <div class="mini-card highlight">
+                <p class="mini-title">Impact Compass</p>
+                <p>Track Nature, Economy, Society, and Wellbeing.</p>
+              </div>
+              <div class="mini-card">
+                <p class="mini-title">Seeds of Change</p>
+                <p>Student zine spotlighting stories and action.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="composer card" aria-label="Create post">
+          <div class="composer-header">
+            <div>
+              <p class="meta-label">Share something</p>
+              <p class="muted">Post updates, ask for help, or publish your idea.</p>
+            </div>
+            <div class="chip-row">
+              <span class="chip">N Nature</span>
+              <span class="chip">E Economy</span>
+              <span class="chip">S Society</span>
+              <span class="chip">W Wellbeing</span>
+            </div>
+          </div>
+          <form id="post-form" class="composer-form">
+            <input type="text" name="title" placeholder="Give your post a title" required />
+            <textarea
+              name="body"
+              placeholder="What are you building? What support do you need?"
+              required
+            ></textarea>
+            <div class="composer-actions">
+              <select name="strand" aria-label="Choose strand">
+                <option value="all">Pick a strand</option>
+                <option value="N">Nature</option>
+                <option value="E">Economy</option>
+                <option value="S">Society</option>
+                <option value="W">Wellbeing</option>
+              </select>
+              <div class="button-row">
+                <button type="button" class="ghost">Add media</button>
+                <button type="submit" class="primary">Publish</button>
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <section class="feed">
+          <div class="feed-header">
+            <h2>Home Feed</h2>
+            <div class="filter-row" id="strand-filters">
+              <button class="filter active" data-strand="all">All</button>
+              <button class="filter" data-strand="N">N Nature</button>
+              <button class="filter" data-strand="E">E Economy</button>
+              <button class="filter" data-strand="S">S Society</button>
+              <button class="filter" data-strand="W">W Wellbeing</button>
+            </div>
+          </div>
+
+          <article class="post card" data-strand="S">
+            <div class="post-header">
+              <div>
+                <p class="post-author">Amira Khalil</p>
+                <p class="post-role">Student organizer - Frankfurt IS</p>
+              </div>
+              <span class="strand">S Society</span>
+            </div>
+            <h3>Neighborhood welcome kit for new families</h3>
+            <p>
+              We are mapping services for new arrivals and want to co-design a
+              welcome kit with local youth councils. Looking for translation
+              partners and a designer.
+            </p>
+            <div class="post-actions">
+              <button class="ghost">Applaud</button>
+              <button class="ghost">Comment</button>
+              <button class="ghost">Bridge</button>
+            </div>
+          </article>
+
+          <article class="post card" data-strand="N">
+            <div class="post-header">
+              <div>
+                <p class="post-author">Kai Lindholm</p>
+                <p class="post-role">Eco-Committee lead - Helsinki</p>
+              </div>
+              <span class="strand">N Nature</span>
+            </div>
+            <h3>River cleanup dashboard</h3>
+            <p>
+              Building a live map of cleanup sites with data from student teams.
+              Need help connecting sensors and a storytelling editor.
+            </p>
+            <div class="post-actions">
+              <button class="ghost">Applaud</button>
+              <button class="ghost">Comment</button>
+              <button class="ghost">Bridge</button>
+            </div>
+          </article>
+
+          <article class="post card" data-strand="E">
+            <div class="post-header">
+              <div>
+                <p class="post-author">Lena Torres</p>
+                <p class="post-role">Social entrepreneur - Barcelona</p>
+              </div>
+              <span class="strand">E Economy</span>
+            </div>
+            <h3>Circular uniform exchange</h3>
+            <p>
+              Piloting a circular economy exchange for school uniforms. Seeking
+              policy mentors and a partner school to scale.
+            </p>
+            <div class="post-actions">
+              <button class="ghost">Applaud</button>
+              <button class="ghost">Comment</button>
+              <button class="ghost">Bridge</button>
+            </div>
+          </article>
+
+          <article class="post card" data-strand="W">
+            <div class="post-header">
+              <div>
+                <p class="post-author">Noor Binta</p>
+                <p class="post-role">Wellbeing coach - Nairobi</p>
+              </div>
+              <span class="strand">W Wellbeing</span>
+            </div>
+            <h3>Peer support circles</h3>
+            <p>
+              Designing peer support circles to reduce stress during exams.
+              Looking for facilitators and a digital toolkit.
+            </p>
+            <div class="post-actions">
+              <button class="ghost">Applaud</button>
+              <button class="ghost">Comment</button>
+              <button class="ghost">Bridge</button>
+            </div>
+          </article>
+        </section>
+
+        <section class="feature-grid" id="ideas">
+          <div class="card feature">
+            <h2>Idea Forge</h2>
+            <p>
+              Turn a spark into a proposal with a structured canvas, team roles,
+              and a pitch reel.
+            </p>
+            <ul>
+              <li>Impact hypothesis and evidence tracker</li>
+              <li>SDG alignment with N E S W tagging</li>
+              <li>Mentor ask and collaboration map</li>
+            </ul>
+          </div>
+          <div class="card feature">
+            <h2>Action Sprints</h2>
+            <p>
+              Run 24-72 hour collaboration pushes with clear outcomes and
+              micro-grants.
+            </p>
+            <ul>
+              <li>Built-in sprint rooms and daily check-ins</li>
+              <li>Volunteer and partner matching</li>
+              <li>Auto-generated impact recap</li>
+            </ul>
+          </div>
+          <div class="card feature">
+            <h2>Proof of Change</h2>
+            <p>
+              Showcase outcomes with evidence, testimonials, and open artifacts.
+            </p>
+            <ul>
+              <li>Impact timeline and data uploads</li>
+              <li>Community feedback and endorsements</li>
+              <li>Shareable case study format</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="card" id="collab">
+          <div class="section-header">
+            <div>
+              <h2>Co-Lab Rooms</h2>
+              <p class="muted">
+                Persistent project spaces with chat, tasks, and shared assets.
+              </p>
+            </div>
+            <button class="ghost">Create room</button>
+          </div>
+          <div class="collab-grid">
+            <div class="collab-card">
+              <p class="collab-title">Rhein Cleanup Collective</p>
+              <p class="muted">Weekly shoreline action and data collection.</p>
+              <div class="tag-row">
+                <span class="tag">N Nature</span>
+                <span class="tag">S Society</span>
+              </div>
+              <button class="primary">Enter room</button>
+            </div>
+            <div class="collab-card">
+              <p class="collab-title">Circular Economy Lab</p>
+              <p class="muted">Designing exchange systems for schools.</p>
+              <div class="tag-row">
+                <span class="tag">E Economy</span>
+                <span class="tag">S Society</span>
+              </div>
+              <button class="primary">Enter room</button>
+            </div>
+            <div class="collab-card">
+              <p class="collab-title">Wellbeing First Aid</p>
+              <p class="muted">Peer coaching, mental health, and support.</p>
+              <div class="tag-row">
+                <span class="tag">W Wellbeing</span>
+              </div>
+              <button class="primary">Enter room</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="projects">
+          <div class="section-header">
+            <div>
+              <h2>Project Rooms</h2>
+              <p class="muted">Make progress visible with shared roadmaps.</p>
+            </div>
+            <button class="ghost">Browse projects</button>
+          </div>
+          <div class="project-grid">
+            <div class="project-card">
+              <h3>Bridge Toolkit</h3>
+              <p>Open-source guides for leading changemaker teams.</p>
+              <div class="progress">
+                <span>74% complete</span>
+                <div class="bar"><div class="bar-fill" style="width: 74%"></div></div>
+              </div>
+              <button class="ghost">View roadmap</button>
+            </div>
+            <div class="project-card">
+              <h3>Impact Host Playbook</h3>
+              <p>Transparent criteria and planning steps for host schools.</p>
+              <div class="progress">
+                <span>52% complete</span>
+                <div class="bar"><div class="bar-fill" style="width: 52%"></div></div>
+              </div>
+              <button class="ghost">View roadmap</button>
+            </div>
+            <div class="project-card">
+              <h3>Seed Library</h3>
+              <p>Community stories and resources from student leaders.</p>
+              <div class="progress">
+                <span>38% complete</span>
+                <div class="bar"><div class="bar-fill" style="width: 38%"></div></div>
+              </div>
+              <button class="ghost">View roadmap</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="bridges">
+          <div class="section-header">
+            <div>
+              <h2>Bridge Cards</h2>
+              <p class="muted">
+                Match skills and needs to form fast collaboration bridges.
+              </p>
+            </div>
+          </div>
+          <form id="bridge-form" class="bridge-form">
+            <input type="text" name="need" placeholder="What do you need?" required />
+            <input type="text" name="skill" placeholder="What can you offer?" required />
+            <button type="submit" class="primary">Find matches</button>
+          </form>
+          <div class="bridge-results" id="bridge-results">
+            <p class="muted">Add a need and offer to see suggested matches.</p>
+          </div>
+        </section>
+
+        <section class="card" id="impact">
+          <div class="section-header">
+            <div>
+              <h2>Impact Map</h2>
+              <p class="muted">Track how your work touches the four strands.</p>
+            </div>
+            <button class="ghost">Open dashboard</button>
+          </div>
+          <div class="impact-grid">
+            <div class="impact-card">
+              <p class="impact-label">Nature</p>
+              <p class="impact-value">12 active projects</p>
+              <p class="muted">Ecosystems, waste, conservation</p>
+            </div>
+            <div class="impact-card">
+              <p class="impact-label">Economy</p>
+              <p class="impact-value">9 active projects</p>
+              <p class="muted">Circular systems, green jobs</p>
+            </div>
+            <div class="impact-card">
+              <p class="impact-label">Society</p>
+              <p class="impact-value">18 active projects</p>
+              <p class="muted">Community resilience, equity</p>
+            </div>
+            <div class="impact-card">
+              <p class="impact-label">Wellbeing</p>
+              <p class="impact-value">7 active projects</p>
+              <p class="muted">Health, belonging, growth</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="events">
+          <div class="section-header">
+            <div>
+              <h2>Events</h2>
+              <p class="muted">Stay connected to the Changemaker network.</p>
+            </div>
+            <button class="ghost">View calendar</button>
+          </div>
+          <div class="event-grid">
+            <div class="event-card">
+              <p class="event-date">March 5-7, 2026</p>
+              <h3>Changemaker Conference 2026</h3>
+              <p>International School of Dusseldorf, Dusseldorf, Germany</p>
+              <button class="primary">RSVP</button>
+            </div>
+            <div class="event-card">
+              <p class="event-date">March 11-13, 2027</p>
+              <h3>Changemaker Conference 2027</h3>
+              <p>Herojus Gymnasium, Kaunas, Lithuania</p>
+              <button class="ghost">Follow updates</button>
+            </div>
+            <div class="event-card">
+              <p class="event-date">Monthly</p>
+              <h3>Bridge to Impact Showcases</h3>
+              <p>Live student demos and community feedback.</p>
+              <button class="ghost">Join livestream</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="zine">
+          <div class="section-header">
+            <div>
+              <h2>Seeds of Change Zine</h2>
+              <p class="muted">
+                Sustainability stories led by students and their communities.
+              </p>
+            </div>
+            <button class="ghost">Open zine library</button>
+          </div>
+          <div class="zine-grid">
+            <div class="zine-issue">
+              <p class="zine-month">Dec 2025</p>
+              <h3>Seeds of Change</h3>
+              <p>Student voices on climate action and community care.</p>
+            </div>
+            <div class="zine-issue">
+              <p class="zine-month">Jan 2026</p>
+              <h3>Seeds of Change</h3>
+              <p>Projects bridging equity, wellbeing, and sustainability.</p>
+            </div>
+            <div class="zine-issue">
+              <p class="zine-month">Feb 2026</p>
+              <h3>Seeds of Change</h3>
+              <p>How student agency is reshaping school culture.</p>
+            </div>
+            <div class="zine-issue">
+              <p class="zine-month">Mar 2026</p>
+              <h3>Seeds of Change</h3>
+              <p>Conference highlights and action toolkits.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="mentors">
+          <div class="section-header">
+            <div>
+              <h2>Mentor Network</h2>
+              <p class="muted">
+                Match with educators, activists, and industry partners.
+              </p>
+            </div>
+            <button class="ghost">Request mentor</button>
+          </div>
+          <div class="mentor-grid">
+            <div class="mentor-card">
+              <p class="mentor-name">Dr. Elisa Meyer</p>
+              <p class="muted">Sustainability education, curriculum design</p>
+              <button class="primary">Connect</button>
+            </div>
+            <div class="mentor-card">
+              <p class="mentor-name">Rahul Desai</p>
+              <p class="muted">Circular economy and social enterprise</p>
+              <button class="primary">Connect</button>
+            </div>
+            <div class="mentor-card">
+              <p class="mentor-name">Ana Duarte</p>
+              <p class="muted">Youth wellbeing and community health</p>
+              <button class="primary">Connect</button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <aside class="right-rail">
+        <div class="card mini">
+          <p class="eyebrow">Strands</p>
+          <h3>Impact Compass</h3>
+          <p class="muted">
+            The conference strands mirror the Sustainability Compass: Nature,
+            Economy, Society, and Wellbeing.
+          </p>
+          <div class="compass">
+            <div class="compass-item">N</div>
+            <div class="compass-item">E</div>
+            <div class="compass-item">S</div>
+            <div class="compass-item">W</div>
+          </div>
+          <button class="ghost full">Filter feed</button>
+        </div>
+
+        <div class="card mini">
+          <p class="eyebrow">Host Criteria</p>
+          <h3>Becoming a Host School</h3>
+          <ul class="criteria">
+            <li>No direct repeat hosts within two years.</li>
+            <li>Capacity for 200 or more participants.</li>
+            <li>Hosted in continental Europe.</li>
+            <li>Prior student attendance required.</li>
+            <li>Rotate host country when possible.</li>
+          </ul>
+        </div>
+
+        <div class="card mini">
+          <p class="eyebrow">Community</p>
+          <h3>Changemaker Movement</h3>
+          <p class="muted">
+            A global shift that builds empathy, teamwork, creative problem solving,
+            and leadership so communities share responsibility for solutions.
+          </p>
+          <button class="ghost full">Learn more</button>
+        </div>
+
+        <div class="card mini">
+          <p class="eyebrow">Next Steps</p>
+          <h3>Start a Bridge</h3>
+          <p class="muted">Invite a partner school or mentor to your project.</p>
+          <button class="primary full">Send invite</button>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="footer">
+      <div>
+        <p class="logo">Bridge</p>
+        <p class="muted">Built for changemakers who want to build together.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#feed">Home</a>
+        <a href="#ideas">Idea Forge</a>
+        <a href="#events">Events</a>
+        <a href="#zine">Zine</a>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

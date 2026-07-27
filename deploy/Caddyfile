@@ -1,0 +1,14 @@
+{$CHANGERS_DOMAIN} {
+	encode zstd gzip
+
+	handle_path /media/* {
+		root * /srv/changers/media
+		file_server
+		header {
+			Cache-Control "public, max-age=31536000, immutable"
+			X-Content-Type-Options "nosniff"
+		}
+	}
+
+	reverse_proxy web:3000
+}

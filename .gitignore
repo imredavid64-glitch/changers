@@ -1,0 +1,31 @@
+# dependencies
+node_modules/
+*/node_modules/
+
+# build output
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+
+# local env and secrets
+.env
+.env.*
+!.env.example
+!.env.dell.example
+*.pem
+
+# local runtime data
+.bridge-media/
+postgres-data/
+caddy-data/
+caddy-config/
+backups/
+
+# logs and system files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+

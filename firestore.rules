@@ -1,0 +1,125 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function ownsUser(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function threadParticipant(threadId) {
+      return signedIn()
+        && request.auth.uid in get(/databases/$(database)/documents/threads/$(threadId)).data.participants;
+    }
+
+    function roomMember(roomId) {
+      return signedIn()
+        && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.members;
+    }
+
+    function currentPostLikesCount() {
+      return "likes_count" in resource.data ? resource.data.likes_count : resource.data.likes.size();
+    }
+
+    function currentPostCommentsCount() {
+      return "comments_count" in resource.data ? resource.data.comments_count : 0;
+    }
+
+    match /profiles/{userId} {
+      allow read: if true;
+      allow create: if ownsUser(userId);
+      allow update, delete: if ownsUser(userId);
+
+      match /notifications/{notificationId} {
+        allow read, update, delete: if ownsUser(userId);
+        allow create: if signedIn() && request.resource.data.actor_id == request.auth.uid;
+      }
+
+      match /following/{targetId} {
+        allow read: if true;
+        allow create, delete: if ownsUser(userId);
+      }
+
+      match /followers/{followerId} {
+        allow read: if true;
+        allow create, delete: if signedIn() && request.auth.uid == followerId;
+      }
+
+      match /saved_posts/{postId} {
+        allow read, create, delete: if ownsUser(userId);
+      }
+    }
+
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if signedIn() && request.resource.data.author_id == request.auth.uid;
+      allow update: if signedIn() && (
+        resource.data.author_id == request.auth.uid
+        || (
+          request.resource.data.diff(resource.data).changedKeys().hasOnly(["likes", "likes_count", "updated_at"])
+          && (
+            request.auth.uid in resource.data.likes
+            || request.auth.uid in request.resource.data.likes
+          )
+          && (
+            request.resource.data.likes_count == currentPostLikesCount() + 1
+            || request.resource.data.likes_count == currentPostLikesCount() - 1
+          )
+        )
+        || (
+          request.resource.data.diff(resource.data).changedKeys().hasOnly(["comments_count", "updated_at"])
+          && request.resource.data.comments_count == currentPostCommentsCount() + 1
+        )
+      );
+      allow delete: if signedIn() && resource.data.author_id == request.auth.uid;
+
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if signedIn() && request.resource.data.author_id == request.auth.uid;
+        allow update, delete: if signedIn() && resource.data.author_id == request.auth.uid;
+      }
+    }
+
+    match /bridge_requests/{requestId} {
+      allow read: if true;
+      allow create: if signedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if signedIn() && resource.data.user_id == request.auth.uid;
+    }
+
+    match /rooms/{roomId} {
+      allow read: if true;
+      allow create: if signedIn() && request.resource.data.owner_id == request.auth.uid;
+      allow update: if signedIn() && (
+        resource.data.owner_id == request.auth.uid
+        || (
+          request.resource.data.diff(resource.data).changedKeys().hasOnly(["members", "member_count", "updated_at", "last_message"])
+          && (
+            request.auth.uid in resource.data.members
+            || request.auth.uid in request.resource.data.members
+          )
+        )
+      );
+      allow delete: if signedIn() && resource.data.owner_id == request.auth.uid;
+
+      match /messages/{messageId} {
+        allow read: if true;
+        allow create: if roomMember(roomId) && request.resource.data.author_id == request.auth.uid;
+      }
+    }
+
+    match /threads/{threadId} {
+      allow read: if threadParticipant(threadId);
+      allow create: if signedIn() && request.auth.uid in request.resource.data.participants;
+      allow update: if threadParticipant(threadId);
+      allow delete: if false;
+
+      match /messages/{messageId} {
+        allow read: if threadParticipant(threadId);
+        allow create: if threadParticipant(threadId) && request.resource.data.sender_id == request.auth.uid;
+      }
+    }
+  }
+}

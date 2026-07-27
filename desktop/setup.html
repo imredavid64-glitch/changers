@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bridge Desktop Setup</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #0d1b1a;
+        --moss: #1f5e54;
+        --teal: #2c8a7d;
+        --sand: #f4efe6;
+        --cloud: #fdfbf7;
+        --coral: #ff6f4f;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(circle at top left, rgba(255, 111, 79, 0.2), transparent 32%),
+          radial-gradient(circle at bottom right, rgba(44, 138, 125, 0.18), transparent 30%),
+          var(--sand);
+        color: var(--ink);
+        font-family: "Avenir Next", "Segoe UI", sans-serif;
+      }
+
+      .panel {
+        width: min(640px, calc(100vw - 48px));
+        padding: 36px;
+        border-radius: 28px;
+        background: rgba(253, 251, 247, 0.92);
+        box-shadow: 0 24px 60px rgba(13, 27, 26, 0.12);
+        border: 1px solid rgba(13, 27, 26, 0.08);
+      }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.24em;
+        font-size: 12px;
+        color: var(--moss);
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: 40px;
+        line-height: 1;
+      }
+
+      p {
+        margin: 0 0 18px;
+        line-height: 1.55;
+      }
+
+      label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      input {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(13, 27, 26, 0.14);
+        background: white;
+        font-size: 16px;
+      }
+
+      .actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 16px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        border: 0;
+        border-radius: 999px;
+        padding: 12px 18px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .primary {
+        background: linear-gradient(135deg, var(--coral), #ff9160);
+        color: var(--ink);
+      }
+
+      .ghost {
+        background: rgba(44, 138, 125, 0.1);
+        color: var(--moss);
+      }
+
+      .status {
+        min-height: 24px;
+        margin-top: 16px;
+        color: var(--moss);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="panel">
+      <p class="eyebrow">Bridge Desktop</p>
+      <h1>Connect your live site.</h1>
+      <p>
+        Bridge desktop wraps your deployed website so you get the same realtime
+        social platform on macOS, Windows, and Linux without opening a terminal.
+      </p>
+      <label for="app-url">Vercel or production URL</label>
+      <input
+        id="app-url"
+        type="url"
+        placeholder="https://your-bridge-app.vercel.app"
+        autocomplete="off"
+      />
+      <div class="actions">
+        <button class="primary" id="save-button">Save and open Bridge</button>
+        <button class="ghost" id="docs-button">Open Vercel</button>
+      </div>
+      <p class="status" id="status"></p>
+    </main>
+    <script>
+      const urlInput = document.getElementById("app-url");
+      const statusNode = document.getElementById("status");
+      const saveButton = document.getElementById("save-button");
+      const docsButton = document.getElementById("docs-button");
+
+      async function bootstrap() {
+        const config = await window.bridgeDesktop.getConfig();
+        if (config.appUrl) {
+          urlInput.value = config.appUrl;
+        }
+      }
+
+      saveButton.addEventListener("click", async () => {
+        statusNode.textContent = "";
+
+        try {
+          const value = urlInput.value.trim();
+          if (!value) {
+            throw new Error("Add your deployed Bridge URL first.");
+          }
+
+          await window.bridgeDesktop.saveConfig(value);
+          statusNode.textContent = "Opening Bridge...";
+        } catch (error) {
+          statusNode.textContent = error.message || "Unable to save that URL.";
+        }
+      });
+
+      docsButton.addEventListener("click", async () => {
+        await window.bridgeDesktop.openExternal("https://vercel.com/new");
+      });
+
+      bootstrap();
+    </script>
+  </body>
+</html>
