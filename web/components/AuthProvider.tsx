@@ -91,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!appwriteEnabled) return "Appwrite is not configured.";
 
     try {
-      await account.createEmailPasswordSession({ email, password });
+      await account.createEmailSession(email, password);
       await refreshAuth();
       return null;
     } catch (error) {
@@ -109,14 +109,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!appwriteEnabled) return "Appwrite is not configured.";
 
     try {
-      await account.create({
-        userId: ID.unique(),
-        email,
-        password,
-        name: fullName,
-      });
+      await account.create(ID.unique(), email, password, fullName);
 
-      await account.createEmailPasswordSession({ email, password });
+      await account.createEmailSession(email, password);
       const nextUser = await account.get();
       const interests = (options?.interests?.length ? options.interests : ["S"]).slice(0, 4);
 
@@ -150,7 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!appwriteEnabled) return;
 
     try {
-      await account.deleteSession({ sessionId: "current" });
+      await account.deleteSession("current");
     } finally {
       setUser(null);
       setProfile(null);
@@ -161,7 +156,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function syncProfileName(nextName: string) {
     if (!user || !profile) return;
 
-    await account.updateName({ name: nextName });
+    await account.updateName(nextName);
     await updateDocument(COLLECTIONS.profiles, user.$id, {
       full_name: nextName,
       search_index: buildProfileSearchIndex({
