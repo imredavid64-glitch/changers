@@ -18,7 +18,7 @@ export default function SetupAdminPage() {
       const response = await fetch("/api/setup-admin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.$id }),
+        body: JSON.stringify({ userId: user.$id, email: user.email }),
       });
 
       const data = await response.json();
