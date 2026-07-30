@@ -311,6 +311,35 @@ const COLLECTIONS = {
       { key: "search_idx", type: "fulltext", attributes: ["search_index"] },
     ],
   },
+  documents: {
+    attributes: [
+      { key: "user_id", type: "string", size: 64, required: true },
+      { key: "title", type: "string", size: 512, required: true },
+      { key: "body", type: "string", size: 65536, required: false },
+      { key: "word_count", type: "integer", required: true },
+      { key: "created_at_ms", type: "integer", required: true },
+      { key: "updated_at_ms", type: "integer", required: true },
+    ],
+    indexes: [
+      { key: "user_idx", type: "key", attributes: ["user_id"], orders: ["asc"] },
+      { key: "updated_idx", type: "key", attributes: ["updated_at_ms"], orders: ["desc"] },
+    ],
+  },
+  slideshows: {
+    attributes: [
+      { key: "user_id", type: "string", size: 64, required: true },
+      { key: "title", type: "string", size: 512, required: true },
+      { key: "template_id", type: "string", size: 64, required: false },
+      { key: "slides_json", type: "string", size: 65536, required: true },
+      { key: "slide_count", type: "integer", required: true },
+      { key: "created_at_ms", type: "integer", required: true },
+      { key: "updated_at_ms", type: "integer", required: true },
+    ],
+    indexes: [
+      { key: "user_idx", type: "key", attributes: ["user_id"], orders: ["asc"] },
+      { key: "updated_idx", type: "key", attributes: ["updated_at_ms"], orders: ["desc"] },
+    ],
+  },
   "event-rsvps": {
     documentId: (eventId, userId) => `${eventId}_${userId}`,
     attributes: [

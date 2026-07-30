@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
+import { COLLECTIONS, createDocument, publicReadOwnerWritePermissions } from "@/lib/appwrite/bridge";
 import { generateDocumentSuggestions, AISuggestion } from "@/lib/ai/tools";
 
 export default function NewDocumentPage() {
@@ -14,6 +15,7 @@ export default function NewDocumentPage() {
   const [suggestions, setSuggestions] = useState<AISuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const analyzeDocument = useCallback(() => {
     const result = generateDocumentSuggestions(title, body);
@@ -38,9 +40,30 @@ export default function NewDocumentPage() {
   async function handleSave() {
     if (!title.trim()) return;
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 500));
-    setSaving(false);
-    router.push("/documents");
+    setError("");
+
+    try {
+      const wordCount = body.trim() ? body.trim().split(/\s+/).length : 0;
+      const now = Date.now();
+
+      await createDocument(
+        COLLECTIONS.documents,
+        {
+          user_id: user.$id,
+          title: title.trim(),
+          body,
+          word_count: wordCount,
+          created_at_ms: now,
+          updated_at_ms: now,
+        },
+        publicReadOwnerWritePermissions(user.$id),
+      );
+
+      router.push("/documents");
+    } catch (e) {
+      setError("Failed to save document. Please try again.");
+      setSaving(false);
+    }
   }
 
   return (
@@ -87,6 +110,7 @@ export default function NewDocumentPage() {
             resize: "vertical",
           }}
         />
+        {error && <p style={{ color: "var(--coral)", fontSize: "0.85rem" }}>{error}</p>}
         <div style={{ display: "flex", gap: 12, marginTop: 24, flexWrap: "wrap" }}>
           <button className="primary" onClick={analyzeDocument} disabled={!title.trim()}>
             Analyze with AI

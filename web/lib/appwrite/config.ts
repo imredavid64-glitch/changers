@@ -25,6 +25,8 @@ export const appwriteConfig = {
       process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_PROJECT_MEMBERS || "project-members",
     events: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EVENTS || "events",
     eventRsvps: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EVENT_RSVPS || "event-rsvps",
+    documents: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_DOCUMENTS || "documents",
+    slideshows: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_SLIDESHOWS || "slideshows",
   },
 };
 

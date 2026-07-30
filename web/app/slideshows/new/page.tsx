@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { getTemplateById, generateSlideContent, SlideDefinition } from "@/lib/ai/tools";
+import { COLLECTIONS, createDocument, publicReadOwnerWritePermissions } from "@/lib/appwrite/bridge";
 
 export default function NewSlideshowPage() {
   const router = useRouter();
@@ -16,6 +17,8 @@ export default function NewSlideshowPage() {
   const [slides, setSlides] = useState<SlideDefinition[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (templateId) {
@@ -41,6 +44,34 @@ export default function NewSlideshowPage() {
     setSlides(slides.filter((_, i) => i !== index));
     if (currentSlide >= slides.length - 1) {
       setCurrentSlide(Math.max(0, slides.length - 2));
+    }
+  }
+
+  async function handleSave() {
+    if (!title.trim() || slides.length === 0 || !user) return;
+    setSaving(true);
+    setError("");
+
+    try {
+      const now = Date.now();
+      await createDocument(
+        COLLECTIONS.slideshows,
+        {
+          user_id: user.$id,
+          title: title.trim(),
+          template_id: templateId || "",
+          slides_json: JSON.stringify(slides),
+          slide_count: slides.length,
+          created_at_ms: now,
+          updated_at_ms: now,
+        },
+        publicReadOwnerWritePermissions(user.$id),
+      );
+
+      router.push("/slideshows");
+    } catch (e) {
+      setError("Failed to save slideshow. Please try again.");
+      setSaving(false);
     }
   }
 
@@ -80,11 +111,13 @@ export default function NewSlideshowPage() {
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <button className="ghost" onClick={addSlide}>+ Add slide</button>
-          <button className="primary" onClick={async () => { await new Promise((r) => setTimeout(r, 300)); router.push("/slideshows"); }}>
-            Save slideshow
+          <button className="primary" onClick={handleSave} disabled={saving || slides.length === 0}>
+            {saving ? "Saving..." : "Save slideshow"}
           </button>
         </div>
       </div>
+
+      {error && <p style={{ color: "var(--coral)", fontSize: "0.85rem" }}>{error}</p>}
 
       <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 24 }}>
         <div className="card" style={{ padding: 16, alignSelf: "start" }}>

@@ -197,9 +197,6 @@ export default function WelcomePage() {
               </div>
             ))}
           </div>
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 24, textAlign: "center", fontSize: "0.85rem" }}>
-            &copy; {new Date().getFullYear()} Changers. Built for sustainable impact.
-          </div>
         </div>
       </footer>
 

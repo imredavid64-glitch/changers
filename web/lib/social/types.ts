@@ -176,6 +176,27 @@ export interface AppEvent {
   updated_at?: TimestampLike;
 }
 
+export interface AppDocument {
+  id: string;
+  user_id: string;
+  title: string;
+  body: string;
+  word_count: number;
+  created_at?: TimestampLike;
+  updated_at?: TimestampLike;
+}
+
+export interface AppSlideshow {
+  id: string;
+  user_id: string;
+  title: string;
+  template_id: string;
+  slides: { layout: string; heading: string; body: string }[];
+  slide_count: number;
+  created_at?: TimestampLike;
+  updated_at?: TimestampLike;
+}
+
 export interface AppEventRsvp {
   id: string;
   event_id: string;

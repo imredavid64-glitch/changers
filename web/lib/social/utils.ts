@@ -1,4 +1,4 @@
-import { AppBlock, AppComment, AppEvent, AppEventRsvp, AppNotification, AppPost, AppPrivacySettings, AppProfile, AppProject, AppProjectMember, AppRoom, AppThread, Strand, TimestampLike } from "@/lib/social/types";
+import { AppBlock, AppComment, AppDocument, AppEvent, AppEventRsvp, AppNotification, AppPost, AppPrivacySettings, AppProfile, AppProject, AppProjectMember, AppRoom, AppSlideshow, AppThread, Strand, TimestampLike } from "@/lib/social/types";
 import { appwriteConfig } from "@/lib/appwrite/config";
 
 export const STRAND_OPTIONS: { value: Strand; label: string; description: string }[] = [
@@ -559,6 +559,38 @@ export function normalizeEvent(id: string, data: Record<string, unknown>): AppEv
           tags,
           STRAND_LABELS[strand],
         ]),
+    created_at: resolveDocumentTimestamp(data, "created_at"),
+    updated_at: resolveDocumentTimestamp(data, "updated_at"),
+  };
+}
+
+export function normalizeDocument(id: string, data: Record<string, unknown>): AppDocument {
+  return {
+    id,
+    user_id: typeof data.user_id === "string" ? data.user_id : "",
+    title: typeof data.title === "string" ? data.title : "",
+    body: typeof data.body === "string" ? data.body : "",
+    word_count: typeof data.word_count === "number" ? data.word_count : 0,
+    created_at: resolveDocumentTimestamp(data, "created_at"),
+    updated_at: resolveDocumentTimestamp(data, "updated_at"),
+  };
+}
+
+export function normalizeSlideshow(id: string, data: Record<string, unknown>): AppSlideshow {
+  let slides: AppSlideshow["slides"] = [];
+  if (typeof data.slides_json === "string") {
+    try {
+      const parsed = JSON.parse(data.slides_json);
+      if (Array.isArray(parsed)) slides = parsed;
+    } catch {}
+  }
+  return {
+    id,
+    user_id: typeof data.user_id === "string" ? data.user_id : "",
+    title: typeof data.title === "string" ? data.title : "",
+    template_id: typeof data.template_id === "string" ? data.template_id : "",
+    slides,
+    slide_count: typeof data.slide_count === "number" ? data.slide_count : slides.length,
     created_at: resolveDocumentTimestamp(data, "created_at"),
     updated_at: resolveDocumentTimestamp(data, "updated_at"),
   };

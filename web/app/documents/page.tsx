@@ -1,19 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
-
-interface Document {
-  id: string;
-  title: string;
-  updatedAt: string;
-  wordCount: number;
-}
+import { useRouter } from "next/navigation";
+import { COLLECTIONS, watchDocuments } from "@/lib/appwrite/bridge";
+import { Query } from "@/lib/appwrite/client";
+import { normalizeDocument, formatRelativeTime } from "@/lib/social/utils";
+import { AppDocument } from "@/lib/social/types";
 
 export default function DocumentsPage() {
   const { user } = useAuth();
-  const [documents] = useState<Document[]>([]);
+  const router = useRouter();
+  const [documents, setDocuments] = useState<AppDocument[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const queries = [Query.equal("user_id", user.$id), Query.orderDesc("updated_at_ms")];
+    const unsub = watchDocuments(
+      COLLECTIONS.documents,
+      queries,
+      (doc) => normalizeDocument(doc.$id, doc as unknown as Record<string, unknown>),
+      (docs) => {
+        setDocuments(docs);
+        setLoading(false);
+      },
+      () => setLoading(false),
+    );
+
+    return unsub;
+  }, [user]);
 
   if (!user) {
     return (
@@ -41,7 +59,11 @@ export default function DocumentsPage() {
         </Link>
       </div>
 
-      {documents.length === 0 ? (
+      {loading ? (
+        <div className="card" style={{ textAlign: "center", padding: "60px 24px" }}>
+          <p className="muted">Loading documents...</p>
+        </div>
+      ) : documents.length === 0 ? (
         <div className="card" style={{ textAlign: "center", padding: "60px 24px" }}>
           <div style={{ fontSize: "3rem", marginBottom: 16 }}>📄</div>
           <h3 style={{ fontFamily: "var(--font-head)", marginBottom: 8 }}>No documents yet</h3>
@@ -55,20 +77,20 @@ export default function DocumentsPage() {
       ) : (
         <div style={{ display: "grid", gap: 12 }}>
           {documents.map((doc) => (
-            <Link
+            <button
               key={doc.id}
-              href={`/documents/${doc.id}`}
+              onClick={() => router.push(`/documents/${doc.id}`)}
               className="card hover-lift"
-              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", textDecoration: "none" }}
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", textDecoration: "none", cursor: "pointer", textAlign: "left", border: "none", width: "100%", fontFamily: "inherit", fontSize: "inherit" }}
             >
               <div>
                 <div className="collab-title" style={{ marginBottom: 4 }}>{doc.title}</div>
                 <p className="muted" style={{ fontSize: "0.85rem" }}>
-                  Updated {doc.updatedAt} · {doc.wordCount} words
+                  Updated {formatRelativeTime(doc.updated_at)} · {doc.word_count} words
                 </p>
               </div>
               <span style={{ fontSize: "0.85rem", color: "var(--moss)", fontWeight: 600 }}>Edit →</span>
-            </Link>
+            </button>
           ))}
         </div>
       )}
