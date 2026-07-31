@@ -340,6 +340,64 @@ const COLLECTIONS = {
       { key: "updated_idx", type: "key", attributes: ["updated_at_ms"], orders: ["desc"] },
     ],
   },
+  tables: {
+    attributes: [
+      { key: "user_id", type: "string", size: 64, required: true },
+      { key: "title", type: "string", size: 512, required: true },
+      { key: "rows", type: "integer", required: true },
+      { key: "cols", type: "integer", required: true },
+      { key: "data_json", type: "string", size: 65536, required: true },
+      { key: "created_at_ms", type: "integer", required: true },
+      { key: "updated_at_ms", type: "integer", required: true },
+    ],
+    indexes: [
+      { key: "user_idx", type: "key", attributes: ["user_id"], orders: ["asc"] },
+      { key: "updated_idx", type: "key", attributes: ["updated_at_ms"], orders: ["desc"] },
+    ],
+  },
+  "code-snippets": {
+    attributes: [
+      { key: "user_id", type: "string", size: 64, required: true },
+      { key: "title", type: "string", size: 512, required: true },
+      { key: "language", type: "string", size: 32, required: true },
+      { key: "code", type: "string", size: 65536, required: true },
+      { key: "created_at_ms", type: "integer", required: true },
+      { key: "updated_at_ms", type: "integer", required: true },
+    ],
+    indexes: [
+      { key: "user_idx", type: "key", attributes: ["user_id"], orders: ["asc"] },
+      { key: "updated_idx", type: "key", attributes: ["updated_at_ms"], orders: ["desc"] },
+    ],
+  },
+  designs: {
+    attributes: [
+      { key: "user_id", type: "string", size: 64, required: true },
+      { key: "title", type: "string", size: 512, required: true },
+      { key: "elements_json", type: "string", size: 65536, required: true },
+      { key: "canvas_width", type: "integer", required: true },
+      { key: "canvas_height", type: "integer", required: true },
+      { key: "created_at_ms", type: "integer", required: true },
+      { key: "updated_at_ms", type: "integer", required: true },
+    ],
+    indexes: [
+      { key: "user_idx", type: "key", attributes: ["user_id"], orders: ["asc"] },
+      { key: "updated_idx", type: "key", attributes: ["updated_at_ms"], orders: ["desc"] },
+    ],
+  },
+  films: {
+    attributes: [
+      { key: "user_id", type: "string", size: 64, required: true },
+      { key: "title", type: "string", size: 512, required: true },
+      { key: "scenes_json", type: "string", size: 65536, required: true },
+      { key: "scene_count", type: "integer", required: true },
+      { key: "created_at_ms", type: "integer", required: true },
+      { key: "updated_at_ms", type: "integer", required: true },
+    ],
+    indexes: [
+      { key: "user_idx", type: "key", attributes: ["user_id"], orders: ["asc"] },
+      { key: "updated_idx", type: "key", attributes: ["updated_at_ms"], orders: ["desc"] },
+    ],
+  },
   "event-rsvps": {
     documentId: (eventId, userId) => `${eventId}_${userId}`,
     attributes: [

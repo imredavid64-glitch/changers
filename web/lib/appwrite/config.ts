@@ -27,6 +27,10 @@ export const appwriteConfig = {
     eventRsvps: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EVENT_RSVPS || "event-rsvps",
     documents: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_DOCUMENTS || "documents",
     slideshows: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_SLIDESHOWS || "slideshows",
+    tables: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_TABLES || "tables",
+    codeSnippets: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_CODE_SNIPPETS || "code-snippets",
+    designs: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_DESIGNS || "designs",
+    films: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_FILMS || "films",
   },
 };
 

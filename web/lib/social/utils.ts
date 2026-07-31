@@ -1,4 +1,4 @@
-import { AppBlock, AppComment, AppDocument, AppEvent, AppEventRsvp, AppNotification, AppPost, AppPrivacySettings, AppProfile, AppProject, AppProjectMember, AppRoom, AppSlideshow, AppThread, Strand, TimestampLike } from "@/lib/social/types";
+import { AppBlock, AppCodeSnippet, AppComment, AppDesign, AppDocument, AppEvent, AppEventRsvp, AppFilm, AppNotification, AppPost, AppPrivacySettings, AppProfile, AppProject, AppProjectMember, AppRoom, AppSlideshow, AppTable, AppThread, Strand, TimestampLike } from "@/lib/social/types";
 import { appwriteConfig } from "@/lib/appwrite/config";
 
 export const STRAND_OPTIONS: { value: Strand; label: string; description: string }[] = [
@@ -591,6 +591,77 @@ export function normalizeSlideshow(id: string, data: Record<string, unknown>): A
     template_id: typeof data.template_id === "string" ? data.template_id : "",
     slides,
     slide_count: typeof data.slide_count === "number" ? data.slide_count : slides.length,
+    created_at: resolveDocumentTimestamp(data, "created_at"),
+    updated_at: resolveDocumentTimestamp(data, "updated_at"),
+  };
+}
+
+export function normalizeTable(id: string, data: Record<string, unknown>): AppTable {
+  let data_grid: string[][] = [];
+  if (typeof data.data_json === "string") {
+    try {
+      const parsed = JSON.parse(data.data_json);
+      if (Array.isArray(parsed)) data_grid = parsed;
+    } catch {}
+  }
+  return {
+    id,
+    user_id: typeof data.user_id === "string" ? data.user_id : "",
+    title: typeof data.title === "string" ? data.title : "",
+    rows: typeof data.rows === "number" ? data.rows : 0,
+    cols: typeof data.cols === "number" ? data.cols : 0,
+    data: data_grid,
+    created_at: resolveDocumentTimestamp(data, "created_at"),
+    updated_at: resolveDocumentTimestamp(data, "updated_at"),
+  };
+}
+
+export function normalizeCodeSnippet(id: string, data: Record<string, unknown>): AppCodeSnippet {
+  return {
+    id,
+    user_id: typeof data.user_id === "string" ? data.user_id : "",
+    title: typeof data.title === "string" ? data.title : "",
+    language: typeof data.language === "string" ? data.language : "plaintext",
+    code: typeof data.code === "string" ? data.code : "",
+    created_at: resolveDocumentTimestamp(data, "created_at"),
+    updated_at: resolveDocumentTimestamp(data, "updated_at"),
+  };
+}
+
+export function normalizeDesign(id: string, data: Record<string, unknown>): AppDesign {
+  let elements: AppDesign["elements"] = [];
+  if (typeof data.elements_json === "string") {
+    try {
+      const parsed = JSON.parse(data.elements_json);
+      if (Array.isArray(parsed)) elements = parsed;
+    } catch {}
+  }
+  return {
+    id,
+    user_id: typeof data.user_id === "string" ? data.user_id : "",
+    title: typeof data.title === "string" ? data.title : "",
+    elements,
+    canvas_width: typeof data.canvas_width === "number" ? data.canvas_width : 800,
+    canvas_height: typeof data.canvas_height === "number" ? data.canvas_height : 600,
+    created_at: resolveDocumentTimestamp(data, "created_at"),
+    updated_at: resolveDocumentTimestamp(data, "updated_at"),
+  };
+}
+
+export function normalizeFilm(id: string, data: Record<string, unknown>): AppFilm {
+  let scenes: AppFilm["scenes"] = [];
+  if (typeof data.scenes_json === "string") {
+    try {
+      const parsed = JSON.parse(data.scenes_json);
+      if (Array.isArray(parsed)) scenes = parsed;
+    } catch {}
+  }
+  return {
+    id,
+    user_id: typeof data.user_id === "string" ? data.user_id : "",
+    title: typeof data.title === "string" ? data.title : "",
+    scenes,
+    scene_count: typeof data.scene_count === "number" ? data.scene_count : scenes.length,
     created_at: resolveDocumentTimestamp(data, "created_at"),
     updated_at: resolveDocumentTimestamp(data, "updated_at"),
   };

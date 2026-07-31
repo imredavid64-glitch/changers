@@ -197,6 +197,70 @@ export interface AppSlideshow {
   updated_at?: TimestampLike;
 }
 
+export interface AppTable {
+  id: string;
+  user_id: string;
+  title: string;
+  rows: number;
+  cols: number;
+  data: string[][];
+  created_at?: TimestampLike;
+  updated_at?: TimestampLike;
+}
+
+export interface AppCodeSnippet {
+  id: string;
+  user_id: string;
+  title: string;
+  language: string;
+  code: string;
+  created_at?: TimestampLike;
+  updated_at?: TimestampLike;
+}
+
+export interface AppDesign {
+  id: string;
+  user_id: string;
+  title: string;
+  elements: DesignElement[];
+  canvas_width: number;
+  canvas_height: number;
+  created_at?: TimestampLike;
+  updated_at?: TimestampLike;
+}
+
+export interface DesignElement {
+  id: string;
+  type: "text" | "rect" | "circle" | "line";
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color: string;
+  content: string;
+  font_size: number;
+}
+
+export interface AppFilm {
+  id: string;
+  user_id: string;
+  title: string;
+  scenes: FilmScene[];
+  scene_count: number;
+  created_at?: TimestampLike;
+  updated_at?: TimestampLike;
+}
+
+export interface FilmScene {
+  id: string;
+  number: number;
+  setting: string;
+  description: string;
+  dialogue: string;
+  shot_type: "wide" | "medium" | "close-up" | "pov" | "aerial";
+  duration_secs: number;
+}
+
 export interface AppEventRsvp {
   id: string;
   event_id: string;

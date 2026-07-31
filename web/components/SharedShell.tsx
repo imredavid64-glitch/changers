@@ -68,6 +68,9 @@ export default function SharedShell({ children }: { children: React.ReactNode })
           </div>
           <div className="nav-group">
             <p className="nav-title">Tools</p>
+            <Link href="/tools" className={`nav-link ${pathname === '/tools' ? 'active' : ''}`}>
+              All Tools
+            </Link>
             <Link href="/dashboard" className={`nav-link ${pathname === '/dashboard' ? 'active' : ''}`}>
               Dashboard
             </Link>
@@ -76,6 +79,18 @@ export default function SharedShell({ children }: { children: React.ReactNode })
             </Link>
             <Link href="/slideshows" className={`nav-link ${pathname.startsWith('/slideshows') ? 'active' : ''}`}>
               Slideshows
+            </Link>
+            <Link href="/tools/tables" className={`nav-link ${pathname.startsWith('/tools/tables') ? 'active' : ''}`}>
+              Tables
+            </Link>
+            <Link href="/tools/code" className={`nav-link ${pathname.startsWith('/tools/code') ? 'active' : ''}`}>
+              Code Maker
+            </Link>
+            <Link href="/tools/design" className={`nav-link ${pathname.startsWith('/tools/design') ? 'active' : ''}`}>
+              Designer
+            </Link>
+            <Link href="/tools/films" className={`nav-link ${pathname.startsWith('/tools/films') ? 'active' : ''}`}>
+              Film Maker
             </Link>
           </div>
           <div className="nav-group">
