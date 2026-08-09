@@ -47,9 +47,18 @@ class SustainableAnalyst {
   }
 
   async searchWithSustainabilityMetrics(query, userContext = null) {
-    const searchUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&pretty=1`;
-    const response = await fetch(searchUrl);
-    const data = await response.json();
+    let data = {};
+    try {
+      const searchUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&pretty=1`;
+      const response = await fetch(searchUrl);
+      if (response.ok) {
+        const text = await response.text();
+        if (text) data = JSON.parse(text);
+      }
+    } catch (e) {
+      // External search service unreachable or returned non-JSON — degrade
+      // gracefully to empty results so metrics reflect "no data".
+    }
     
     const abstract = data.AbstractText || '';
     const relatedTopics = data.RelatedTopics?.slice(0, 3) || [];
