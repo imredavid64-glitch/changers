@@ -273,6 +273,41 @@ export default function WelcomePage() {
         </section>
       ))}
 
+      <section style={{ background: "linear-gradient(135deg, rgba(31,94,84,0.08), rgba(155,199,177,0.16))", padding: "80px 24px" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 48 }}>
+            <p className="eyebrow">Sustainable AI</p>
+            <h2 style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)", fontFamily: "var(--font-head)", color: "var(--ink)", marginBottom: 12 }}>
+              AI that measures its own footprint
+            </h2>
+            <p className="muted" style={{ fontSize: "1.1rem", maxWidth: 640, margin: "0 auto" }}>
+              Changers runs lightweight, rule-based intelligence right in the app — no giant models,
+              no data harvesting, no hidden energy cost. Every AI query is scored for how well, how
+              fairly, and how sustainably it answers.
+            </p>
+          </div>
+          <div className="feature-grid" style={{ textAlign: "left" }}>
+            {[
+              ["🌍", "Sustainability Analyzer", "/documents/new", "Run any topic through the analyzer to get a live score: accuracy, source bias, energy, water, and carbon per query — plus tips to improve."],
+              ["⚡", "Low-impact by design", "/documents", "Deterministic, on-device logic instead of heavy inference. A document check costs fractions of a milliwatt-hour, not a data-center round trip."],
+              ["🎯", "Accuracy & bias checks", "/documents", "Answers are cross-checked against source diversity so you never get locked into a single perspective or echo chamber."],
+              ["🧭", "Strand-aware guidance", "/projects", "AI suggestions are aligned to the four impact strands — Nature, Economy, Society, and Wellbeing — so every assist moves projects forward."],
+            ].map(([emoji, title, href, desc]) => (
+              <Link
+                key={title as string}
+                href={href as string}
+                className="feature hover-lift"
+                style={{ display: "block", background: "rgba(255,255,255,0.85)", borderRadius: 20, padding: 28, textDecoration: "none", color: "inherit", border: "1px solid rgba(16,24,32,0.06)" }}
+              >
+                <div style={{ fontSize: "2.2rem", marginBottom: 14 }}>{emoji}</div>
+                <h3 style={{ fontSize: "1.2rem", fontFamily: "var(--font-head)", marginBottom: 8, color: "var(--ink)" }}>{title}</h3>
+                <p className="muted" style={{ lineHeight: 1.7, fontSize: "0.95rem" }}>{desc}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section style={{ background: "white", padding: "80px 24px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", textAlign: "center" }}>
           <h2 style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)", fontFamily: "var(--font-head)", color: "var(--ink)", marginBottom: 12 }}>

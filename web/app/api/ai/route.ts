@@ -266,6 +266,26 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ ideas: generateProjectIdeas(strand || "S") });
       }
 
+      case "analyze-sustainability": {
+        const { topic } = data || {};
+        if (!topic || typeof topic !== "string") {
+          return NextResponse.json({ error: "Topic is required" }, { status: 400 });
+        }
+
+        try {
+          const { SustainableAnalyst } = await import("@/src/lib/sustainable-ai");
+          const analyst = new SustainableAnalyst();
+          const result = await analyst.analyzeQuery(topic);
+          return NextResponse.json(result);
+        } catch (error) {
+          console.error("Sustainability analysis error:", error);
+          return NextResponse.json(
+            { error: "Sustainability analysis failed. Please try again." },
+            { status: 502 },
+          );
+        }
+      }
+
       default:
         return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });
     }

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Sparkles, Wand2, FileText, ListTree, Type } from "lucide-react";
-import { AISuggestion, OutlineSection, callAnalyzeDocument, callGenerateOutline, callRewriteDocument, callSummarizeDocument, callSuggestTitles } from "@/lib/ai/tools";
+import { AISuggestion, OutlineSection, SustainabilityAnalysis, callAnalyzeDocument, callAnalyzeSustainability, callGenerateOutline, callRewriteDocument, callSummarizeDocument, callSuggestTitles } from "@/lib/ai/tools";
 
 interface AIPanelProps {
   title: string;
@@ -27,6 +27,8 @@ export function AIPanel({ title, content, onApplyTitle, onApplyContent }: AIPane
   const [tone, setTone] = useState("concise");
   const [rewriteResult, setRewriteResult] = useState<string | null>(null);
   const [summary, setSummary] = useState<string | null>(null);
+  const [sustainabilityTopic, setSustainabilityTopic] = useState("");
+  const [sustainability, setSustainability] = useState<SustainabilityAnalysis | null>(null);
 
   async function run<T>(key: string, fn: () => Promise<T>) {
     setBusy(key);
@@ -65,6 +67,13 @@ export function AIPanel({ title, content, onApplyTitle, onApplyContent }: AIPane
   async function handleTitles() {
     const result = await run("titles", () => callSuggestTitles(content, title));
     if (result) setTitles(result.titles);
+  }
+
+  async function handleSustainability() {
+    const topic = sustainabilityTopic.trim() || title || content.slice(0, 80);
+    if (!topic) return;
+    const result = await run("sustainability", () => callAnalyzeSustainability(topic));
+    if (result) setSustainability(result);
   }
 
   return (
@@ -192,6 +201,46 @@ export function AIPanel({ title, content, onApplyTitle, onApplyContent }: AIPane
           </div>
         </div>
       )}
+
+      <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(16,24,32,0.08)" }}>
+        <p style={{ fontWeight: 700, marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
+          🌍 Sustainability Analyzer
+        </p>
+        <p className="muted" style={{ fontSize: "0.8rem", marginBottom: 10 }}>
+          Score any topic for accuracy, bias, and environmental footprint.
+        </p>
+        <div className="button-row" style={{ alignItems: "center" }}>
+          <input
+            value={sustainabilityTopic}
+            onChange={(e) => setSustainabilityTopic(e.target.value)}
+            placeholder="Topic or query"
+            style={{ flex: 1, padding: "10px 12px" }}
+          />
+          <button className="ghost" onClick={handleSustainability} disabled={busy !== null}>
+            {busy === "sustainability" ? "Analyzing..." : "Analyze"}
+          </button>
+        </div>
+        {sustainability && (
+          <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
+            <div style={{ padding: 12, borderRadius: 14, background: "rgba(44,138,125,0.1)" }}>
+              <p style={{ fontWeight: 700, fontSize: "0.9rem" }}>
+                Sustainability score: {Math.round(sustainability.sustainabilityScore * 100)}%
+              </p>
+              <p className="muted" style={{ fontSize: "0.8rem" }}>
+                Accuracy {Math.round(sustainability.accuracy * 100)}% · Bias {Math.round(sustainability.bias * 100)}% ·
+                ~{sustainability.environmental.energy_kwh.toFixed(4)} kWh · {sustainability.environmental.water_liters.toFixed(1)} L water
+              </p>
+            </div>
+            {sustainability.sustainabilityTips.length > 0 && (
+              <div style={{ display: "grid", gap: 6 }}>
+                {sustainability.sustainabilityTips.map((tip) => (
+                  <p key={tip} className="muted" style={{ fontSize: "0.85rem", background: "rgba(244,184,96,0.12)", padding: "10px 12px", borderRadius: 12 }}>{tip}</p>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

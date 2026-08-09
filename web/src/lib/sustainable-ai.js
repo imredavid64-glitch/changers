@@ -93,47 +93,85 @@ class SustainableAnalyst {
     const uniqueDomains = new Set(domains);
     const totalSources = domains.length;
     
-    return Math.max(0, 1 - (uniqueDomains.size / Math.max(totalSources, 1)));
+    if (totalSources === 0) return 0; // no sources found — nothing to be biased toward
+    return Math.max(0, 1 - (uniqueDomains.size / totalSources));
   }
 
   extractDomainList(sources) {
     return sources.map(source => source.domain || 'unknown');
   }
 
+  extractSourceCount(data) {
+    return this.extractSources(data).length;
+  }
+
+  calculateDomainDiversity(data) {
+    const sources = this.extractSources(data);
+    const domains = new Set(sources.map(s => s.domain).filter(Boolean));
+    return sources.length > 0 ? domains.size / sources.length : 0;
+  }
+
+  calculateContentFreshness(data) {
+    // DuckDuckGo instant answers do not expose publish dates, so return a
+    // deterministic neutral estimate based on how many sources were found.
+    const sources = this.extractSources(data);
+    return sources.length > 0 ? 0.6 : 0;
+  }
+
+  calculateComprehensiveMetrics(query, searchResults) {
+    const accuracy = this.calculateAccuracy(query, searchResults);
+    const bias = this.calculateDiversityBias(searchResults);
+    const environmental = this.calculateEnvironmentalImpact(searchResults);
+
+    return {
+      accuracy,
+      bias,
+      environmental,
+      sustainabilityScore: this.calculateOverallSustainability({ bias, accuracy, environmental }),
+      sourceCount: searchResults.metrics.sourceCount,
+      domainDiversity: searchResults.metrics.domainDiversity,
+      contentFreshness: searchResults.metrics.contentFreshness
+    };
+  }
+
   extractSources(data) {
     const sources = [];
+
+    const pushSource = (source) => {
+      try {
+        sources.push({
+          ...source,
+          domain: new URL(source.url).hostname
+        });
+      } catch (e) {
+        // Invalid or relative URL (DuckDuckGo sometimes returns relative image paths), skip
+      }
+    };
     
     if (data.AbstractURL) {
-      sources.push({
+      pushSource({
         title: data.AbstractSource || 'Abstract',
         url: data.AbstractURL,
-        domain: new URL(data.AbstractURL).hostname,
         type: 'abstract'
       });
     }
     
     if (data.Image) {
-      sources.push({
+      pushSource({
         title: data.ImageAlt || 'Image',
         url: data.Image,
-        domain: new URL(data.Image).hostname,
         type: 'image'
       });
     }
     
     if (data.RelatedTopics?.length > 0) {
-      data.RelatedTopics.forEach((topic, index) => {
+      data.RelatedTopics.forEach((topic) => {
         if (topic.FirstURL && topic.Text) {
-          try {
-            sources.push({
-              title: topic.Text.substring(0, 100) + '...',
-              url: topic.FirstURL,
-              domain: new URL(topic.FirstURL).hostname,
-              type: 'related_topic'
-            });
-          } catch (e) {
-            // Invalid URL, skip
-          }
+          pushSource({
+            title: topic.Text.substring(0, 100) + '...',
+            url: topic.FirstURL,
+            type: 'related_topic'
+          });
         }
       });
     }
@@ -145,14 +183,16 @@ class SustainableAnalyst {
     const baseEnergy = 0.0003;
     const baseWater = 1.8;
     
-    const complexity = Math.min(searchResults.textLength / 1000, 5);
+    const textLength = searchResults.metrics?.textLength || 0;
+    const complexity = Math.min(textLength / 1000, 5);
     const contentScore = this.calculateContentSustainability(searchResults.sources);
     
     return {
       energy_kwh: baseEnergy * (1 + complexity * 0.5) * contentScore,
       water_liters: baseWater * (1 + complexity * 0.3) * contentScore,
       carbon_g: (baseEnergy * 442) * (1 + complexity * 0.4) * contentScore,
-      renewable_ratio: 0.3 + Math.random() * 0.4
+      // Approximate share of grid electricity from renewable sources (deterministic).
+      renewable_ratio: 0.35
     };
   }
 
@@ -180,9 +220,10 @@ class SustainableAnalyst {
       accuracy: metrics.accuracy
     };
     
-    const score = Object.entries(normalizedMetrics).reduce((sum, [key, value]) => 
-      sum + value * weights[key], 0
-    );
+    const score = Object.entries(normalizedMetrics).reduce((sum, [key, value]) => {
+      const safeValue = Number.isFinite(value) ? value : 0;
+      return sum + safeValue * (weights[key] || 0);
+    }, 0);
     
     return Math.round(score * 100) / 100;
   }

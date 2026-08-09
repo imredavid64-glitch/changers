@@ -29,6 +29,23 @@ export interface ProjectIdea {
   index: number;
 }
 
+export interface SustainabilityAnalysis {
+  query: string;
+  accuracy: number;
+  bias: number;
+  environmental: {
+    energy_kwh: number;
+    water_liters: number;
+    carbon_g: number;
+    renewable_ratio: number;
+  };
+  sustainabilityScore: number;
+  latency_s: number;
+  timestamp: string;
+  recommendations: { type: string; message: string; impact: string }[];
+  sustainabilityTips: string[];
+}
+
 export interface AIRewriteResult {
   rewritten: string;
   tone: string;
@@ -198,5 +215,12 @@ export function callGenerateProjectIdeas(strand: string) {
   return callAI<"generate-project-ideas", { strand: string }, { ideas: ProjectIdea[] }>(
     "generate-project-ideas",
     { strand },
+  );
+}
+
+export function callAnalyzeSustainability(topic: string) {
+  return callAI<"analyze-sustainability", { topic: string }, SustainabilityAnalysis>(
+    "analyze-sustainability",
+    { topic },
   );
 }
