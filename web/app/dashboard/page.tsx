@@ -1,10 +1,67 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import { COLLECTIONS, countDocuments } from "@/lib/appwrite/bridge";
+import { Query } from "@/lib/appwrite/client";
+import { computeImpactScore, impactLevel } from "@/lib/social/impact";
+import { refreshBadges } from "@/lib/badges/refresh";
+
+interface DashboardStats {
+  projects: number;
+  documents: number;
+  posts: number;
+  slideshows: number;
+  followers: number;
+}
 
 export default function DashboardPage() {
   const { user, profile } = useAuth();
+  const [stats, setStats] = useState<DashboardStats>({ projects: 0, documents: 0, posts: 0, slideshows: 0, followers: 0 });
+
+  useEffect(() => {
+    if (!user) return;
+    const userId = user.$id;
+    let cancelled = false;
+
+    async function loadStats() {
+      const results = await Promise.allSettled([
+        countDocuments(COLLECTIONS.projects, [Query.equal("owner_id", userId)]),
+        countDocuments(COLLECTIONS.documents, [Query.equal("user_id", userId)]),
+        countDocuments(COLLECTIONS.posts, [Query.equal("author_id", userId)]),
+        countDocuments(COLLECTIONS.slideshows, [Query.equal("user_id", userId)]),
+        countDocuments(COLLECTIONS.follows, [Query.equal("followee_id", userId)]),
+      ]);
+
+      const count = (result: PromiseSettledResult<number>, key: keyof DashboardStats) => {
+        if (!cancelled && result.status === "fulfilled") {
+          setStats((prev) => ({ ...prev, [key]: result.value }));
+        }
+      };
+
+      count(results[0], "projects");
+      count(results[1], "documents");
+      count(results[2], "posts");
+      count(results[3], "slideshows");
+      count(results[4], "followers");
+    }
+
+    void loadStats();
+    void refreshBadges(userId);
+    return () => { cancelled = true; };
+  }, [user]);
+
+  const impactScore = computeImpactScore({
+    posts: stats.posts,
+    projects: stats.projects,
+    documents: stats.documents,
+    slideshows: stats.slideshows,
+    eventsHosted: 0,
+    roomsJoined: 0,
+    followers: stats.followers,
+  });
+  const level = impactLevel(impactScore);
 
   if (!user) {
     return (
@@ -45,15 +102,27 @@ export default function DashboardPage() {
           <div className="hero-meta">
             <div>
               <p className="meta-label">Projects</p>
-              <p className="meta-value">0</p>
+              <p className="meta-value">{stats.projects}</p>
+            </div>
+            <div>
+              <p className="meta-label">Posts</p>
+              <p className="meta-value">{stats.posts}</p>
             </div>
             <div>
               <p className="meta-label">Documents</p>
-              <p className="meta-value">0</p>
+              <p className="meta-value">{stats.documents}</p>
             </div>
             <div>
-              <p className="meta-label">Impact</p>
-              <p className="meta-value">Just starting</p>
+              <p className="meta-label">Slideshows</p>
+              <p className="meta-value">{stats.slideshows}</p>
+            </div>
+            <div>
+              <p className="meta-label">Impact score</p>
+              <p className="meta-value">{impactScore}</p>
+            </div>
+            <div>
+              <p className="meta-label">Level</p>
+              <p className="meta-value" style={{ fontSize: "0.9rem" }}>{level}</p>
             </div>
           </div>
         </div>

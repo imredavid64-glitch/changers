@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { COLLECTIONS, createDocument, publicReadOwnerWritePermissions } from "@/lib/appwrite/bridge";
 import { FilmScene } from "@/lib/social/types";
+import { buildFilmSearchIndex } from "@/lib/social/toolSearch";
 
 const SHOT_TYPES: FilmScene["shot_type"][] = ["wide", "medium", "close-up", "pov", "aerial"];
 
@@ -45,7 +46,7 @@ export default function NewFilmPage() {
   function removeScene(id: string) {
     const remaining = scenes.filter((s) => s.id !== id);
     setScenes(remaining.map((s, i) => ({ ...s, number: i + 1 })));
-    if (current === id) setCurrent(null);
+    if (current === id) setCurrent("");
   }
 
   async function handleSave() {
@@ -62,6 +63,7 @@ export default function NewFilmPage() {
           title: title.trim(),
           scenes_json: JSON.stringify(scenes),
           scene_count: scenes.length,
+          search_index: buildFilmSearchIndex(title.trim(), scenes),
           created_at_ms: now,
           updated_at_ms: now,
         },

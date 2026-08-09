@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { getTemplateById, generateSlideContent, SlideDefinition } from "@/lib/ai/tools";
 import { COLLECTIONS, createDocument, publicReadOwnerWritePermissions } from "@/lib/appwrite/bridge";
+import { buildSlideshowSearchIndex } from "@/lib/social/toolSearch";
 
 export default function NewSlideshowPage() {
   const router = useRouter();
@@ -62,6 +63,7 @@ export default function NewSlideshowPage() {
           template_id: templateId || "",
           slides_json: JSON.stringify(slides),
           slide_count: slides.length,
+          search_index: buildSlideshowSearchIndex(title.trim(), slides),
           created_at_ms: now,
           updated_at_ms: now,
         },

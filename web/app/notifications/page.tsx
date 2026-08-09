@@ -17,6 +17,28 @@ export default function NotificationsSettingsPage() {
     setPushSupported("Notification" in window && "serviceWorker" in navigator);
   }, []);
 
+  useEffect(() => {
+    setEmailEnabled(Boolean(profile?.email_notifications));
+  }, [profile]);
+
+  async function handleToggleEmail() {
+    if (!user) return;
+    const next = !emailEnabled;
+    setEmailEnabled(next);
+    setStatus(next ? "Email notifications enabled." : "Email notifications disabled.");
+
+    try {
+      await updateDocument(COLLECTIONS.profiles, user.$id, {
+        email_notifications: next,
+        updated_at_ms: Date.now(),
+      });
+    } catch (error) {
+      setEmailEnabled(!next);
+      setStatus("Failed to update email notification preference.");
+      console.error(error);
+    }
+  }
+
   async function handleTogglePush() {
     if (!pushSupported) { setStatus("Push notifications are not supported in this browser."); return; }
 
@@ -103,7 +125,7 @@ export default function NotificationsSettingsPage() {
               <p className="muted" style={{ fontSize: "0.85rem" }}>Get email digests of your unanswered messages and trending posts.</p>
             </div>
           </div>
-          <button className={emailEnabled ? "primary" : "ghost"} onClick={() => { setEmailEnabled(!emailEnabled); setStatus(emailEnabled ? "Email notifications disabled." : "Email notifications enabled."); }}>
+          <button className={emailEnabled ? "primary" : "ghost"} onClick={handleToggleEmail}>
             {emailEnabled ? "Enabled" : "Enable"}
           </button>
         </div>

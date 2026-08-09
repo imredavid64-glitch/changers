@@ -1,18 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { NotificationsDropdown } from "@/components/NotificationsDropdown";
 import { useAuth } from "@/components/AuthProvider";
 
 export default function SharedShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, profile, signOut } = useAuth();
   const isAdmin = profile?.is_admin === true;
 
   async function handleSignOut() {
     await signOut();
+  }
+
+  function goToFeed(params: string) {
+    router.push(`/posts${params}`);
   }
 
   return (
@@ -40,7 +45,7 @@ export default function SharedShell({ children }: { children: React.ReactNode })
               Sign in
             </Link>
           )}
-          <Link className="primary" href="/#compose">
+          <Link className="primary" href="/posts">
             Create Post
           </Link>
         </div>
@@ -50,7 +55,7 @@ export default function SharedShell({ children }: { children: React.ReactNode })
         <aside className="side-nav">
           <div className="nav-group">
             <p className="nav-title">Explore</p>
-            <Link href="/" className={`nav-link ${pathname === '/' ? 'active' : ''}`}>
+            <Link href="/posts" className={`nav-link ${pathname.startsWith('/posts') ? 'active' : ''}`}>
               Home Feed
             </Link>
             <Link href="/projects" className={`nav-link ${pathname.startsWith('/projects') ? 'active' : ''}`}>
@@ -65,6 +70,11 @@ export default function SharedShell({ children }: { children: React.ReactNode })
             <Link href="/impact" className={`nav-link ${pathname === '/impact' ? 'active' : ''}`}>
               Impact Map
             </Link>
+            {user && (
+              <Link href="/network" className={`nav-link ${pathname === '/network' ? 'active' : ''}`}>
+                My Network
+              </Link>
+            )}
           </div>
           <div className="nav-group">
             <p className="nav-title">Tools</p>
@@ -149,12 +159,20 @@ export default function SharedShell({ children }: { children: React.ReactNode })
               Economy, Society, and Wellbeing.
             </p>
             <div className="compass">
-              <div className="compass-item">N</div>
-              <div className="compass-item">E</div>
-              <div className="compass-item">S</div>
-              <div className="compass-item">W</div>
+              {([["N", "Nature"], ["E", "Economy"], ["S", "Society"], ["W", "Wellbeing"]] as const).map(([key, label]) => (
+                <button
+                  key={key}
+                  className="compass-item"
+                  onClick={() => goToFeed(`?strand=${key}`)}
+                  title={`View ${label} posts`}
+                >
+                  {key}
+                </button>
+              ))}
             </div>
-            <button className="ghost full">Filter feed</button>
+            <button className="ghost full" onClick={() => goToFeed("?tab=for-you")}>
+              Filter feed
+            </button>
           </div>
         </aside>
       </div>

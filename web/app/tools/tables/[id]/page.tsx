@@ -17,6 +17,17 @@ function resizeGrid(grid: string[][], newRows: number, newCols: number) {
   );
 }
 
+function escapeCsvCell(cell: string): string {
+  if (/[",\n]/.test(cell)) {
+    return `"${cell.replace(/"/g, '""')}"`;
+  }
+  return cell;
+}
+
+function toCsv(data: string[][]): string {
+  return data.map((row) => row.map(escapeCsvCell).join(",")).join("\r\n");
+}
+
 export default function TableDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -66,6 +77,19 @@ export default function TableDetailPage() {
     setCols(newCols);
     setData(resizeGrid(data, rows, newCols));
     setDirty(true);
+  }
+
+  function handleDownload() {
+    const csv = toCsv(data);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${title || "table"}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
   async function handleSave() {
@@ -149,6 +173,7 @@ export default function TableDetailPage() {
               {saving ? "Saving..." : "Save"}
             </button>
           )}
+          <button className="ghost" onClick={handleDownload}>Download CSV</button>
           <button className="ghost" onClick={handleDelete} disabled={deleting} style={{ color: "var(--coral)" }}>
             {deleting ? "Deleting..." : "Delete"}
           </button>

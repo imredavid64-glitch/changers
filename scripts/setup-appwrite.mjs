@@ -237,21 +237,6 @@ const COLLECTIONS = {
       { key: "blocked_idx", type: "key", attributes: ["blocked_id"], orders: ["asc"] },
     ],
   },
-  "privacy-settings": {
-    documentId: (userId) => userId,
-    attributes: [
-      { key: "user_id", type: "string", size: 64, required: true },
-      { key: "profile_visibility", type: "string", size: 16, required: true },
-      { key: "posts_visibility", type: "string", size: 16, required: true },
-      { key: "dm_permission", type: "string", size: 16, required: true },
-      { key: "show_saved_posts", type: "boolean", required: true },
-      { key: "created_at_ms", type: "integer", required: true },
-      { key: "updated_at_ms", type: "integer", required: true },
-    ],
-    indexes: [
-      { key: "user_idx", type: "key", attributes: ["user_id"], orders: ["asc"] },
-    ],
-  },
   projects: {
     attributes: [
       { key: "name", type: "string", size: 256, required: true },
@@ -274,16 +259,40 @@ const COLLECTIONS = {
       { key: "search_idx", type: "fulltext", attributes: ["search_index"] },
     ],
   },
-  "project-members": {
+  tasks: {
     attributes: [
       { key: "project_id", type: "string", size: 64, required: true },
-      { key: "user_id", type: "string", size: 64, required: true },
-      { key: "role", type: "string", size: 16, required: true },
-      { key: "joined_at_ms", type: "integer", required: true },
+      { key: "title", type: "string", size: 512, required: true },
+      { key: "description", type: "string", size: 4096, required: false },
+      { key: "status", type: "string", size: 16, required: true },
+      { key: "assignee_id", type: "string", size: 64, required: false },
+      { key: "assignee_name", type: "string", size: 256, required: false },
+      { key: "priority", type: "string", size: 16, required: true },
+      { key: "created_by", type: "string", size: 64, required: true },
+      { key: "created_at_ms", type: "integer", required: true },
+      { key: "updated_at_ms", type: "integer", required: true },
     ],
     indexes: [
       { key: "project_idx", type: "key", attributes: ["project_id"], orders: ["asc"] },
+      { key: "project_status_idx", type: "key", attributes: ["project_id", "status"], orders: ["asc", "asc"] },
+      { key: "project_updated_idx", type: "key", attributes: ["project_id", "updated_at_ms"], orders: ["asc", "desc"] },
+    ],
+  },
+  badges: {
+    attributes: [
+      { key: "user_id", type: "string", size: 64, required: true },
+      { key: "badge_id", type: "string", size: 64, required: true },
+      { key: "badge_name", type: "string", size: 128, required: true },
+      { key: "badge_description", type: "string", size: 512, required: true },
+      { key: "badge_icon", type: "string", size: 64, required: true },
+      { key: "badge_category", type: "string", size: 32, required: true },
+      { key: "earned_at_ms", type: "integer", required: true },
+      { key: "metadata", type: "string", size: 4096, required: false },
+    ],
+    indexes: [
       { key: "user_idx", type: "key", attributes: ["user_id"], orders: ["asc"] },
+      { key: "user_badge_idx", type: "key", attributes: ["user_id", "badge_id"], orders: ["asc", "asc"] },
+      { key: "earned_idx", type: "key", attributes: ["earned_at_ms"], orders: ["desc"] },
     ],
   },
   events: {
@@ -317,12 +326,14 @@ const COLLECTIONS = {
       { key: "title", type: "string", size: 512, required: true },
       { key: "body", type: "string", size: 65536, required: false },
       { key: "word_count", type: "integer", required: true },
+      { key: "search_index", type: "string", size: 4096, required: true },
       { key: "created_at_ms", type: "integer", required: true },
       { key: "updated_at_ms", type: "integer", required: true },
     ],
     indexes: [
       { key: "user_idx", type: "key", attributes: ["user_id"], orders: ["asc"] },
       { key: "updated_idx", type: "key", attributes: ["updated_at_ms"], orders: ["desc"] },
+      { key: "search_idx", type: "fulltext", attributes: ["search_index"] },
     ],
   },
   slideshows: {
@@ -332,12 +343,14 @@ const COLLECTIONS = {
       { key: "template_id", type: "string", size: 64, required: false },
       { key: "slides_json", type: "string", size: 65536, required: true },
       { key: "slide_count", type: "integer", required: true },
+      { key: "search_index", type: "string", size: 4096, required: true },
       { key: "created_at_ms", type: "integer", required: true },
       { key: "updated_at_ms", type: "integer", required: true },
     ],
     indexes: [
       { key: "user_idx", type: "key", attributes: ["user_id"], orders: ["asc"] },
       { key: "updated_idx", type: "key", attributes: ["updated_at_ms"], orders: ["desc"] },
+      { key: "search_idx", type: "fulltext", attributes: ["search_index"] },
     ],
   },
   tables: {
@@ -347,12 +360,14 @@ const COLLECTIONS = {
       { key: "rows", type: "integer", required: true },
       { key: "cols", type: "integer", required: true },
       { key: "data_json", type: "string", size: 65536, required: true },
+      { key: "search_index", type: "string", size: 4096, required: true },
       { key: "created_at_ms", type: "integer", required: true },
       { key: "updated_at_ms", type: "integer", required: true },
     ],
     indexes: [
       { key: "user_idx", type: "key", attributes: ["user_id"], orders: ["asc"] },
       { key: "updated_idx", type: "key", attributes: ["updated_at_ms"], orders: ["desc"] },
+      { key: "search_idx", type: "fulltext", attributes: ["search_index"] },
     ],
   },
   "code-snippets": {
@@ -361,12 +376,14 @@ const COLLECTIONS = {
       { key: "title", type: "string", size: 512, required: true },
       { key: "language", type: "string", size: 32, required: true },
       { key: "code", type: "string", size: 65536, required: true },
+      { key: "search_index", type: "string", size: 4096, required: true },
       { key: "created_at_ms", type: "integer", required: true },
       { key: "updated_at_ms", type: "integer", required: true },
     ],
     indexes: [
       { key: "user_idx", type: "key", attributes: ["user_id"], orders: ["asc"] },
       { key: "updated_idx", type: "key", attributes: ["updated_at_ms"], orders: ["desc"] },
+      { key: "search_idx", type: "fulltext", attributes: ["search_index"] },
     ],
   },
   designs: {
@@ -376,12 +393,14 @@ const COLLECTIONS = {
       { key: "elements_json", type: "string", size: 65536, required: true },
       { key: "canvas_width", type: "integer", required: true },
       { key: "canvas_height", type: "integer", required: true },
+      { key: "search_index", type: "string", size: 4096, required: true },
       { key: "created_at_ms", type: "integer", required: true },
       { key: "updated_at_ms", type: "integer", required: true },
     ],
     indexes: [
       { key: "user_idx", type: "key", attributes: ["user_id"], orders: ["asc"] },
       { key: "updated_idx", type: "key", attributes: ["updated_at_ms"], orders: ["desc"] },
+      { key: "search_idx", type: "fulltext", attributes: ["search_index"] },
     ],
   },
   films: {
@@ -390,12 +409,14 @@ const COLLECTIONS = {
       { key: "title", type: "string", size: 512, required: true },
       { key: "scenes_json", type: "string", size: 65536, required: true },
       { key: "scene_count", type: "integer", required: true },
+      { key: "search_index", type: "string", size: 4096, required: true },
       { key: "created_at_ms", type: "integer", required: true },
       { key: "updated_at_ms", type: "integer", required: true },
     ],
     indexes: [
       { key: "user_idx", type: "key", attributes: ["user_id"], orders: ["asc"] },
       { key: "updated_idx", type: "key", attributes: ["updated_at_ms"], orders: ["desc"] },
+      { key: "search_idx", type: "fulltext", attributes: ["search_index"] },
     ],
   },
   "event-rsvps": {

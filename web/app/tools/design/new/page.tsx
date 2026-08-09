@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { COLLECTIONS, createDocument, publicReadOwnerWritePermissions } from "@/lib/appwrite/bridge";
 import { DesignElement } from "@/lib/social/types";
+import { buildDesignSearchIndex } from "@/lib/social/toolSearch";
 
 const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 600;
@@ -58,7 +59,7 @@ export default function NewDesignPage() {
   }
 
   async function handleSave() {
-    if (!title.trim()) return;
+    if (!title.trim() || !user) return;
     setSaving(true);
     setError("");
 
@@ -72,6 +73,7 @@ export default function NewDesignPage() {
           elements_json: JSON.stringify(elements),
           canvas_width: CANVAS_WIDTH,
           canvas_height: CANVAS_HEIGHT,
+          search_index: buildDesignSearchIndex(title.trim()),
           created_at_ms: now,
           updated_at_ms: now,
         },

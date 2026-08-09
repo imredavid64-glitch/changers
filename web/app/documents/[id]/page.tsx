@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { COLLECTIONS, watchDocument, updateDocument, deleteDocument } from "@/lib/appwrite/bridge";
 import { normalizeDocument, formatRelativeTime } from "@/lib/social/utils";
 import { AppDocument } from "@/lib/social/types";
+import { AIPanel } from "@/components/AIPanel";
 
 export default function DocumentDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -18,6 +19,13 @@ export default function DocumentDetailPage() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle");
+  const [editCount, setEditCount] = useState(0);
+  const [isCoEditing, setIsCoEditing] = useState(false);
+  const [coEditorName, setCoEditorName] = useState("");
+  const lastSavedRef = useRef<{ title: string; body: string }>({ title: "", body: "" });
+  const applyingExternalRef = useRef(false);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!user || !id) return;
@@ -28,9 +36,35 @@ export default function DocumentDetailPage() {
       (doc) => normalizeDocument(doc.$id, doc as unknown as Record<string, unknown>),
       (doc) => {
         if (doc) {
-          setDocument(doc);
-          setTitle(doc.title);
-          setBody(doc.body);
+          if (!document) {
+            setDocument(doc);
+            setTitle(doc.title);
+            setBody(doc.body);
+            lastSavedRef.current = { title: doc.title, body: doc.body };
+          } else {
+            const localMatches =
+              lastSavedRef.current.title === doc.title &&
+              lastSavedRef.current.body === doc.body;
+
+            const ourSnapshot =
+              title === doc.title && body === doc.body;
+
+            if (!localMatches && !ourSnapshot && !applyingExternalRef.current) {
+              applyingExternalRef.current = true;
+              setIsCoEditing(true);
+              setCoEditorName(doc.user_id === user.$id ? "another device" : "a teammate");
+              setTitle(doc.title);
+              setBody(doc.body);
+              lastSavedRef.current = { title: doc.title, body: doc.body };
+              setDirty(false);
+              setSaveState("saved");
+              setEditCount((c) => c + 1);
+              setTimeout(() => {
+                applyingExternalRef.current = false;
+                setIsCoEditing(false);
+              }, 5000);
+            }
+          }
         }
       },
     );
@@ -38,9 +72,34 @@ export default function DocumentDetailPage() {
     return unsub;
   }, [user, id]);
 
+  function triggerDownload(filename: string, content: string, type = "text/plain") {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = window.document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    window.document.body.appendChild(a);
+    a.click();
+    window.document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(title + "\n\n" + body);
+    } catch (e) {
+      console.error("Failed to copy document", e);
+    }
+  }
+
+  function handleDownload() {
+    triggerDownload(`${title || "document"}.txt`, title + "\n\n" + body);
+  }
+
   async function handleSave() {
     if (!title.trim() || !document || !user) return;
     setSaving(true);
+    setSaveState("saving");
 
     try {
       const wordCount = body.trim() ? body.trim().split(/\s+/).length : 0;
@@ -54,12 +113,52 @@ export default function DocumentDetailPage() {
           updated_at_ms: Date.now(),
         },
       );
+      lastSavedRef.current = { title: title.trim(), body };
       setDirty(false);
+      setSaveState("saved");
     } catch (e) {
       console.error("Failed to save document", e);
+      setSaveState("idle");
     }
     setSaving(false);
   }
+
+  const autosave = useCallback(() => {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      if (dirty && document) {
+        void handleSave();
+      }
+    }, 2500);
+  }, [dirty, document, title, body]);
+
+  function handleTitleChange(value: string) {
+    setTitle(value);
+    setDirty(true);
+    autosave();
+  }
+
+  function handleBodyChange(value: string) {
+    setBody(value);
+    setDirty(true);
+    autosave();
+  }
+
+  function handleApplyContent(value: string) {
+    setBody(value);
+    setDirty(true);
+  }
+
+  function handleApplyTitle(value: string) {
+    setTitle(value);
+    setDirty(true);
+  }
+
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, []);
 
   async function handleDelete() {
     if (!document || !user) return;
@@ -108,17 +207,30 @@ export default function DocumentDetailPage() {
             ← Back to documents
           </Link>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {isCoEditing && (
+            <span className="chip" style={{ background: "rgba(244,184,96,0.2)" }}>
+              ✍️ {coEditorName} is editing — changes synced
+            </span>
+          )}
+          {saveState === "saving" && <span className="muted" style={{ fontSize: "0.8rem" }}>Saving…</span>}
+          {saveState === "saved" && <span className="muted" style={{ fontSize: "0.8rem" }}>Saved ✓</span>}
           {document.updated_at && (
             <span className="muted" style={{ fontSize: "0.8rem", alignSelf: "center" }}>
               Updated {formatRelativeTime(document.updated_at)}
             </span>
           )}
           {dirty && (
-            <button className="primary" onClick={handleSave} disabled={saving || !title.trim()}>
+            <button className="primary" onClick={() => void handleSave()} disabled={saving || !title.trim()}>
               {saving ? "Saving..." : "Save"}
             </button>
           )}
+          <button className="ghost" onClick={handleCopy}>
+            Copy
+          </button>
+          <button className="ghost" onClick={handleDownload}>
+            Download .txt
+          </button>
           <button className="ghost" onClick={handleDelete} disabled={deleting} style={{ color: "var(--coral)" }}>
             {deleting ? "Deleting..." : "Delete"}
           </button>
@@ -129,7 +241,7 @@ export default function DocumentDetailPage() {
         <input
           type="text"
           value={title}
-          onChange={(e) => { setTitle(e.target.value); setDirty(true); }}
+          onChange={(e) => handleTitleChange(e.target.value)}
           style={{
             width: "100%",
             fontSize: "1.6rem",
@@ -143,7 +255,7 @@ export default function DocumentDetailPage() {
         />
         <textarea
           value={body}
-          onChange={(e) => { setBody(e.target.value); setDirty(true); }}
+          onChange={(e) => handleBodyChange(e.target.value)}
           style={{
             width: "100%",
             minHeight: 500,
@@ -156,7 +268,19 @@ export default function DocumentDetailPage() {
             resize: "vertical",
           }}
         />
+        {editCount > 0 && (
+          <p className="muted" style={{ fontSize: "0.8rem", marginTop: 12 }}>
+            Co-edit history: {editCount} external change{editCount !== 1 ? "s" : ""} applied from teammates.
+          </p>
+        )}
       </div>
+
+      <AIPanel
+        title={title}
+        content={body}
+        onApplyTitle={handleApplyTitle}
+        onApplyContent={handleApplyContent}
+      />
     </div>
   );
 }

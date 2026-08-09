@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { COLLECTIONS, createDocument, publicReadOwnerWritePermissions } from "@/lib/appwrite/bridge";
-import { generateDocumentSuggestions, AISuggestion } from "@/lib/ai/tools";
+import { AISuggestion } from "@/lib/ai/tools";
+import { AIPanel } from "@/components/AIPanel";
+import { buildDocumentSearchIndex } from "@/lib/social/toolSearch";
 
 export default function NewDocumentPage() {
   const router = useRouter();
@@ -17,10 +19,26 @@ export default function NewDocumentPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const analyzeDocument = useCallback(() => {
-    const result = generateDocumentSuggestions(title, body);
-    setSuggestions(result);
+  const analyzeDocument = useCallback(async () => {
     setShowSuggestions(true);
+    setError("");
+    try {
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "analyze-document", data: { title, content: body } }),
+      });
+      const data = await res.json();
+      if (res.ok && Array.isArray(data.suggestions)) {
+        setSuggestions(data.suggestions);
+      } else {
+        setSuggestions([]);
+        setError(data.error || "AI analysis failed.");
+      }
+    } catch {
+      setSuggestions([]);
+      setError("AI analysis failed. Please try again.");
+    }
   }, [title, body]);
 
   if (!user) {
@@ -38,7 +56,7 @@ export default function NewDocumentPage() {
   }
 
   async function handleSave() {
-    if (!title.trim()) return;
+    if (!title.trim() || !user) return;
     setSaving(true);
     setError("");
 
@@ -53,6 +71,7 @@ export default function NewDocumentPage() {
           title: title.trim(),
           body,
           word_count: wordCount,
+          search_index: buildDocumentSearchIndex(title.trim(), body),
           created_at_ms: now,
           updated_at_ms: now,
         },
@@ -112,7 +131,7 @@ export default function NewDocumentPage() {
         />
         {error && <p style={{ color: "var(--coral)", fontSize: "0.85rem" }}>{error}</p>}
         <div style={{ display: "flex", gap: 12, marginTop: 24, flexWrap: "wrap" }}>
-          <button className="primary" onClick={analyzeDocument} disabled={!title.trim()}>
+          <button className="primary" onClick={() => void analyzeDocument()} disabled={!title.trim()}>
             Analyze with AI
           </button>
           <button className="ghost" onClick={handleSave} disabled={saving || !title.trim()}>
@@ -120,6 +139,13 @@ export default function NewDocumentPage() {
           </button>
         </div>
       </div>
+
+      <AIPanel
+        title={title}
+        content={body}
+        onApplyTitle={setTitle}
+        onApplyContent={setBody}
+      />
 
       {showSuggestions && suggestions.length > 0 && (
         <div className="card">

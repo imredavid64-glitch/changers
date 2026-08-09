@@ -29,6 +29,16 @@ function normalizeLanguage(lang: string): string {
   return map[lang] || lang;
 }
 
+async function copyText(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (e) {
+    console.error("Failed to copy", e);
+    return false;
+  }
+}
+
 export default function CodeSnippetDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -40,6 +50,7 @@ export default function CodeSnippetDetailPage() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!user || !id) return;
@@ -82,6 +93,14 @@ export default function CodeSnippetDetailPage() {
       console.error("Failed to save snippet", e);
     }
     setSaving(false);
+  }
+
+  async function handleCopyCode() {
+    const ok = await copyText(code);
+    if (ok) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }
   }
 
   async function handleDelete() {
@@ -142,6 +161,9 @@ export default function CodeSnippetDetailPage() {
               {saving ? "Saving..." : "Save"}
             </button>
           )}
+          <button className="ghost" onClick={handleCopyCode}>
+            {copied ? "Copied!" : "Copy code"}
+          </button>
           <button className="ghost" onClick={handleDelete} disabled={deleting} style={{ color: "var(--coral)" }}>
             {deleting ? "Deleting..." : "Delete"}
           </button>

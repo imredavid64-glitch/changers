@@ -4,11 +4,43 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { COLLECTIONS } from "@/lib/appwrite/bridge";
+import { databases, Query } from "@/lib/appwrite/client";
+import { appwriteEnabled, appwriteConfig } from "@/lib/appwrite/config";
 
 export default function WelcomePage() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const [showDemo, setShowDemo] = useState(false);
+  const [stats, setStats] = useState({ changemakers: 0, projects: 0, posts: 0 });
+
+  useEffect(() => {
+    if (!appwriteEnabled) return;
+
+    let active = true;
+
+    const load = async () => {
+      const [profiles, projects, posts] = await Promise.allSettled([
+        databases.listDocuments(appwriteConfig.databaseId, COLLECTIONS.profiles, [Query.limit(1)]),
+        databases.listDocuments(appwriteConfig.databaseId, COLLECTIONS.projects, [Query.limit(1)]),
+        databases.listDocuments(appwriteConfig.databaseId, COLLECTIONS.posts, [Query.limit(1)]),
+      ]);
+
+      if (!active) return;
+
+      setStats({
+        changemakers: profiles.status === "fulfilled" ? profiles.value.total : 0,
+        projects: projects.status === "fulfilled" ? projects.value.total : 0,
+        posts: posts.status === "fulfilled" ? posts.value.total : 0,
+      });
+    };
+
+    void load();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!loading && user) {
@@ -152,7 +184,11 @@ export default function WelcomePage() {
             No ads. No algorithms. No dopamine loops. Just real tools for real change.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24, maxWidth: 480, margin: "0 auto" }}>
-            {[["Active changemakers", "0"], ["Projects launched", "0"], ["kg CO₂ tracked", "0"]].map(([label, value]) => (
+            {[
+              ["Active changemakers", stats.changemakers],
+              ["Projects launched", stats.projects],
+              ["Posts shared", stats.posts],
+            ].map(([label, value]) => (
               <div key={label} style={{ background: "rgba(255,255,255,0.1)", borderRadius: 20, padding: 24, backdropFilter: "blur(8px)" }}>
                 <div style={{ fontSize: "2rem", fontWeight: 700, marginBottom: 4 }}>{value}</div>
                 <div style={{ fontSize: "0.85rem", opacity: 0.8 }}>{label}</div>
@@ -186,13 +222,16 @@ export default function WelcomePage() {
               <p style={{ fontSize: "1.2rem", fontFamily: "var(--font-head)", color: "white", marginBottom: 8 }}>🌿 Changers</p>
               <p style={{ fontSize: "0.85rem" }}>A changemaker community platform. Built for students, by changemakers.</p>
             </div>
-            {[["Platform", ["Dashboard", "Projects", "Documents", "Events"]], ["Resources", ["About", "Privacy", "Terms"]]].map(([title, links]) => (
-              <div key={title}>
+            {[["Platform", ["Dashboard", "Projects", "Documents", "Events", "Posts"]], ["Tools", ["Tables", "Slideshows", "Film Maker"]], ["Community", ["Mentors", "Impact", "Rooms"]]].map(([title, links]) => (
+              <div key={title as string}>
                 <p style={{ color: "white", fontWeight: 600, marginBottom: 12, fontSize: "0.9rem" }}>{title}</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {(links as string[]).map(link => (
-                    <Link key={link} href={`/${link.toLowerCase()}`} style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.6)" }}>{link}</Link>
-                  ))}
+                  {(links as string[]).map(link => {
+                    const path = `/tools/${link.toLowerCase().replace(/ /g, "-")}`;
+                    return (
+                      <Link key={link} href={["Tables", "Slideshows", "Film Maker"].includes(link) ? path : `/${link.toLowerCase()}`} style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.6)" }}>{link}</Link>
+                    );
+                  })}
                 </div>
               </div>
             ))}

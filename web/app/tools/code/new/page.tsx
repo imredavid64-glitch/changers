@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { COLLECTIONS, createDocument, publicReadOwnerWritePermissions } from "@/lib/appwrite/bridge";
+import { buildCodeSearchIndex } from "@/lib/social/toolSearch";
 
 const LANGUAGES = [
   "JavaScript", "TypeScript", "Python", "HTML", "CSS", "JSON", "SQL", "Bash", "Rust", "Go", "Plain Text",
@@ -34,7 +35,7 @@ export default function NewCodeSnippetPage() {
   }
 
   async function handleSave() {
-    if (!title.trim()) return;
+    if (!title.trim() || !user) return;
     setSaving(true);
     setError("");
 
@@ -49,6 +50,7 @@ export default function NewCodeSnippetPage() {
           title: title.trim(),
           language: langValue,
           code,
+          search_index: buildCodeSearchIndex(title.trim(), langValue, code),
           created_at_ms: now,
           updated_at_ms: now,
         },

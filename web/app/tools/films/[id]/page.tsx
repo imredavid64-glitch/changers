@@ -71,8 +71,30 @@ export default function FilmDetailPage() {
   function removeScene(sceneId: string) {
     const remaining = scenes.filter((s) => s.id !== sceneId);
     setScenes(remaining.map((s, i) => ({ ...s, number: i + 1 })));
-    if (current === sceneId) setCurrent(null);
+    if (current === sceneId) setCurrent("");
     setDirty(true);
+  }
+
+  function buildScript(): string {
+    return scenes
+      .map(
+        (s) =>
+          `SCENE ${s.number} \u2014 ${s.shot_type} (${s.duration_secs}s)\nSETTING: ${s.setting}\nDESCRIPTION: ${s.description}\nDIALOGUE: ${s.dialogue}\n`,
+      )
+      .join("\n");
+  }
+
+  function handleExportScript() {
+    const script = buildScript();
+    const blob = new Blob([script], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${title || "film"}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
   async function handleSave() {
@@ -151,6 +173,7 @@ export default function FilmDetailPage() {
             </span>
           )}
           <button className="ghost" onClick={addScene}>+ Add scene</button>
+          <button className="ghost" onClick={handleExportScript}>Export Script</button>
           {dirty && (
             <button className="primary" onClick={handleSave} disabled={saving}>
               {saving ? "Saving..." : "Save"}

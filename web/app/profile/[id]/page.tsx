@@ -29,6 +29,9 @@ import {
   normalizeProfile,
 } from "@/lib/social/utils";
 import { deleteMediaAsset, uploadMediaAsset } from "@/lib/media/client";
+import { computeImpactScore, impactLevel } from "@/lib/social/impact";
+import { BadgeDisplay } from "@/components/BadgeDisplay";
+import { refreshBadges } from "@/lib/badges/refresh";
 
 type ProfileFormState = {
   fullName: string;
@@ -39,6 +42,23 @@ type ProfileFormState = {
   mentorFocus: string;
   interests: Strand[];
   isMentor: boolean;
+  theme: AppProfile["theme"];
+};
+
+type ThemeOption = { value: AppProfile["theme"]; label: string; swatch: string };
+
+const THEME_OPTIONS: ThemeOption[] = [
+  { value: "moss", label: "Moss", swatch: "#2c8a7d" },
+  { value: "ocean", label: "Ocean", swatch: "#1f5e8f" },
+  { value: "sunset", label: "Sunset", swatch: "#e0784f" },
+  { value: "rose", label: "Rose", swatch: "#c2547a" },
+];
+
+const THEME_GRADIENTS: Record<AppProfile["theme"], string> = {
+  moss: "linear-gradient(130deg, rgba(31, 94, 84, 0.95), rgba(44, 138, 125, 0.82), rgba(244, 184, 96, 0.72))",
+  ocean: "linear-gradient(130deg, rgba(20, 60, 99, 0.95), rgba(31, 105, 164, 0.85), rgba(116, 178, 224, 0.7))",
+  sunset: "linear-gradient(130deg, rgba(178, 72, 46, 0.95), rgba(224, 120, 79, 0.85), rgba(244, 184, 96, 0.75))",
+  rose: "linear-gradient(130deg, rgba(150, 50, 92, 0.95), rgba(194, 84, 122, 0.85), rgba(244, 184, 96, 0.7))",
 };
 
 export default function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
@@ -71,10 +91,17 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     mentorFocus: "",
     interests: ["S"],
     isMentor: false,
+    theme: "moss",
   });
 
   const isOwner = currentUser?.$id === profileId;
   const followDocumentId = currentUser ? `${currentUser.$id}_${profileId}` : "";
+
+  useEffect(() => {
+    if (currentUser?.$id && currentUser.$id === profileId) {
+      void refreshBadges(profileId);
+    }
+  }, [currentUser?.$id, profileId]);
 
   useEffect(() => {
     return watchDocument(
@@ -93,6 +120,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
             mentorFocus: nextProfile.mentor_focus,
             interests: nextProfile.interests,
             isMentor: nextProfile.is_mentor,
+            theme: nextProfile.theme,
           });
         } else {
           setProfile(null);
@@ -239,6 +267,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         interests: editForm.interests,
         is_mentor: editForm.isMentor,
         mentor_focus: editForm.isMentor ? editForm.mentorFocus.trim() : "",
+        theme: editForm.theme,
         search_index: buildProfileSearchIndex({
           full_name: editForm.fullName.trim(),
           role: editForm.role.trim(),
@@ -405,8 +434,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
           style={{
             height: 160,
             margin: "-24px -24px 0",
-            background:
-              "linear-gradient(130deg, rgba(31, 94, 84, 0.95), rgba(44, 138, 125, 0.82), rgba(244, 184, 96, 0.72))",
+            background: THEME_GRADIENTS[profile.theme] || THEME_GRADIENTS.moss,
           }}
         />
 
@@ -526,7 +554,37 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
             <p className="meta-label">Saved</p>
             <p className="meta-value">{isOwner ? savedPosts.length : "Private"}</p>
           </div>
+          <div className="mini-card">
+            <p className="meta-label">Impact score</p>
+            <p className="meta-value" style={{ fontSize: "0.95rem" }}>
+              {computeImpactScore({
+                posts: posts.length,
+                projects: 0,
+                documents: 0,
+                slideshows: 0,
+                eventsHosted: 0,
+                roomsJoined: 0,
+                followers: followersCount,
+              })}
+            </p>
+          </div>
+          <div className="mini-card">
+            <p className="meta-label">Level</p>
+            <p className="meta-value" style={{ fontSize: "0.8rem" }}>
+              {impactLevel(computeImpactScore({
+                posts: posts.length,
+                projects: 0,
+                documents: 0,
+                slideshows: 0,
+                eventsHosted: 0,
+                roomsJoined: 0,
+                followers: followersCount,
+              }))}
+            </p>
+          </div>
         </div>
+
+        {profile && <BadgeDisplay profile={profile} />}
 
         <div style={{ marginTop: 20, display: "grid", gap: 10 }}>
           <p>{profile.bio || "This changemaker hasn't added a bio yet."}</p>
@@ -643,6 +701,60 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                 style={{ minHeight: 90 }}
               />
             )}
+
+            <div style={{ display: "grid", gap: 10 }}>
+              <span style={{ fontWeight: 600 }}>Profile theme</span>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                {THEME_OPTIONS.map((themeOption) => (
+                  <button
+                    type="button"
+                    key={themeOption.value}
+                    onClick={() => setEditForm({ ...editForm, theme: themeOption.value })}
+                    style={{
+                      display: "inline-flex",
+                      gap: 8,
+                      alignItems: "center",
+                      padding: "10px 12px",
+                      borderRadius: 14,
+                      border: editForm.theme === themeOption.value ? "2px solid var(--teal)" : "1px solid rgba(16,24,32,0.1)",
+                      background: editForm.theme === themeOption.value ? "rgba(44,138,125,0.08)" : "white",
+                      cursor: "pointer",
+                      font: "inherit",
+                    }}
+                  >
+                    <span style={{ width: 16, height: 16, borderRadius: 8, background: themeOption.swatch }} />
+                    {themeOption.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gap: 10 }}>
+              <span style={{ fontWeight: 600 }}>Profile theme</span>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                {THEME_OPTIONS.map((themeOption) => (
+                  <button
+                    type="button"
+                    key={themeOption.value}
+                    onClick={() => setEditForm({ ...editForm, theme: themeOption.value })}
+                    style={{
+                      display: "inline-flex",
+                      gap: 8,
+                      alignItems: "center",
+                      padding: "10px 12px",
+                      borderRadius: 14,
+                      border: editForm.theme === themeOption.value ? "2px solid var(--teal)" : "1px solid rgba(16,24,32,0.1)",
+                      background: editForm.theme === themeOption.value ? "rgba(44,138,125,0.08)" : "white",
+                      cursor: "pointer",
+                      font: "inherit",
+                    }}
+                  >
+                    <span style={{ width: 16, height: 16, borderRadius: 8, background: themeOption.swatch }} />
+                    {themeOption.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <label style={{ display: "grid", gap: 8 }}>
               <span style={{ fontWeight: 600 }}>Avatar image</span>

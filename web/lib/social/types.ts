@@ -21,10 +21,16 @@ export interface AppProfile {
   avatar_media_url: string;
   avatar_url: string;
   interests: Strand[];
+  saved_project_ids: string[];
   is_mentor: boolean;
   mentor_focus: string;
   is_admin: boolean;
   privacy: "public" | "followers" | "private";
+  theme: "moss" | "ocean" | "sunset" | "rose";
+  email_notifications?: boolean;
+  impact_score?: number;
+  strand_counts?: Partial<Record<Strand, number>>;
+  push_subscription?: string;
   search_index: string;
   created_at?: TimestampLike;
   updated_at?: TimestampLike;
@@ -122,17 +128,6 @@ export interface AppBlock {
   created_at?: TimestampLike;
 }
 
-export interface AppPrivacySettings {
-  id: string;
-  user_id: string;
-  profile_visibility: "public" | "followers" | "private";
-  posts_visibility: "public" | "followers" | "private";
-  dm_permission: "everyone" | "followers" | "none";
-  show_saved_posts: boolean;
-  created_at?: TimestampLike;
-  updated_at?: TimestampLike;
-}
-
 export interface AppProject {
   id: string;
   name: string;
@@ -149,12 +144,63 @@ export interface AppProject {
   updated_at?: TimestampLike;
 }
 
-export interface AppProjectMember {
+export type TaskStatus = "todo" | "in-progress" | "done";
+export type TaskPriority = "low" | "medium" | "high";
+
+export interface AppTask {
   id: string;
   project_id: string;
+  title: string;
+  description: string;
+  status: TaskStatus;
+  assignee_id: string;
+  assignee_name: string;
+  priority: TaskPriority;
+  created_by: string;
+  created_at?: TimestampLike;
+  updated_at?: TimestampLike;
+}
+
+export type BadgeCategory = "milestone" | "social" | "creation" | "impact" | "streak" | "special";
+
+export interface AppBadge {
+  id: string;
   user_id: string;
-  role: "owner" | "collaborator" | "viewer";
-  joined_at?: TimestampLike;
+  badge_id: string;
+  badge_name: string;
+  badge_description: string;
+  badge_icon: string;
+  badge_category: BadgeCategory;
+  earned_at?: TimestampLike;
+  metadata?: Record<string, unknown>;
+}
+
+export interface UserStats {
+  postsCount: number;
+  projectsCount: number;
+  documentsCount: number;
+  slideshowsCount: number;
+  followersCount: number;
+  followingCount: number;
+  likesReceived: number;
+  commentsReceived: number;
+  daysSinceJoin: number;
+  currentStreak: number;
+  longestStreak: number;
+  tasksCompleted: number;
+  eventsHosted: number;
+  eventsAttended: number;
+  impactScore: number;
+  strandCounts: Partial<Record<Strand, number>>;
+}
+
+export interface BadgeDefinition {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: BadgeCategory;
+  condition: (profile: AppProfile, stats: UserStats) => boolean;
 }
 
 export interface AppEvent {

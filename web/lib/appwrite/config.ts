@@ -18,11 +18,9 @@ export const appwriteConfig = {
     threadMessages:
       process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_THREAD_MESSAGES || "thread-messages",
     blocks: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_BLOCKS || "blocks",
-    privacySettings:
-      process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_PRIVACY_SETTINGS || "privacy-settings",
     projects: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_PROJECTS || "projects",
-    projectMembers:
-      process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_PROJECT_MEMBERS || "project-members",
+    tasks: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_TASKS || "tasks",
+    badges: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_BADGES || "badges",
     events: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EVENTS || "events",
     eventRsvps: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EVENT_RSVPS || "event-rsvps",
     documents: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_DOCUMENTS || "documents",

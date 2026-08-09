@@ -70,7 +70,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
     <div style={{ display: "grid", gap: 24 }}>
       <div>
         <Link
-          href="/"
+          href="/posts"
           className="muted"
           style={{ display: "inline-flex", alignItems: "center", gap: 6, fontWeight: 600 }}
         >

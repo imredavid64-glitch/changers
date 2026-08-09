@@ -59,6 +59,32 @@ export default function SlideshowDetailPage() {
     setDirty(true);
   }
 
+  function buildOutline(): string {
+    return slides.map((s, i) => `${i + 1}. ${s.heading}\n${s.body}`).join("\n\n");
+  }
+
+  function triggerDownload(filename: string, content: string, type = "text/plain") {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  async function handleExport() {
+    const outline = buildOutline();
+    try {
+      await navigator.clipboard.writeText(outline);
+    } catch (e) {
+      console.error("Failed to copy outline", e);
+    }
+    triggerDownload(`${title || "slideshow"}.md`, outline, "text/markdown");
+  }
+
   async function handleSave() {
     if (!slideshow || !user) return;
     setSaving(true);
@@ -146,6 +172,7 @@ export default function SlideshowDetailPage() {
             </span>
           )}
           <button className="ghost" onClick={addSlide}>+ Add slide</button>
+          <button className="ghost" onClick={handleExport}>Export</button>
           {dirty && (
             <button className="primary" onClick={handleSave} disabled={saving}>
               {saving ? "Saving..." : "Save"}

@@ -56,14 +56,25 @@ export async function listDocuments<T extends AppwriteDocument = AppwriteDocumen
 ) {
   if (!appwriteEnabled) return [] as T[];
 
-  const result = await databases.listDocuments({
-    databaseId: appwriteConfig.databaseId,
+  const result = await databases.listDocuments(
+    appwriteConfig.databaseId,
     collectionId,
     queries,
-    total: false,
-  });
+  );
 
   return result.documents as unknown as T[];
+}
+
+export async function countDocuments(collectionId: string, queries: string[] = []) {
+  if (!appwriteEnabled) return 0;
+
+  const result = await databases.listDocuments(
+    appwriteConfig.databaseId,
+    collectionId,
+    [...queries, Query.limit(1)],
+  );
+
+  return result.total || 0;
 }
 
 export async function getDocument<T extends AppwriteDocument = AppwriteDocument>(
@@ -73,11 +84,11 @@ export async function getDocument<T extends AppwriteDocument = AppwriteDocument>
   if (!appwriteEnabled) return null;
 
   try {
-    return (await databases.getDocument({
-      databaseId: appwriteConfig.databaseId,
+    return (await databases.getDocument(
+      appwriteConfig.databaseId,
       collectionId,
       documentId,
-    })) as T;
+    )) as T;
   } catch {
     return null;
   }
@@ -89,13 +100,13 @@ export async function createDocument<T extends Record<string, unknown>>(
   permissions?: string[],
   documentId = ID.unique(),
 ) {
-  return databases.createDocument({
-    databaseId: appwriteConfig.databaseId,
+  return databases.createDocument(
+    appwriteConfig.databaseId,
     collectionId,
     documentId,
     data,
     permissions,
-  });
+  );
 }
 
 export async function updateDocument<T extends Record<string, unknown>>(
@@ -104,21 +115,21 @@ export async function updateDocument<T extends Record<string, unknown>>(
   data: T,
   permissions?: string[],
 ) {
-  return databases.updateDocument({
-    databaseId: appwriteConfig.databaseId,
+  return databases.updateDocument(
+    appwriteConfig.databaseId,
     collectionId,
     documentId,
     data,
     permissions,
-  });
+  );
 }
 
 export async function deleteDocument(collectionId: string, documentId: string) {
-  return databases.deleteDocument({
-    databaseId: appwriteConfig.databaseId,
+  return databases.deleteDocument(
+    appwriteConfig.databaseId,
     collectionId,
     documentId,
-  });
+  );
 }
 
 export function subscribeToCollection(
@@ -212,12 +223,12 @@ export async function uploadMediaFile(
         ]
       : privateReadWritePermissions(userId);
 
-  const created = await storage.createFile({
-    bucketId: appwriteConfig.mediaBucketId,
-    fileId: ID.unique(),
+  const created = await storage.createFile(
+    appwriteConfig.mediaBucketId,
+    ID.unique(),
     file,
     permissions,
-  });
+  );
 
   return created;
 }
@@ -235,10 +246,12 @@ export function buildDefaultProfileDocument(userId: string, fullName: string, ro
     avatar_media_storage_key: "",
     avatar_media_url: "",
     interests: ["S"],
+    saved_project_ids: [],
     is_mentor: false,
     mentor_focus: "",
     is_admin: false,
     privacy: "public",
+    theme: "moss",
     search_index: `${fullName} ${role}`.toLowerCase(),
     created_at_ms: nowMs(),
     updated_at_ms: nowMs(),

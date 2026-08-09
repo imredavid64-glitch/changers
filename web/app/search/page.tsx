@@ -7,9 +7,10 @@ import { useSearchParams } from "next/navigation";
 import { COLLECTIONS, listDocuments } from "@/lib/appwrite/bridge";
 import { Query } from "@/lib/appwrite/client";
 import { appwriteEnabled } from "@/lib/appwrite/config";
-import { normalizeEvent, normalizePost, normalizeProfile, normalizeProject, normalizeRoom } from "@/lib/social/utils";
+import { normalizeCodeSnippet, normalizeDesign, normalizeDocument, normalizeEvent, normalizeFilm, normalizePost, normalizeProfile, normalizeProject, normalizeRoom, normalizeSlideshow, normalizeTable } from "@/lib/social/utils";
+import { buildCodeSearchIndex, buildDesignSearchIndex, buildDocumentSearchIndex, buildSlideshowSearchIndex, buildTableSearchIndex, buildFilmSearchIndex } from "@/lib/social/toolSearch";
 
-type SearchType = "all" | "profiles" | "posts" | "rooms" | "projects" | "events";
+type SearchType = "all" | "profiles" | "posts" | "rooms" | "projects" | "events" | "tools";
 
 type SearchResult = {
   id: string;
@@ -69,12 +70,18 @@ function SearchResults() {
       const tokens = tokenize(queryText);
 
       try {
-        const [profileDocuments, postDocuments, roomDocuments, projectDocuments, eventDocuments] = await Promise.all([
+        const [profileDocuments, postDocuments, roomDocuments, projectDocuments, eventDocuments, documentDocuments, slideshowDocuments, tableDocuments, codeSnippetDocuments, designDocuments, filmDocuments] = await Promise.all([
           listDocuments(COLLECTIONS.profiles, [Query.limit(200)]),
           listDocuments(COLLECTIONS.posts, [Query.limit(200)]),
           listDocuments(COLLECTIONS.rooms, [Query.limit(200)]),
           listDocuments(COLLECTIONS.projects, [Query.limit(200)]),
           listDocuments(COLLECTIONS.events, [Query.limit(200)]),
+          listDocuments(COLLECTIONS.documents, [Query.limit(200)]),
+          listDocuments(COLLECTIONS.slideshows, [Query.limit(200)]),
+          listDocuments(COLLECTIONS.tables, [Query.limit(200)]),
+          listDocuments(COLLECTIONS.codeSnippets, [Query.limit(200)]),
+          listDocuments(COLLECTIONS.designs, [Query.limit(200)]),
+          listDocuments(COLLECTIONS.films, [Query.limit(200)]),
         ]);
 
         const profileResults = profileDocuments
@@ -137,8 +144,59 @@ function SearchResults() {
           }))
           .filter((result) => result.score > 0);
 
+        const toolResults = [
+          ...documentDocuments.map((document) => normalizeDocument(document.$id, document)).map((doc) => ({
+            id: doc.id,
+            type: "tools" as const,
+            title: doc.title,
+            subtitle: `${doc.body.slice(0, 80)}${doc.body.length > 80 ? "..." : ""}`,
+            href: `/documents/${doc.id}`,
+            score: scoreText(buildDocumentSearchIndex(doc.title, doc.body), tokens) + doc.word_count,
+          })),
+          ...slideshowDocuments.map((document) => normalizeSlideshow(document.$id, document)).map((show) => ({
+            id: show.id,
+            type: "tools" as const,
+            title: show.title,
+            subtitle: show.slides[0]?.heading || `${show.slide_count} slides`,
+            href: `/slideshows/${show.id}`,
+            score: scoreText(buildSlideshowSearchIndex(show.title, show.slides), tokens) + show.slide_count,
+          })),
+          ...tableDocuments.map((document) => normalizeTable(document.$id, document)).map((table) => ({
+            id: table.id,
+            type: "tools" as const,
+            title: table.title,
+            subtitle: `${table.rows} × ${table.cols} table`,
+            href: `/tools/tables/${table.id}`,
+            score: scoreText(buildTableSearchIndex(table.title, table.data), tokens),
+          })),
+          ...codeSnippetDocuments.map((document) => normalizeCodeSnippet(document.$id, document)).map((snippet) => ({
+            id: snippet.id,
+            type: "tools" as const,
+            title: snippet.title,
+            subtitle: snippet.language,
+            href: `/tools/code/${snippet.id}`,
+            score: scoreText(buildCodeSearchIndex(snippet.title, snippet.language, snippet.code), tokens),
+          })),
+          ...designDocuments.map((document) => normalizeDesign(document.$id, document)).map((design) => ({
+            id: design.id,
+            type: "tools" as const,
+            title: design.title,
+            subtitle: "Design",
+            href: `/tools/design/${design.id}`,
+            score: scoreText(buildDesignSearchIndex(design.title), tokens),
+          })),
+          ...filmDocuments.map((document) => normalizeFilm(document.$id, document)).map((film) => ({
+            id: film.id,
+            type: "tools" as const,
+            title: film.title,
+            subtitle: film.scenes[0]?.setting || `${film.scene_count} scenes`,
+            href: `/tools/films/${film.id}`,
+            score: scoreText(buildFilmSearchIndex(film.title, film.scenes), tokens) + film.scene_count,
+          })),
+        ].filter((result) => result.score > 0);
+
         setResults(
-          [...profileResults, ...postResults, ...roomResults, ...projectResults, ...eventResults].sort((a, b) => b.score - a.score),
+          [...profileResults, ...postResults, ...roomResults, ...projectResults, ...eventResults, ...toolResults].sort((a, b) => b.score - a.score),
         );
       } catch (error) {
         console.error(error);
@@ -173,6 +231,7 @@ function SearchResults() {
             { key: "projects", label: "Projects" },
             { key: "events", label: "Events" },
             { key: "rooms", label: "Rooms" },
+            { key: "tools", label: "Tools" },
           ].map((item) => (
             <button
               key={item.key}

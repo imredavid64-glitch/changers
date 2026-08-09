@@ -18,10 +18,14 @@ dist/
 
 # local runtime data
 .bridge-media/
+.changers-media/
 postgres-data/
 caddy-data/
 caddy-config/
 backups/
+
+# app-local state (Freebuff desktop db, etc.)
+.freebuff/
 
 # logs and system files
 npm-debug.log*

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { COLLECTIONS, createDocument, publicReadOwnerWritePermissions } from "@/lib/appwrite/bridge";
+import { buildTableSearchIndex } from "@/lib/social/toolSearch";
 
 const cellStyle = { border: "1px solid rgba(16,24,32,0.12)", padding: 0, background: "white" };
 const inputStyle = { border: "none", background: "transparent", padding: "8px 12px", width: 120, outline: "none", fontSize: "0.9rem" };
@@ -54,6 +55,7 @@ export default function NewTablePage() {
           data_json: JSON.stringify(data),
           rows,
           cols,
+          search_index: buildTableSearchIndex(title.trim(), data),
           created_at_ms: now,
           updated_at_ms: now,
         },

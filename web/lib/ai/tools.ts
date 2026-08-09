@@ -18,6 +18,22 @@ export interface SlideDefinition {
   body: string;
 }
 
+export interface OutlineSection {
+  heading: string;
+  subpoints: string[];
+}
+
+export interface ProjectIdea {
+  title: string;
+  description: string;
+  index: number;
+}
+
+export interface AIRewriteResult {
+  rewritten: string;
+  tone: string;
+}
+
 const SAMPLE_TEMPLATES: SlideTemplate[] = [
   {
     id: "project-pitch",
@@ -123,4 +139,64 @@ export function generateSlideContent(templateId: string): { slides: SlideDefinit
     return { slides: [] };
   }
   return { slides: [...template.slides] };
+}
+
+export async function callAI<TAction extends string, TData, TResult>(
+  action: TAction,
+  data: TData,
+): Promise<TResult> {
+  const response = await fetch("/api/ai", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action, data }),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({}));
+    throw new Error(errorBody.error || `AI request failed with status ${response.status}`);
+  }
+
+  return (await response.json()) as TResult;
+}
+
+export function callAnalyzeDocument(title: string, content: string) {
+  return callAI<"analyze-document", { title: string; content: string }, { suggestions: AISuggestion[] }>(
+    "analyze-document",
+    { title, content },
+  );
+}
+
+export function callGenerateOutline(topic: string, audience?: string) {
+  return callAI<"generate-outline", { topic: string; audience?: string }, { outline: OutlineSection[] }>(
+    "generate-outline",
+    { topic, audience },
+  );
+}
+
+export function callRewriteDocument(content: string, tone: string) {
+  return callAI<"rewrite-document", { content: string; tone: string }, AIRewriteResult>(
+    "rewrite-document",
+    { content, tone },
+  );
+}
+
+export function callSummarizeDocument(content: string, maxSentences?: number) {
+  return callAI<"summarize-document", { content: string; max_sentences?: number }, { summary: string }>(
+    "summarize-document",
+    { content, max_sentences: maxSentences },
+  );
+}
+
+export function callSuggestTitles(content: string, topic?: string) {
+  return callAI<"suggest-titles", { content: string; topic?: string }, { titles: string[] }>(
+    "suggest-titles",
+    { content, topic },
+  );
+}
+
+export function callGenerateProjectIdeas(strand: string) {
+  return callAI<"generate-project-ideas", { strand: string }, { ideas: ProjectIdea[] }>(
+    "generate-project-ideas",
+    { strand },
+  );
 }

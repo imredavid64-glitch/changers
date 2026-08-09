@@ -99,6 +99,20 @@ export default function DesignDetailPage() {
     setSaving(false);
   }
 
+  function handleExportJson() {
+    if (!design) return;
+    const json = JSON.stringify({ title, elements, canvas_width: design.canvas_width, canvas_height: design.canvas_height }, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = window.document.createElement("a");
+    a.href = url;
+    a.download = `${title || "design"}.json`;
+    window.document.body.appendChild(a);
+    a.click();
+    window.document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
   async function handleDelete() {
     if (!design) return;
     if (!window.confirm("Delete this design? This cannot be undone.")) return;
@@ -157,6 +171,7 @@ export default function DesignDetailPage() {
               {saving ? "Saving..." : "Save"}
             </button>
           )}
+          <button className="ghost" onClick={handleExportJson}>Export JSON</button>
           <button className="ghost" onClick={handleDelete} disabled={deleting} style={{ color: "var(--coral)" }}>
             {deleting ? "Deleting..." : "Delete"}
           </button>

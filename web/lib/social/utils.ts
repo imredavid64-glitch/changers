@@ -1,4 +1,4 @@
-import { AppBlock, AppCodeSnippet, AppComment, AppDesign, AppDocument, AppEvent, AppEventRsvp, AppFilm, AppNotification, AppPost, AppPrivacySettings, AppProfile, AppProject, AppProjectMember, AppRoom, AppSlideshow, AppTable, AppThread, Strand, TimestampLike } from "@/lib/social/types";
+import { AppBlock, AppCodeSnippet, AppComment, AppDesign, AppDocument, AppEvent, AppEventRsvp, AppFilm, AppNotification, AppPost, AppProfile, AppProject, AppRoom, AppSlideshow, AppTable, AppTask, AppThread, Strand, TimestampLike, AppBadge, BadgeCategory } from "@/lib/social/types";
 import { appwriteConfig } from "@/lib/appwrite/config";
 
 export const STRAND_OPTIONS: { value: Strand; label: string; description: string }[] = [
@@ -58,7 +58,7 @@ export function timestampToMillis(value: TimestampLike) {
   return 0;
 }
 
-function resolveDocumentTimestamp(data: Record<string, unknown>, key: "created_at" | "updated_at") {
+function resolveDocumentTimestamp(data: Record<string, unknown>, key: "created_at" | "updated_at" | "earned_at") {
   const numericKey = `${key}_ms`;
   const systemKey = key === "created_at" ? "$createdAt" : "$updatedAt";
 
@@ -214,10 +214,18 @@ export function normalizeProfile(id: string, data: Record<string, unknown>): App
     avatar_media_url: avatarMediaUrl,
     avatar_url: avatarMediaUrl || legacyAvatarUrl,
     interests: interests.length ? interests : ["S"],
+    saved_project_ids: Array.isArray(data.saved_project_ids)
+      ? data.saved_project_ids.filter((v): v is string => typeof v === "string")
+      : [],
     is_mentor: Boolean(data.is_mentor),
     mentor_focus: typeof data.mentor_focus === "string" ? data.mentor_focus : "",
     is_admin: Boolean(data.is_admin),
     privacy: privacyValue,
+    theme: ["moss", "ocean", "sunset", "rose"].includes(String(data.theme))
+      ? String(data.theme) as AppProfile["theme"]
+      : "moss",
+    email_notifications: Boolean(data.email_notifications),
+    push_subscription: typeof data.push_subscription === "string" ? data.push_subscription : "",
     search_index:
       typeof data.search_index === "string"
         ? data.search_index
@@ -453,29 +461,6 @@ export function normalizeBlock(id: string, data: Record<string, unknown>): AppBl
   };
 }
 
-export function normalizePrivacySettings(id: string, data: Record<string, unknown>): AppPrivacySettings {
-  const profileVis = ["public", "followers", "private"].includes(String(data.profile_visibility))
-    ? String(data.profile_visibility) as "public" | "followers" | "private"
-    : "public";
-  const postsVis = ["public", "followers", "private"].includes(String(data.posts_visibility))
-    ? String(data.posts_visibility) as "public" | "followers" | "private"
-    : "public";
-  const dmPerm = ["everyone", "followers", "none"].includes(String(data.dm_permission))
-    ? String(data.dm_permission) as "everyone" | "followers" | "none"
-    : "everyone";
-
-  return {
-    id,
-    user_id: typeof data.user_id === "string" ? data.user_id : "",
-    profile_visibility: profileVis,
-    posts_visibility: postsVis,
-    dm_permission: dmPerm,
-    show_saved_posts: Boolean(data.show_saved_posts),
-    created_at: resolveDocumentTimestamp(data, "created_at"),
-    updated_at: resolveDocumentTimestamp(data, "updated_at"),
-  };
-}
-
 export function normalizeProject(id: string, data: Record<string, unknown>): AppProject {
   const strand = isStrand(data.strand) ? data.strand : "S";
   const members = Array.isArray(data.members)
@@ -514,18 +499,49 @@ export function normalizeProject(id: string, data: Record<string, unknown>): App
   };
 }
 
-export function normalizeProjectMember(id: string, data: Record<string, unknown>): AppProjectMember {
-  const roles = ["owner", "collaborator", "viewer"] as const;
-  const role = roles.includes(data.role as typeof roles[number])
-    ? (data.role as AppProjectMember["role"])
-    : "collaborator";
+export function normalizeTask(id: string, data: Record<string, unknown>): AppTask {
+  const statuses = ["todo", "in-progress", "done"] as const;
+  const priorities = ["low", "medium", "high"] as const;
+  const status = statuses.includes(data.status as typeof statuses[number])
+    ? (data.status as AppTask["status"])
+    : "todo";
+  const priority = priorities.includes(data.priority as typeof priorities[number])
+    ? (data.priority as AppTask["priority"])
+    : "medium";
 
   return {
     id,
     project_id: typeof data.project_id === "string" ? data.project_id : "",
+    title: typeof data.title === "string" ? data.title : "Untitled task",
+    description: typeof data.description === "string" ? data.description : "",
+    status,
+    assignee_id: typeof data.assignee_id === "string" ? data.assignee_id : "",
+    assignee_name: typeof data.assignee_name === "string" ? data.assignee_name : "",
+    priority,
+    created_by: typeof data.created_by === "string" ? data.created_by : "",
+    created_at: resolveDocumentTimestamp(data, "created_at"),
+    updated_at: resolveDocumentTimestamp(data, "updated_at"),
+  };
+}
+
+export function normalizeBadge(id: string, data: Record<string, unknown>): AppBadge {
+  let metadata: Record<string, unknown> = {};
+  if (typeof data.metadata === "string") {
+    try {
+      const parsed = JSON.parse(data.metadata);
+      if (typeof parsed === "object" && parsed !== null) metadata = parsed;
+    } catch {}
+  }
+  return {
+    id,
     user_id: typeof data.user_id === "string" ? data.user_id : "",
-    role,
-    joined_at: resolveDocumentTimestamp(data, "joined_at" as "created_at" | "updated_at"),
+    badge_id: typeof data.badge_id === "string" ? data.badge_id : "",
+    badge_name: typeof data.badge_name === "string" ? data.badge_name : "",
+    badge_description: typeof data.badge_description === "string" ? data.badge_description : "",
+    badge_icon: typeof data.badge_icon === "string" ? data.badge_icon : "🏅",
+    badge_category: typeof data.badge_category === "string" ? data.badge_category as BadgeCategory : "milestone",
+    earned_at: resolveDocumentTimestamp(data, "earned_at"),
+    metadata,
   };
 }
 

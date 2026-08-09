@@ -34,6 +34,8 @@ export default function RoomWorkspace({ params }: { params: Promise<{ id: string
   const [messages, setMessages] = useState<RoomMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [status, setStatus] = useState<string | null>(null);
+  const [pendingMessageIds, setPendingMessageIds] = useState<Set<string>>(new Set());
+  const optimisticIdRef = useRef(0);
   const [loadingRoom, setLoadingRoom] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(true);
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
@@ -73,6 +75,7 @@ export default function RoomWorkspace({ params }: { params: Promise<{ id: string
           (a, b) => timestampToMillis(a.created_at) - timestampToMillis(b.created_at),
         );
         setMessages(loadedMessages);
+        setPendingMessageIds(new Set());
         setLoadingMessages(false);
       },
       (error) => {
@@ -118,6 +121,17 @@ export default function RoomWorkspace({ params }: { params: Promise<{ id: string
     setNewMessage("");
     setStatus(null);
 
+    const optimisticId = `optimistic_${Date.now()}_${optimisticIdRef.current++}`;
+    const optimisticMessage: RoomMessage = {
+      id: optimisticId,
+      author_id: currentUser.$id,
+      author_name: profile?.full_name || getDisplayName(currentUser),
+      text,
+      created_at: Date.now(),
+    };
+    setMessages((current) => [...current, optimisticMessage]);
+    setPendingMessageIds((current) => new Set(current).add(optimisticId));
+
     try {
       await createDocument(
         COLLECTIONS.roomMessages,
@@ -136,6 +150,12 @@ export default function RoomWorkspace({ params }: { params: Promise<{ id: string
         updated_at_ms: Date.now(),
       });
     } catch (error) {
+      setMessages((current) => current.filter((message) => message.id !== optimisticId));
+      setPendingMessageIds((current) => {
+        const next = new Set(current);
+        next.delete(optimisticId);
+        return next;
+      });
       setStatus("Message failed to send.");
       setNewMessage(text);
       console.error(error);
@@ -237,6 +257,11 @@ export default function RoomWorkspace({ params }: { params: Promise<{ id: string
                   >
                     <p style={{ margin: 0 }}>{message.text}</p>
                   </div>
+                  {pendingMessageIds.has(message.id) && (
+                    <span style={{ fontSize: "0.7rem", color: "rgba(16, 24, 32, 0.45)", marginTop: 4 }}>
+                      sending...
+                    </span>
+                  )}
                 </div>
               );
             })
