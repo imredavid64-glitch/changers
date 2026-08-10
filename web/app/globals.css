@@ -716,3 +716,134 @@ button:disabled {
     max-width: 100%;
   }
 }
+
+/* ---- Platform effects ----
+ * Subtle motion everywhere: entrance reveals, card lifts, link underlines,
+ * focus rings, and press feedback. Everything is disabled for users who
+ * prefer reduced motion. */
+
+html {
+  scroll-behavior: smooth;
+}
+
+:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* Cards lift gently on hover. */
+.card,
+.collab-card,
+.project-card,
+.event-card,
+.zine-issue,
+.mentor-card,
+.impact-card {
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.card:hover,
+.collab-card:hover,
+.project-card:hover,
+.event-card:hover,
+.zine-issue:hover,
+.mentor-card:hover,
+.impact-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 36px rgba(16, 24, 32, 0.1);
+  border-color: rgba(44, 138, 125, 0.3);
+}
+
+/* Main-column sections rise into view on load, slightly staggered. */
+.main > * {
+  animation: rise-in 0.45s ease both;
+}
+
+.main > *:nth-child(2) {
+  animation-delay: 0.06s;
+}
+
+.main > *:nth-child(3) {
+  animation-delay: 0.12s;
+}
+
+.main > *:nth-child(4) {
+  animation-delay: 0.18s;
+}
+
+.main > *:nth-child(5) {
+  animation-delay: 0.24s;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Logo mark breathes. */
+.logo-mark {
+  animation: mark-glow 3.2s ease-in-out infinite;
+}
+
+@keyframes mark-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px rgba(255, 111, 79, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 0 9px rgba(255, 111, 79, 0.05);
+  }
+}
+
+/* Side-nav links get a sweeping underline. */
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--teal);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  transform: scaleX(1);
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
