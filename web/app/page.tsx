@@ -56,9 +56,9 @@ const FEATURE_GROUPS: { title: string; blurb: string; items: { emoji: string; na
     blurb: "See your contribution add up — and get recognized for it.",
     items: [
       { emoji: "🏔️", name: "Impact Score", href: "/impact", desc: "Every post, project, and event earns impact points with levels from Beginner to Trailblazer." },
-      { emoji: "🏆", name: "Badges", href: "/profile", desc: "30+ achievements for milestones, streaks, community building, and strand leadership." },
+      { emoji: "🏆", name: "Badges", href: "/impact", desc: "30+ achievements for milestones, streaks, community building, and strand leadership." },
       { emoji: "🔔", name: "Notifications", href: "/notifications", desc: "Realtime alerts for likes, comments, follows, and event reminders — plus an email digest." },
-      { emoji: "🎨", name: "Profiles", href: "/profile", desc: "Custom themes, mentor focus, and privacy controls that put you in charge." },
+      { emoji: "🎨", name: "Profiles", href: "/sign-up", desc: "Custom themes, mentor focus, and privacy controls that put you in charge." },
       { emoji: "🔎", name: "Search", href: "/search", desc: "Find people, projects, and ideas across the whole community." },
     ],
   },
