@@ -160,6 +160,20 @@ export async function listContactMessages(limit = 200) {
   return rows.map(mapContactMessageRow);
 }
 
+export async function getContactMessage(id: string): Promise<ContactMessageRecord | null> {
+  const { rows } = await getContactPool().query<ContactMessageDbRow>(
+    `
+      SELECT *
+      FROM contact_messages
+      WHERE id = $1
+      LIMIT 1
+    `,
+    [id],
+  );
+
+  return rows[0] ? mapContactMessageRow(rows[0]) : null;
+}
+
 export async function updateContactMessageStatus(
   id: string,
   changes: { read?: boolean; replied?: boolean },

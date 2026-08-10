@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { COLLECTIONS, listDocuments, updateDocument } from "@/lib/appwrite/bridge";
 import { account, Query } from "@/lib/appwrite/client";
 import type { ContactMessageRecord } from "@/lib/contact/server";
+import type { AdminActionRecord } from "@/lib/audit/server";
 import { anonymizeUserData, eraseUserData } from "@/lib/userdata/client";
 import { AppPost, AppProfile } from "@/lib/social/types";
 import { normalizePost, normalizeProfile } from "@/lib/social/utils";
@@ -17,9 +18,14 @@ export default function AdminPage() {
   const [posts, setPosts] = useState<AppPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"profiles" | "posts" | "messages">("profiles");
+  const [activeTab, setActiveTab] = useState<"profiles" | "posts" | "messages" | "audit">("profiles");
   const [messages, setMessages] = useState<ContactMessageRecord[]>([]);
   const [messagesLoaded, setMessagesLoaded] = useState(false);
+  const [auditActions, setAuditActions] = useState<AdminActionRecord[]>([]);
+  const [auditLoaded, setAuditLoaded] = useState(false);
+  const [replyTarget, setReplyTarget] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [sendingReply, setSendingReply] = useState(false);
   const [eraseTarget, setEraseTarget] = useState<string | null>(null);
   const [eraseConfirmText, setEraseConfirmText] = useState("");
   const [eraseMode, setEraseMode] = useState<"delete" | "anonymize">("delete");
@@ -82,6 +88,31 @@ export default function AdminPage() {
     }
   }, [activeTab, messagesLoaded, isAdmin]);
 
+  async function loadAuditActions() {
+    try {
+      const jwt = await account.createJWT();
+      const response = await fetch("/api/audit", {
+        headers: { Authorization: `Bearer ${jwt.jwt}` },
+      });
+      if (!response.ok) {
+        throw new Error(`Audit API returned ${response.status}`);
+      }
+      const data = (await response.json()) as { actions: AdminActionRecord[] };
+      setAuditActions(data.actions);
+    } catch (error) {
+      setStatus("Failed to load audit log.");
+      console.error(error);
+    } finally {
+      setAuditLoaded(true);
+    }
+  }
+
+  useEffect(() => {
+    if (activeTab === "audit" && !auditLoaded && isAdmin) {
+      void loadAuditActions();
+    }
+  }, [activeTab, auditLoaded, isAdmin]);
+
   function formatDate(value: string) {
     return new Date(value).toLocaleString(undefined, {
       dateStyle: "medium",
@@ -111,6 +142,36 @@ export default function AdminPage() {
     } finally {
       setEraseTarget(null);
       setEraseConfirmText("");
+    }
+  }
+
+  async function handleSendReply(id: string) {
+    if (!replyText.trim() || sendingReply) return;
+    setSendingReply(true);
+    try {
+      const jwt = await account.createJWT();
+      const response = await fetch(`/api/contact/${id}/reply`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${jwt.jwt}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ reply: replyText }),
+      });
+      const data = (await response.json()) as { ok?: boolean; message?: ContactMessageRecord; error?: string };
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error || `Reply API returned ${response.status}`);
+      }
+      if (data.message) {
+        setMessages((prev) => prev.map((m) => (m.id === id ? (data.message as ContactMessageRecord) : m)));
+      }
+      setReplyTarget(null);
+      setReplyText("");
+      setStatus("Reply sent by email.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to send reply.");
+    } finally {
+      setSendingReply(false);
     }
   }
 
@@ -173,6 +234,9 @@ export default function AdminPage() {
           </button>
           <button className={`filter ${activeTab === "messages" ? "active" : ""}`} onClick={() => setActiveTab("messages")}>
             Messages ({messages.length})
+          </button>
+          <button className={`filter ${activeTab === "audit" ? "active" : ""}`} onClick={() => setActiveTab("audit")}>
+            Audit
           </button>
         </div>
       </div>
@@ -262,12 +326,52 @@ export default function AdminPage() {
                   <a className="ghost" href={`mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.subject || "Your message to Changers")}`} style={{ fontSize: "0.85rem" }}>
                     <Mail size={14} style={{ display: "inline", marginRight: 4, verticalAlign: "middle" }} /> Reply
                   </a>
+                  <button className="ghost" onClick={() => { setReplyTarget(replyTarget === msg.id ? null : msg.id); setReplyText(""); }} style={{ fontSize: "0.8rem" }}>
+                    Reply by email
+                  </button>
                   <button className="ghost" onClick={() => handleMessageStatus(msg.id, msg.readAt ? { read: false } : { read: true })} style={{ fontSize: "0.8rem" }}>
                     {msg.readAt ? "Mark unread" : "Mark read"}
                   </button>
                   <button className="ghost" onClick={() => handleMessageStatus(msg.id, msg.repliedAt ? { replied: false } : { replied: true, read: true })} style={{ fontSize: "0.8rem" }}>
                     {msg.repliedAt ? "Unmark replied" : "Mark replied"}
                   </button>
+                  {replyTarget === msg.id && (
+                    <div style={{ display: "grid", gap: 6, width: 260 }}>
+                      <textarea
+                        value={replyText}
+                        onChange={(event) => setReplyText(event.target.value)}
+                        placeholder={`Reply to ${msg.name}...`}
+                        rows={4}
+                        style={{ width: "100%", padding: "8px 10px", borderRadius: 10, border: "1px solid rgba(16,24,32,0.15)", background: "white", fontSize: "0.85rem", resize: "vertical" }}
+                      />
+                      <button className="primary" onClick={() => handleSendReply(msg.id)} disabled={!replyText.trim() || sendingReply} style={{ fontSize: "0.8rem", padding: "8px 14px" }}>
+                        {sendingReply ? "Sending..." : "Send reply"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      ) : activeTab === "audit" ? (
+        <div style={{ display: "grid", gap: 12 }}>
+          {!auditLoaded ? <p className="muted">Loading audit log...</p> : auditActions.length === 0 ? (
+            <p className="muted">No admin actions recorded yet. Erase/anonymize operations on users will appear here.</p>
+          ) : (
+            auditActions.map((action) => (
+              <div key={action.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(16,24,32,0.08)", background: "white" }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontWeight: 600 }}>
+                    <span className="chip" style={{ background: action.action === "erase" ? "var(--coral)" : "rgba(44,138,125,0.2)", color: action.action === "erase" ? "white" : "inherit", marginRight: 8 }}>
+                      {action.action}
+                    </span>
+                    by {action.adminUserId.slice(0, 10)}... → {action.targetUserId.slice(0, 10)}...
+                  </p>
+                  <p className="muted" style={{ fontSize: "0.85rem" }}>
+                    {formatDate(action.createdAt)} · {action.deletedCount} deleted{action.action === "anonymize" ? ` · ${action.anonymizedCount} anonymized` : ""}
+                    {action.errorCount > 0 ? ` · ⚠ ${action.errorCount} errors` : ""}
+                  </p>
                 </div>
               </div>
             ))

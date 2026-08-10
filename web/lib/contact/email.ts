@@ -45,6 +45,61 @@ export function getSmtpConfig(): SmtpConfig | null {
   };
 }
 
+/**
+ * Sends an admin's reply to a contact message sender over SMTP. Returns the
+ * subject actually used, or the reason the send was skipped.
+ */
+export async function sendReplyEmail(
+  record: ContactMessageRecord,
+  replyText: string,
+): Promise<{ sent: boolean; subject?: string; reason?: string }> {
+  const config = getSmtpConfig();
+  if (!config) {
+    return { sent: false, reason: "SMTP is not configured." };
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host: config.host,
+      port: config.port,
+      secure: config.port === 465,
+      auth: { user: config.user, pass: config.pass },
+    });
+
+    const subject = `Re: ${record.subject || "Your message to Changers"}`;
+    const text = [
+      `Hi ${record.name},`,
+      ``,
+      replyText.trim(),
+      ``,
+      `— The Changers team`,
+    ].join("\n");
+
+    const html = [
+      `<p>Hi ${escapeHtml(record.name)},</p>`,
+      `<p style="white-space: pre-wrap;">${escapeHtml(replyText.trim()).replace(/\n/g, "<br>")}</p>`,
+      `<p>— The Changers team</p>`,
+      `<hr>`,
+      `<p style="color: #666; font-size: 0.85rem;">Re: ${escapeHtml(record.subject || "Your message to Changers")} · Reference: ${escapeHtml(record.id)}</p>`,
+    ].join("\n");
+
+    await transporter.sendMail({
+      from: config.from,
+      to: record.email,
+      subject,
+      text,
+      html,
+      inReplyTo: record.id,
+      references: record.id,
+    });
+
+    return { sent: true, subject };
+  } catch (error) {
+    console.error("Contact reply email failed:", error);
+    return { sent: false, reason: error instanceof Error ? error.message : "Unknown SMTP error." };
+  }
+}
+
 export async function forwardContactMessage(
   record: ContactMessageRecord,
 ): Promise<{ sent: boolean; reason?: string }> {

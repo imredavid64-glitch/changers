@@ -1,5 +1,7 @@
+import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedAppwriteUser } from "@/lib/media/server";
+import { recordAdminAction } from "@/lib/audit/server";
 import { anonymizeUserData, deleteUserData } from "@/lib/userdata/server";
 import { verifyAdminUser } from "@/lib/admin/server";
 
@@ -56,6 +58,24 @@ export async function DELETE(request: NextRequest) {
       const result = await deleteUserData(targetUserId);
       deletedCount = result.deleted.length;
       errors = result.errors;
+    }
+
+    // Audit trail: record admin actions on other users (self-deletes are not
+    // admin actions). Best-effort — auditing never fails the erase itself.
+    if (targetUserId !== user.$id) {
+      try {
+        await recordAdminAction({
+          id: crypto.randomUUID(),
+          adminUserId: user.$id,
+          targetUserId,
+          action: mode === "anonymize" ? "anonymize" : "erase",
+          deletedCount,
+          anonymizedCount,
+          errorCount: errors.length,
+        });
+      } catch (error) {
+        console.error("Failed to record admin action:", error);
+      }
     }
 
     const message =
