@@ -7,6 +7,7 @@ import {
   listContactMessages,
 } from "@/lib/contact/server";
 import { getContactRateLimitMax } from "@/lib/contact/config";
+import { forwardContactMessage } from "@/lib/contact/email";
 import { verifyAdminUser } from "@/lib/admin/server";
 
 export const runtime = "nodejs";
@@ -114,6 +115,14 @@ export async function POST(request: NextRequest) {
       userAgent: request.headers.get("user-agent")?.slice(0, 500) || null,
       referrer: request.headers.get("referer")?.slice(0, 1000) || null,
       pagePath,
+    });
+
+    // Best-effort: also email the message to the team inboxes when SMTP is
+    // configured. Email failures never fail the submission.
+    void forwardContactMessage(record).then((result) => {
+      if (!result.sent) {
+        console.warn("Contact forward skipped:", result.reason);
+      }
     });
 
     return NextResponse.json(

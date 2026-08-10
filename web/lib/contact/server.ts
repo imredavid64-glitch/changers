@@ -159,3 +159,22 @@ export async function listContactMessages(limit = 200) {
 
   return rows.map(mapContactMessageRow);
 }
+
+export async function updateContactMessageStatus(
+  id: string,
+  changes: { read?: boolean; replied?: boolean },
+) {
+  const { rows } = await getContactPool().query<ContactMessageDbRow>(
+    `
+      UPDATE contact_messages
+      SET
+        read_at = CASE WHEN $2 THEN COALESCE(read_at, now()) ELSE NULL END,
+        replied_at = CASE WHEN $3 THEN COALESCE(replied_at, now()) ELSE NULL END
+      WHERE id = $1
+      RETURNING *
+    `,
+    [id, changes.read === true, changes.replied === true],
+  );
+
+  return rows[0] ? mapContactMessageRow(rows[0]) : null;
+}

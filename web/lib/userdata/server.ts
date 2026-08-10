@@ -246,6 +246,171 @@ export async function exportUserData(userId: string): Promise<ExportBundle> {
   };
 }
 
+// Personal/relational collections deleted entirely in anonymize mode; the user's
+// public community content is kept but stripped of identity.
+const ANONYMIZE_DELETE_COLLECTIONS = [
+  "notifications",
+  "follows",
+  "savedPosts",
+  "blocks",
+  "badges",
+  "eventRsvps",
+  "documents",
+  "slideshows",
+  "tables",
+  "codeSnippets",
+  "designs",
+  "films",
+  "tasks",
+];
+
+// Kept content, with identity fields replaced. search_index is rebuilt so the
+// former name no longer surfaces in search.
+const ANONYMIZE_FIELD_MAP: Record<string, Record<string, string>> = {
+  posts: {
+    author_name: "Former member",
+    author_role: "",
+    author_avatar_file_id: "",
+    author_avatar_media_id: "",
+    author_avatar_media_storage_key: "",
+    author_avatar_media_url: "",
+    author_avatar_url: "",
+    search_index: "former member",
+  },
+  comments: {
+    author_name: "Former member",
+    author_avatar_file_id: "",
+    author_avatar_media_id: "",
+    author_avatar_media_storage_key: "",
+    author_avatar_media_url: "",
+    author_avatar_url: "",
+  },
+  events: { host_name: "Former member" },
+  roomMessages: { author_name: "Former member" },
+  threadMessages: { sender_name: "Former member" },
+};
+
+// Rooms/projects the user owns: anonymize the owner name and drop the user from
+// the members array so the doc survives without pointing at a deleted profile.
+const ANONYMIZE_OWNED_MAP: Record<string, { ownerNameField: string; memberField: string }> = {
+  rooms: { ownerNameField: "owner_name", memberField: "members" },
+  projects: { ownerNameField: "owner_name", memberField: "members" },
+};
+
+export async function anonymizeUserData(userId: string) {
+  const deleted: string[] = [];
+  const anonymized: string[] = [];
+  const errors: string[] = [];
+
+  const recordError = (label: string, error: unknown) => {
+    errors.push(`${label}: ${error instanceof Error ? error.message : "error"}`);
+  };
+
+  if (getServerApiKey()) {
+    // 1. Delete personal/relational collections (notifications, follows, saved
+    //    posts, blocks, badges, RSVPs, private tool content, tasks).
+    for (const collectionId of ANONYMIZE_DELETE_COLLECTIONS) {
+      const docs = await listOwnedDocs(collectionId, userId);
+      for (const doc of docs) {
+        try {
+          await deleteDoc(collectionId, doc.$id);
+          deleted.push(`${collectionId}/${doc.$id}`);
+        } catch (error) {
+          recordError(`${collectionId}/${doc.$id}`, error);
+        }
+      }
+    }
+
+    // 2. Anonymize kept community content (posts, comments, events, messages).
+    for (const [collectionId, fieldMap] of Object.entries(ANONYMIZE_FIELD_MAP)) {
+      const docs = await listOwnedDocs(collectionId, userId);
+      for (const doc of docs) {
+        try {
+          await updateDoc(collectionId, doc.$id, fieldMap);
+          anonymized.push(`${collectionId}/${doc.$id}`);
+        } catch (error) {
+          recordError(`${collectionId}/${doc.$id}`, error);
+        }
+      }
+    }
+
+    // 3. Owned rooms/projects: anonymize the owner name, drop the user from members.
+    for (const [collectionId, config] of Object.entries(ANONYMIZE_OWNED_MAP)) {
+      const docs = await listOwnedMembershipDocs(collectionId, userId);
+      for (const doc of docs) {
+        try {
+          const members = Array.isArray(doc[config.memberField]) ? (doc[config.memberField] as string[]) : [];
+          await updateDoc(collectionId, doc.$id, {
+            [config.ownerNameField]: "Former member",
+            [config.memberField]: members.filter((memberId) => memberId !== userId),
+          });
+          anonymized.push(`${collectionId}/${doc.$id}`);
+        } catch (error) {
+          recordError(`${collectionId}/${doc.$id}`, error);
+        }
+      }
+    }
+
+    // 4. Remove the user from shared memberships.
+    for (const [collectionId, attribute] of Object.entries(MEMBERSHIP_COLLECTIONS)) {
+      const docs = await listMembershipDocs(collectionId, userId);
+      for (const doc of docs) {
+        try {
+          const members = Array.isArray(doc[attribute]) ? (doc[attribute] as string[]) : [];
+          const next = members.filter((memberId) => memberId !== userId);
+          if (next.length !== members.length) {
+            await updateDoc(collectionId, doc.$id, { [attribute]: next });
+            anonymized.push(`${collectionId}/${doc.$id} (removed membership)`);
+          }
+        } catch (error) {
+          recordError(`${collectionId}/${doc.$id}`, error);
+        }
+      }
+    }
+
+    // 5. Delete the profile document and the Appwrite account.
+    try {
+      await deleteDoc(appwriteConfig.collections.profiles, userId);
+      deleted.push(`profiles/${userId}`);
+    } catch (error) {
+      recordError(`profiles/${userId}`, error);
+    }
+
+    try {
+      await deleteAccount(userId);
+      deleted.push(`account/${userId}`);
+    } catch (error) {
+      recordError(`account/${userId}`, error);
+    }
+  }
+
+  // 6. Postgres: media rows + files, then contact messages.
+  try {
+    const media = await listOwnedMedia(userId);
+    const mediaRoot = getMediaRoot();
+    for (const asset of media) {
+      try {
+        await removeMediaAssetFiles(mediaRoot, asset.storageKey);
+      } catch {
+        // File may already be gone — continue with the row deletion.
+      }
+    }
+    await getMediaPool().query(`DELETE FROM media_assets WHERE owner_user_id = $1`, [userId]);
+    deleted.push(`media_assets (${media.length})`);
+  } catch (error) {
+    recordError(`media_assets`, error);
+  }
+
+  try {
+    const { rowCount } = await getContactPool().query(`DELETE FROM contact_messages WHERE user_id = $1`, [userId]);
+    deleted.push(`contact_messages (${rowCount ?? 0})`);
+  } catch (error) {
+    recordError(`contact_messages`, error);
+  }
+
+  return { deleted, anonymized, errors };
+}
+
 export async function deleteUserData(userId: string) {
   const deleted: string[] = [];
   const errors: string[] = [];

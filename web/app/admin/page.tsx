@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Shield, Trash2 } from "lucide-react";
+import { Mail, Shield, Trash2 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { COLLECTIONS, listDocuments, updateDocument } from "@/lib/appwrite/bridge";
 import { account, Query } from "@/lib/appwrite/client";
 import type { ContactMessageRecord } from "@/lib/contact/server";
-import { eraseUserData } from "@/lib/userdata/client";
+import { anonymizeUserData, eraseUserData } from "@/lib/userdata/client";
 import { AppPost, AppProfile } from "@/lib/social/types";
 import { normalizePost, normalizeProfile } from "@/lib/social/utils";
 
@@ -22,6 +22,7 @@ export default function AdminPage() {
   const [messagesLoaded, setMessagesLoaded] = useState(false);
   const [eraseTarget, setEraseTarget] = useState<string | null>(null);
   const [eraseConfirmText, setEraseConfirmText] = useState("");
+  const [eraseMode, setEraseMode] = useState<"delete" | "anonymize">("delete");
 
   const isAdmin = profile?.is_admin === true;
 
@@ -92,17 +93,46 @@ export default function AdminPage() {
     if (eraseConfirmText !== "DELETE") return;
     setStatus(null);
     try {
-      const result = await eraseUserData(profileId);
-      setProfiles((prev) => prev.filter((p) => p.id !== profileId));
-      setStatus(`${result.message} (${result.deleted} items deleted).`);
-      if (result.errors.length > 0) {
-        console.error("Erase errors:", result.errors);
+      if (eraseMode === "anonymize") {
+        const result = await anonymizeUserData(profileId);
+        setProfiles((prev) => prev.filter((p) => p.id !== profileId));
+        setStatus(
+          `${result.message} (${result.deleted} personal items removed, ${result.anonymized} content items anonymized).`,
+        );
+        if (result.errors.length > 0) console.error("Anonymize errors:", result.errors);
+      } else {
+        const result = await eraseUserData(profileId);
+        setProfiles((prev) => prev.filter((p) => p.id !== profileId));
+        setStatus(`${result.message} (${result.deleted} items deleted).`);
+        if (result.errors.length > 0) console.error("Erase errors:", result.errors);
       }
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Failed to erase user data.");
     } finally {
       setEraseTarget(null);
       setEraseConfirmText("");
+    }
+  }
+
+  async function handleMessageStatus(id: string, changes: { read?: boolean; replied?: boolean }) {
+    try {
+      const jwt = await account.createJWT();
+      const response = await fetch(`/api/contact/${id}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${jwt.jwt}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(changes),
+      });
+      if (!response.ok) {
+        throw new Error(`Contact API returned ${response.status}`);
+      }
+      const data = (await response.json()) as { message: ContactMessageRecord };
+      setMessages((prev) => prev.map((m) => (m.id === id ? data.message : m)));
+    } catch (error) {
+      setStatus("Failed to update message status.");
+      console.error(error);
     }
   }
 
@@ -162,6 +192,15 @@ export default function AdminPage() {
                 </div>
                 {eraseTarget === prof.id ? (
                   <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                    <select
+                      value={eraseMode}
+                      onChange={(event) => setEraseMode(event.target.value === "anonymize" ? "anonymize" : "delete")}
+                      style={{ padding: "6px 10px", borderRadius: 10, border: "1px solid rgba(16,24,32,0.15)", background: "white", fontSize: "0.8rem" }}
+                      title="Hard delete removes everything; anonymize keeps community content but strips the person's identity"
+                    >
+                      <option value="delete">Hard delete</option>
+                      <option value="anonymize">Anonymize (keep content)</option>
+                    </select>
                     <input
                       type="text"
                       value={eraseConfirmText}
@@ -170,7 +209,7 @@ export default function AdminPage() {
                       style={{ width: 110, padding: "6px 10px", borderRadius: 10, border: "1px solid rgba(255,111,79,0.4)", background: "white", fontSize: "0.8rem" }}
                     />
                     <button className="primary" onClick={() => handleEraseUser(prof.id)} disabled={eraseConfirmText !== "DELETE"} style={{ fontSize: "0.8rem", padding: "8px 14px" }}>
-                      Confirm erase
+                      Confirm {eraseMode === "anonymize" ? "anonymize" : "erase"}
                     </button>
                     <button className="ghost" onClick={() => { setEraseTarget(null); setEraseConfirmText(""); }} style={{ fontSize: "0.8rem" }}>
                       Cancel
@@ -182,7 +221,7 @@ export default function AdminPage() {
                       {prof.is_admin ? "Remove admin" : "Make admin"}
                     </button>
                     {prof.id !== user.$id && (
-                      <button className="ghost" onClick={() => { setEraseConfirmText(""); setEraseTarget(prof.id); }} style={{ fontSize: "0.85rem", color: "var(--coral)" }} title="Permanently delete this user's data and account">
+                      <button className="ghost" onClick={() => { setEraseConfirmText(""); setEraseMode("delete"); setEraseTarget(prof.id); }} style={{ fontSize: "0.85rem", color: "var(--coral)" }} title="Erase or anonymize this user's data">
                         <Trash2 size={16} style={{ display: "inline", marginRight: 4, verticalAlign: "middle" }} /> Erase
                       </button>
                     )}
@@ -204,6 +243,13 @@ export default function AdminPage() {
                     {msg.name}{" "}
                     <a href={`mailto:${msg.email}`} style={{ color: "var(--teal)", fontSize: "0.85rem" }}>{msg.email}</a>
                     {msg.organization && <span className="muted" style={{ fontSize: "0.85rem" }}> · {msg.organization}</span>}
+                    {msg.repliedAt ? (
+                      <span className="chip" style={{ marginLeft: 8, background: "rgba(44,138,125,0.2)" }}>Replied</span>
+                    ) : msg.readAt ? (
+                      <span className="chip" style={{ marginLeft: 8 }}>Read</span>
+                    ) : (
+                      <span className="chip" style={{ marginLeft: 8, background: "var(--coral)", color: "white" }}>Unread</span>
+                    )}
                   </p>
                   {msg.subject && <p style={{ fontWeight: 600, fontSize: "0.9rem", marginTop: 4 }}>{msg.subject}</p>}
                   <p className="muted" style={{ fontSize: "0.9rem", marginTop: 4, whiteSpace: "pre-wrap" }}>{msg.message}</p>
@@ -212,9 +258,17 @@ export default function AdminPage() {
                     {msg.pagePath ? ` · from ${msg.pagePath}` : ""}
                   </p>
                 </div>
-                <a className="ghost" href={`mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.subject || "Your message to Changers")}`} style={{ fontSize: "0.85rem", flexShrink: 0 }}>
-                  Reply
-                </a>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, flexShrink: 0, alignItems: "flex-end" }}>
+                  <a className="ghost" href={`mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.subject || "Your message to Changers")}`} style={{ fontSize: "0.85rem" }}>
+                    <Mail size={14} style={{ display: "inline", marginRight: 4, verticalAlign: "middle" }} /> Reply
+                  </a>
+                  <button className="ghost" onClick={() => handleMessageStatus(msg.id, msg.readAt ? { read: false } : { read: true })} style={{ fontSize: "0.8rem" }}>
+                    {msg.readAt ? "Mark unread" : "Mark read"}
+                  </button>
+                  <button className="ghost" onClick={() => handleMessageStatus(msg.id, msg.repliedAt ? { replied: false } : { replied: true, read: true })} style={{ fontSize: "0.8rem" }}>
+                    {msg.repliedAt ? "Unmark replied" : "Mark replied"}
+                  </button>
+                </div>
               </div>
             ))
           )}

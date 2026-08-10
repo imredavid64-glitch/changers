@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedAppwriteUser } from "@/lib/media/server";
-import { deleteUserData } from "@/lib/userdata/server";
+import { anonymizeUserData, deleteUserData } from "@/lib/userdata/server";
 import { verifyAdminUser } from "@/lib/admin/server";
 
 export const runtime = "nodejs";
@@ -12,7 +12,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: "You must be signed in to delete your data." }, { status: 401 });
   }
 
-  let body: { confirm?: boolean; targetUserId?: unknown };
+  let body: { confirm?: boolean; targetUserId?: unknown; mode?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -25,6 +25,10 @@ export async function DELETE(request: NextRequest) {
       { status: 400 },
     );
   }
+
+  // "delete" hard-erases everything (default); "anonymize" keeps the user's
+  // community content (posts, comments, projects...) but strips their identity.
+  const mode = body.mode === "anonymize" ? "anonymize" : "delete";
 
   // Callers may only erase their own data — unless they are an admin, who can
   // erase any user's data (used by the Admin Dashboard erase-user tool).
@@ -39,13 +43,38 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    const result = await deleteUserData(targetUserId);
+    let deletedCount = 0;
+    let anonymizedCount = 0;
+    let errors: string[] = [];
+
+    if (mode === "anonymize") {
+      const result = await anonymizeUserData(targetUserId);
+      deletedCount = result.deleted.length;
+      anonymizedCount = result.anonymized.length;
+      errors = result.errors;
+    } else {
+      const result = await deleteUserData(targetUserId);
+      deletedCount = result.deleted.length;
+      errors = result.errors;
+    }
+
+    const message =
+      targetUserId === user.$id
+        ? mode === "anonymize"
+          ? "Your content has been anonymized and personal data removed."
+          : "Your data has been deleted."
+        : mode === "anonymize"
+          ? "User content anonymized and personal data removed."
+          : "User data has been erased.";
+
     return NextResponse.json({
       ok: true,
-      message: targetUserId === user.$id ? "Your data has been deleted." : "User data has been erased.",
+      message,
       targetUserId,
-      deleted: result.deleted.length,
-      errors: result.errors,
+      mode,
+      deleted: deletedCount,
+      anonymized: anonymizedCount,
+      errors,
     });
   } catch (error) {
     console.error("Delete user data error:", error);

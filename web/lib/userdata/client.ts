@@ -41,7 +41,7 @@ export async function downloadMyData() {
   return bundle;
 }
 
-export async function deleteMyData() {
+async function deleteUserDataRequest(body: Record<string, unknown>) {
   const jwt = await createUserDataJwt();
   const response = await fetch("/api/user-data", {
     method: "DELETE",
@@ -49,31 +49,47 @@ export async function deleteMyData() {
       Authorization: `Bearer ${jwt}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ confirm: true }),
+    body: JSON.stringify({ confirm: true, ...body }),
   });
 
   if (!response.ok) {
     throw new Error(await readErrorMessage(response));
   }
 
+  return response;
+}
+
+export async function deleteMyData() {
+  const response = await deleteUserDataRequest({});
   return (await response.json()) as { ok: true; message: string; deleted: number; errors: string[] };
 }
 
 /** Admin-only: permanently erases another user's data and account. */
 export async function eraseUserData(targetUserId: string) {
-  const jwt = await createUserDataJwt();
-  const response = await fetch("/api/user-data", {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${jwt}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ confirm: true, targetUserId }),
-  });
+  const response = await deleteUserDataRequest({ targetUserId });
+  return (await response.json()) as {
+    ok: true;
+    message: string;
+    targetUserId: string;
+    mode: "delete";
+    deleted: number;
+    errors: string[];
+  };
+}
 
-  if (!response.ok) {
-    throw new Error(await readErrorMessage(response));
-  }
-
-  return (await response.json()) as { ok: true; message: string; targetUserId: string; deleted: number; errors: string[] };
+/**
+ * Admin-only: keeps the user's community content (posts, comments, projects)
+ * but strips their identity and deletes personal data, instead of hard-deleting.
+ */
+export async function anonymizeUserData(targetUserId: string) {
+  const response = await deleteUserDataRequest({ targetUserId, mode: "anonymize" });
+  return (await response.json()) as {
+    ok: true;
+    message: string;
+    targetUserId: string;
+    mode: "anonymize";
+    deleted: number;
+    anonymized: number;
+    errors: string[];
+  };
 }

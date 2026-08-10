@@ -54,13 +54,16 @@ The Dell PC deployment guide is in [DELL_PC_SETUP.md](/Users/imredavid/Documents
 
 `web/app/contact/page.tsx` is a public contact page (linked from the footer and side nav) where visitors can email the team at `30dimrekatai@student.aisb.hu` (business & partnerships) and `davidimrekatai@gmail.com` (general), or submit the built-in form.
 
-Form submissions are stored in the `contact_messages` Postgres table (migration `web/db/migrations/002_contact_messages.sql`) via `POST /api/contact`. The API captures the sender's name, email, optional organization/subject, message, consent flag, IP, user agent, referrer, page path, and the signed-in user ID when available. Admins can review messages on the Admin Dashboard (Messages tab), which is served by `GET /api/contact` (admin-only, verified through Appwrite).
+Form submissions are stored in the `contact_messages` Postgres table (migration `web/db/migrations/002_contact_messages.sql`) via `POST /api/contact`. The API captures the sender's name, email, optional organization/subject, message, consent flag, IP, user agent, referrer, page path, and the signed-in user ID when available. Each submission is also **forwarded by email** to the team inboxes when SMTP is configured (best-effort — a forward failure never fails the submission). Admins can review messages on the Admin Dashboard (Messages tab), which is served by `GET /api/contact` (admin-only, verified through Appwrite), and can mark messages read/replied via `PATCH /api/contact/[id]`.
 
 Environment variables:
 
 - `DATABASE_URL` (or `POSTGRES_URL`) — required to store messages (same DB as media assets).
 - `CONTACT_RATE_LIMIT_MAX` — optional; max messages per IP per hour (default `10`).
 - `APPWRITE_API_KEY` — required for the admin Messages tab and user-data export/delete. Server-only: `NEXT_PUBLIC_*` keys are public by convention and are never used for privileged operations.
+- `SMTP_HOST`, `SMTP_PORT` (default `587`), `SMTP_USER`, `SMTP_PASS` — SMTP account used to forward submissions.
+- `SMTP_FROM` — optional; sender address for forwarded emails (defaults to `SMTP_USER`).
+- `CONTACT_FORWARD_TO` — comma-separated recipient list, e.g. `30dimrekatai@student.aisb.hu, davidimrekatai@gmail.com`. Forwarding is inert until this and the SMTP vars are set.
 
 The table auto-creates on first use, so no manual SQL is needed in dev.
 
@@ -73,7 +76,10 @@ The table auto-creates on first use, so no manual SQL is needed in dev.
 
 Both routes require a signed-in session (Appwrite JWT) and only ever touch the caller's own data. Implementation lives in `web/lib/userdata/server.ts` and `web/lib/userdata/client.ts`. Requires `APPWRITE_API_KEY` (server-only) and `DATABASE_URL` for the Postgres portions.
 
-Admins can also erase any user's data from the Admin Dashboard (Users tab → Erase): `DELETE /api/user-data` accepts an optional `targetUserId`, which is only honored when the caller is verified as an admin (`web/lib/admin/server.ts`). This lets moderators honor deletion requests from users who can no longer sign in.
+Admins can also erase any user's data from the Admin Dashboard (Users tab → Erase): `DELETE /api/user-data` accepts an optional `targetUserId`, which is only honored when the caller is verified as an admin (`web/lib/admin/server.ts`). This lets moderators honor deletion requests from users who can no longer sign in. The erase tool has two modes:
+
+- **Hard delete** (default) — permanently removes everything: documents, owned rooms/projects, memberships, media files + rows, contact messages, and the Appwrite account.
+- **Anonymize** — keeps the user's public community content (posts, comments, events, room/thread messages, owned rooms/projects) but rewrites identity fields to "Former member", deletes personal/relational data (notifications, follows, saves, blocks, badges, RSVPs, private tool content, tasks), and drops them from shared memberships before deleting the profile + account. This is the right mode when the community content should survive the person's departure.
 
 ## Firebase checklist
 
