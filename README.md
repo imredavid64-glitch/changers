@@ -42,7 +42,7 @@ This repo lives on iCloud-synced storage where bulk reads make `tsc`, `eslint`, 
 
 The sync is file-by-file with per-file timeouts (slow iCloud reads can never hang the run) and skips already-copied files; dependencies install automatically on first use. See `web/scripts/check-local.sh`. All three checks pass green (lint: 0 errors; `react-hooks/purity` and `react-hooks/set-state-in-effect` are intentionally warnings — see the comment in `web/eslint.config.mjs`).
 
-The same three checks run in CI on a clean machine via `.github/workflows/ci.yml` (Node 24, `npm ci`, then `npm run type-check`, `npm run lint`, `npm run build`).
+`check:local` also runs the unit test suite (`npm run test`, vitest): 22 tests cover the user-data erase/anonymize flows against a mocked Appwrite fetch layer, contact-route validation/honeypot/rate-limiting, email-forwarding gating, and media storage safety — all without a live backend. The same checks run in CI on a clean machine via `.github/workflows/ci.yml` (Node 24, `npm ci`, then `npm run type-check`, `npm run lint`, `npm run test`, `npm run build`).
 
 ## Live backend
 
@@ -54,7 +54,7 @@ The Dell PC deployment guide is in [DELL_PC_SETUP.md](/Users/imredavid/Documents
 
 `web/app/contact/page.tsx` is a public contact page (linked from the footer and side nav) where visitors can email the team at `30dimrekatai@student.aisb.hu` (business & partnerships) and `davidimrekatai@gmail.com` (general), or submit the built-in form.
 
-Form submissions are stored in the `contact_messages` Postgres table (migration `web/db/migrations/002_contact_messages.sql`) via `POST /api/contact`. The API captures the sender's name, email, optional organization/subject, message, consent flag, IP, user agent, referrer, page path, and the signed-in user ID when available. Each submission is also **forwarded by email** to the team inboxes when SMTP is configured (best-effort — a forward failure never fails the submission). Admins can review messages on the Admin Dashboard (Messages tab), which is served by `GET /api/contact` (admin-only, verified through Appwrite), and can mark messages read/replied via `PATCH /api/contact/[id]`.
+Form submissions are stored in the `contact_messages` Postgres table (migration `web/db/migrations/002_contact_messages.sql`) via `POST /api/contact`. The API captures the sender's name, email, optional organization/subject, message, consent flag, IP, user agent, referrer, page path, and the signed-in user ID when available. Each submission is also **forwarded by email** to the team inboxes when SMTP is configured (best-effort — a forward failure never fails the submission). Admins can review messages on the Admin Dashboard (Messages tab), which is served by `GET /api/contact` (admin-only, verified through Appwrite), can mark messages read/replied via `PATCH /api/contact/[id]`, and can **reply by email** straight from the panel (`POST /api/contact/[id]/reply`, which sends over SMTP and marks the message replied).
 
 Environment variables:
 
@@ -66,6 +66,15 @@ Environment variables:
 - `CONTACT_FORWARD_TO` — comma-separated recipient list, e.g. `30dimrekatai@student.aisb.hu, davidimrekatai@gmail.com`. Forwarding is inert until this and the SMTP vars are set.
 
 The table auto-creates on first use, so no manual SQL is needed in dev.
+
+## Video calls
+
+Rooms have a **Start video call** button (room workspace header) linking to `/call/<roomId>`. Calls are peer-to-peer WebRTC (STUN included; optional TURN via `NEXT_PUBLIC_TURN_URL` / `NEXT_PUBLIC_TURN_USERNAME` / `NEXT_PUBLIC_TURN_CREDENTIAL` for restrictive networks), with signaling over an Appwrite collection:
+
+- **Signaling** — the `call-signals` collection is the message bus. `POST /api/call/signal` (signed-in) writes signal documents server-side; clients subscribe to the collection channel via Appwrite realtime and filter by room. **Setup:** create a `call-signals` collection in Appwrite with fields `room_id`, `sender_id`, `kind`, `payload`, `created_at_ms`, and read access for signed-in users (set `NEXT_PUBLIC_APPWRITE_COLLECTION_CALL_SIGNALS` if you use a different id). Without it, the call UI shows a clear configuration message.
+- **Features** — camera/mic toggles, screen share, participant grid, in-call chat, a collaborative **whiteboard** (strokes, color/size, undo, clear), **breakout rooms** (host assigns round-robin groups; other groups are muted/dimmed), a shared **timer** (presets + custom, with a completion chime), and emoji **reactions**.
+
+Messaging outside calls uses the existing private threads (`/messages`) and per-room chat.
 
 ## Privacy & user data
 
@@ -80,6 +89,8 @@ Admins can also erase any user's data from the Admin Dashboard (Users tab → Er
 
 - **Hard delete** (default) — permanently removes everything: documents, owned rooms/projects, memberships, media files + rows, contact messages, and the Appwrite account.
 - **Anonymize** — keeps the user's public community content (posts, comments, events, room/thread messages, owned rooms/projects) but rewrites identity fields to "Former member", deletes personal/relational data (notifications, follows, saves, blocks, badges, RSVPs, private tool content, tasks), and drops them from shared memberships before deleting the profile + account. This is the right mode when the community content should survive the person's departure.
+
+Every admin erase/anonymize action is recorded in the `admin_actions` Postgres table (`web/db/migrations/003_admin_audit.sql`, same DB as contact messages) and shown on the Admin Dashboard **Audit** tab: who acted on whom, which mode, item counts, and errors.
 
 ## Firebase checklist
 

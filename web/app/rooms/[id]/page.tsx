@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { use, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Hash, MessageSquare, Send, Users } from "lucide-react";
+import { ArrowLeft, Hash, MessageSquare, Send, Users, Video } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import {
   COLLECTIONS,
@@ -199,7 +199,17 @@ export default function RoomWorkspace({ params }: { params: Promise<{ id: string
               </h2>
               <p className="muted" style={{ marginTop: 6 }}>{room.description}</p>
             </div>
-            <span className="strand">{STRAND_LABELS[room.strand]}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <Link
+                href={`/call/${roomId}`}
+                className="primary"
+                style={{ display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none" }}
+                title="Start a video call for this room (camera, chat, whiteboard, breakout rooms)"
+              >
+                <Video size={16} /> Start video call
+              </Link>
+              <span className="strand">{STRAND_LABELS[room.strand]}</span>
+            </div>
           </div>
 
           <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>

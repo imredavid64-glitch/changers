@@ -29,6 +29,7 @@ export const appwriteConfig = {
     codeSnippets: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_CODE_SNIPPETS || "code-snippets",
     designs: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_DESIGNS || "designs",
     films: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_FILMS || "films",
+    callSignals: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_CALL_SIGNALS || "call-signals",
   },
 };
 
