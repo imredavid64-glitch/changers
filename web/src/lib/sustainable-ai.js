@@ -46,7 +46,7 @@ class SustainableAnalyst {
     return result;
   }
 
-  async searchWithSustainabilityMetrics(query, userContext = null) {
+  async searchWithSustainabilityMetrics(query) {
     let data = {};
     try {
       const searchUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&pretty=1`;
@@ -55,7 +55,7 @@ class SustainableAnalyst {
         const text = await response.text();
         if (text) data = JSON.parse(text);
       }
-    } catch (e) {
+    } catch {
       // External search service unreachable or returned non-JSON — degrade
       // gracefully to empty results so metrics reflect "no data".
     }
@@ -152,7 +152,7 @@ class SustainableAnalyst {
           ...source,
           domain: new URL(source.url).hostname
         });
-      } catch (e) {
+      } catch {
         // Invalid or relative URL (DuckDuckGo sometimes returns relative image paths), skip
       }
     };
@@ -301,11 +301,11 @@ class SustainableAnalyst {
     return query.length > 45 ? query.substring(0, 45) + '...' : query;
   }
 
-  async searchCurrentData(query, context = null) {
-    return await this.searchWithSustainabilityMetrics(query, context);
+  async searchCurrentData(query) {
+    return await this.searchWithSustainabilityMetrics(query);
   }
 
-  async calculateEnvironmentalMetrics(userId = null) {
+  async calculateEnvironmentalMetrics() {
     return {
       total_searches: 150,
       total_energy: 0.045,
@@ -318,7 +318,7 @@ class SustainableAnalyst {
     };
   }
 
-  async analyzeUserPattern(userId) {
+  async analyzeUserPattern() {
     return {
       usagePattern: 'balanced',
       sustainabilityTrend: 'improving',

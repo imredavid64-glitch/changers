@@ -3,20 +3,17 @@
 import Link from "next/link";
 import { use, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Calendar, Globe, MapPin, Users } from "lucide-react";
+import { ArrowLeft, Globe, MapPin, Users } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import {
   COLLECTIONS,
   createDocument,
   getDocument,
-  listDocuments,
   privateReadWritePermissions,
-  publicReadOwnerWritePermissions,
   watchDocument,
 } from "@/lib/appwrite/bridge";
-import { Query } from "@/lib/appwrite/client";
 import { AppEvent } from "@/lib/social/types";
-import { STRAND_LABELS, getDisplayName, normalizeEvent, normalizeEventRsvp } from "@/lib/social/utils";
+import { STRAND_LABELS, getDisplayName, normalizeEvent } from "@/lib/social/utils";
 
 export default function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);

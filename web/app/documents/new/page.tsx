@@ -79,7 +79,7 @@ export default function NewDocumentPage() {
       );
 
       router.push("/documents");
-    } catch (e) {
+    } catch {
       setError("Failed to save document. Please try again.");
       setSaving(false);
     }

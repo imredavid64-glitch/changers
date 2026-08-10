@@ -8,6 +8,10 @@
     "start": "next start",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
+    "check:local": "bash scripts/check-local.sh all",
+    "check:local:type": "bash scripts/check-local.sh type-check",
+    "check:local:lint": "bash scripts/check-local.sh lint",
+    "check:local:build": "bash scripts/check-local.sh build",
     "build:analyze": "ANALYZE=true next build"
   },
   "dependencies": {
@@ -24,6 +28,7 @@
   },
   "devDependencies": {
     "@types/node": "^18.15.0",
+    "@types/pg": "^8.21.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "autoprefixer": "^10.4.14",

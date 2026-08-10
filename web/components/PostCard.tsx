@@ -11,7 +11,6 @@ import {
   COLLECTIONS,
   createDocument,
   deleteDocument,
-  listDocuments,
   privateReadWritePermissions,
   publicReadOwnerWritePermissions,
   updateDocument,

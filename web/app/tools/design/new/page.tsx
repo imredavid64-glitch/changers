@@ -81,7 +81,7 @@ export default function NewDesignPage() {
       );
 
       router.push("/tools/design");
-    } catch (e) {
+    } catch {
       setError("Failed to save design. Please try again.");
       setSaving(false);
     }

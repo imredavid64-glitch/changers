@@ -63,7 +63,7 @@ export default function NewTablePage() {
       );
 
       router.push("/tools/tables");
-    } catch (e) {
+    } catch {
       setError("Failed to save table. Please try again.");
       setSaving(false);
     }

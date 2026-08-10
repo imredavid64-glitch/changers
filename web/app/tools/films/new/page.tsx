@@ -71,7 +71,7 @@ export default function NewFilmPage() {
       );
 
       router.push("/tools/films");
-    } catch (e) {
+    } catch {
       setError("Failed to save film. Please try again.");
       setSaving(false);
     }

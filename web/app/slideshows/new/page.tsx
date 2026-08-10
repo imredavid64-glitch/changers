@@ -71,7 +71,7 @@ export default function NewSlideshowPage() {
       );
 
       router.push("/slideshows");
-    } catch (e) {
+    } catch {
       setError("Failed to save slideshow. Please try again.");
       setSaving(false);
     }

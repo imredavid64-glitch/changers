@@ -88,7 +88,7 @@ export default function MessagesInboxPage() {
           <div style={{ textAlign: "center", margin: "auto", color: "var(--moss)", opacity: 0.5 }}>
             <Send size={48} style={{ margin: "0 auto 16px" }} />
             <p>Your inbox is empty.</p>
-            <p style={{ fontSize: "0.85rem" }}>Go to an author's profile on the timeline to send them a direct message.</p>
+            <p style={{ fontSize: "0.85rem" }}>Go to an author&apos;s profile on the timeline to send them a direct message.</p>
           </div>
         ) : (
           <AnimatePresence>

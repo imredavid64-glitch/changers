@@ -92,7 +92,6 @@ export function BadgeDisplay({ profile, compact = false }: BadgeDisplayProps) {
       >
         {allDefinitions.map((def) => {
           const isEarned = earnedSet.has(def.id);
-          const earnedItem = earnedBadges.find((b) => b.badge_id === def.id);
 
           return (
             <div

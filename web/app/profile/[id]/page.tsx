@@ -4,7 +4,7 @@ import Image from "next/image";
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Briefcase, Edit3, Eye, EyeOff, MapPin, MessageCircle, Save, ShieldCheck, UserCircle, Users } from "lucide-react";
+import { Briefcase, Edit3, Eye, MapPin, MessageCircle, Save, ShieldCheck, UserCircle, Users } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { PostCard } from "@/components/PostCard";
 import {

@@ -58,7 +58,7 @@ export default function NewCodeSnippetPage() {
       );
 
       router.push("/tools/code");
-    } catch (e) {
+    } catch {
       setError("Failed to save snippet. Please try again.");
       setSaving(false);
     }

@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  web:
+    name: Web — type-check, lint, build
+    runs-on: ubuntu-latest
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: web
+        run: npm ci
+
+      # The same checks the local `check:local` scripts run (see
+      # web/scripts/check-local.sh). On a clean CI runner the repo is on normal
+      # storage, so plain npm ci + the npm scripts are the right invocation;
+      # on machines with iCloud-synced storage, use `npm --prefix web run
+      # check:local` instead, which mirrors these checks against a local copy.
+      - name: Type-check
+        working-directory: web
+        run: npm run type-check
+
+      - name: Lint
+        working-directory: web
+        run: npm run lint
+
+      - name: Build
+        working-directory: web
+        run: npm run build

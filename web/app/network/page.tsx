@@ -296,7 +296,7 @@ export default function NetworkPage() {
         <div>
           <h2 style={{ fontFamily: "var(--font-head)" }}>Network map</h2>
           <p className="muted" style={{ marginBottom: 16 }}>
-            {connections.length} connections, {mutualCount} mutual. Rings are color-coded by each connection's primary strand; mutual connections sit closer to you.
+            {connections.length} connections, {mutualCount} mutual. Rings are color-coded by each connection&apos;s primary strand; mutual connections sit closer to you.
           </p>
         </div>
         <NetworkMap connections={connections} />
