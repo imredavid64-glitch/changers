@@ -28,6 +28,14 @@ import type {
   CallTimerPayload,
   CallWhiteboardPayload,
 } from "@/lib/call/types";
+import {
+  type CallQuality,
+  type PeerQuality,
+  computeBreakoutAssignment,
+  formatRemaining,
+  shouldMutePeer,
+  summarizePeerStats,
+} from "@/lib/call/logic";
 
 const STUN_SERVERS: RTCIceServer[] = [
   { urls: "stun:stun.l.google.com:19302" },
@@ -59,11 +67,32 @@ interface TimerState {
 
 const TIMER_PRESETS = [60, 300, 600, 900, 1800];
 
-function formatRemaining(ms: number) {
-  const totalSec = Math.max(0, Math.ceil(ms / 1000));
-  const minutes = Math.floor(totalSec / 60);
-  const seconds = totalSec % 60;
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+// ---- Connection quality (presentation) ------------------------------------
+
+function qualityLabel(quality: CallQuality) {
+  switch (quality) {
+    case "good":
+      return "Great connection";
+    case "fair":
+      return "Fair connection";
+    case "poor":
+      return "Poor connection";
+    default:
+      return "Connecting…";
+  }
+}
+
+function qualityColor(quality: CallQuality) {
+  switch (quality) {
+    case "good":
+      return "var(--moss)";
+    case "fair":
+      return "var(--sun)";
+    case "poor":
+      return "var(--coral)";
+    default:
+      return "rgba(16,24,32,0.4)";
+  }
 }
 
 export default function VideoCallRoom({
@@ -88,6 +117,7 @@ export default function VideoCallRoom({
   const [participants, setParticipants] = useState<CallParticipant[]>([]);
   const [remoteStreams, setRemoteStreams] = useState<Record<string, MediaStream>>({});
   const [mutedByBreakout, setMutedByBreakout] = useState<Record<string, boolean>>({});
+  const [qualityByPeer, setQualityByPeer] = useState<Record<string, PeerQuality>>({});
 
   const [showChat, setShowChat] = useState(false);
   const [chatInput, setChatInput] = useState("");
@@ -235,9 +265,30 @@ export default function VideoCallRoom({
       }
       setParticipants([]);
       setRemoteStreams({});
+      setQualityByPeer({});
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, user]);
+
+  // ---- Connection quality ------------------------------------------------
+
+  // Poll WebRTC stats per peer so each tile (and the header) can show live
+  // quality: packet loss, jitter, round-trip time, and estimated bandwidth.
+  useEffect(() => {
+    if (participants.length === 0) return;
+    const interval = window.setInterval(() => {
+      for (const [peerId, pc] of peersRef.current) {
+        pc.getStats()
+          .then((stats) => {
+            setQualityByPeer((prev) => ({ ...prev, [peerId]: summarizePeerStats(stats) }));
+          })
+          .catch(() => {
+            // Stats unavailable — keep the last snapshot.
+          });
+      }
+    }, 4000);
+    return () => window.clearInterval(interval);
+  }, [participants.length]);
 
   // ---- Peer management -----------------------------------------------------
 
@@ -305,6 +356,11 @@ export default function VideoCallRoom({
       return next;
     });
     setParticipants((prev) => prev.filter((p) => p.id !== peerId));
+    setQualityByPeer((prev) => {
+      const next = { ...prev };
+      delete next[peerId];
+      return next;
+    });
   }
 
   async function handleRtcSignal(senderId: string, payload: CallRtcPayload) {
@@ -656,19 +712,10 @@ export default function VideoCallRoom({
 
   // ---- Breakout rooms ------------------------------------------------------
 
-  function computeAssignment(ids: string[], rooms: number): Record<string, number> {
-    const assignment: Record<string, number> = {};
-    const sorted = [...ids].sort();
-    sorted.forEach((id, index) => {
-      assignment[id] = index % rooms;
-    });
-    return assignment;
-  }
-
   function startBreakout() {
     const rooms = Math.max(2, Math.min(breakoutRooms, 8));
     const ids = [myIdRef.current, ...participantsRef.current.map((p) => p.id)];
-    const assignment = computeAssignment(ids, rooms);
+    const assignment = computeBreakoutAssignment(ids, rooms);
     setBreakout({ active: true, rooms, assignment });
     applyBreakoutMutes(assignment, rooms);
     const payload: CallBreakoutPayload = { action: "start", rooms, assignment };
@@ -687,11 +734,10 @@ export default function VideoCallRoom({
   }
 
   function applyBreakoutMutes(assignment: Record<string, number>, rooms: number) {
-    const myRoom = assignment[myIdRef.current];
+    const myId = myIdRef.current;
     const muted: Record<string, boolean> = {};
     for (const [peerId, pc] of peersRef.current) {
-      const inMyRoom = assignment[peerId] === myRoom;
-      const shouldMute = rooms > 1 && !inMyRoom;
+      const shouldMute = shouldMutePeer(assignment, myId, peerId, rooms);
       muted[peerId] = shouldMute;
       for (const receiver of pc.getReceivers()) {
         if (receiver.track) receiver.track.enabled = !shouldMute;
@@ -711,7 +757,7 @@ export default function VideoCallRoom({
       }
       return;
     }
-    const assignment = payload.assignment || computeAssignment([myIdRef.current, ...participantsRef.current.map((p) => p.id)], payload.rooms || 2);
+    const assignment = payload.assignment || computeBreakoutAssignment([myIdRef.current, ...participantsRef.current.map((p) => p.id)], payload.rooms || 2);
     setBreakout({ active: true, rooms: payload.rooms || 2, assignment });
     applyBreakoutMutes(assignment, payload.rooms || 2);
   }
@@ -729,6 +775,15 @@ export default function VideoCallRoom({
   // ---- Render --------------------------------------------------------------
 
   const myBreakoutRoom = breakout?.assignment[myIdRef.current] ?? null;
+
+  const overallQuality: CallQuality = (() => {
+    const qualities = Object.values(qualityByPeer);
+    if (qualities.length === 0) return "none";
+    if (qualities.every((q) => q.quality === "none")) return "none";
+    if (qualities.some((q) => q.quality === "poor")) return "poor";
+    if (qualities.some((q) => q.quality === "fair")) return "fair";
+    return "good";
+  })();
 
   if (!user) {
     return (
@@ -750,6 +805,31 @@ export default function VideoCallRoom({
           <h2 style={{ margin: 0 }}>{title}</h2>
           <p className="muted" style={{ margin: 0, fontSize: "0.85rem" }}>
             {participants.length + 1} in call
+            {overallQuality !== "none" && (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  marginLeft: 8,
+                  padding: "1px 8px",
+                  borderRadius: 999,
+                  background: "rgba(44,138,125,0.1)",
+                }}
+                title="Live connection quality across all participants"
+              >
+                <span
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 999,
+                    background: qualityColor(overallQuality),
+                    display: "inline-block",
+                  }}
+                />
+                {qualityLabel(overallQuality)}
+              </span>
+            )}
             {breakout?.active ? ` · Breakout rooms (${breakout.rooms})` : ""}
             {myBreakoutRoom !== null && breakout?.active ? ` · You are in room ${myBreakoutRoom + 1}` : ""}
           </p>
@@ -817,6 +897,39 @@ export default function VideoCallRoom({
                   <Users size={36} />
                 </div>
               )}
+              {(() => {
+                const quality = qualityByPeer[participant.id];
+                if (!quality || quality.quality === "none") return null;
+                return (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: 8,
+                      left: 8,
+                      background: "rgba(0,0,0,0.55)",
+                      color: "#fff",
+                      borderRadius: 8,
+                      padding: "2px 8px",
+                      fontSize: "0.75rem",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                    }}
+                    title={`Jitter ${quality.jitterMs}ms · Packet loss ${quality.lossPct}% · RTT ${quality.rttMs}ms · ~${quality.bitrateKbps} kbps`}
+                  >
+                    <span
+                      style={{
+                        width: 7,
+                        height: 7,
+                        borderRadius: 999,
+                        background: qualityColor(quality.quality),
+                        display: "inline-block",
+                      }}
+                    />
+                    {qualityLabel(quality.quality)}
+                  </span>
+                );
+              })()}
               <span style={{ position: "absolute", bottom: 8, left: 8, background: "rgba(0,0,0,0.55)", color: "#fff", borderRadius: 8, padding: "2px 8px", fontSize: "0.8rem" }}>
                 {participant.name}
                 {breakoutMuted ? " · muted (breakout)" : ""}
