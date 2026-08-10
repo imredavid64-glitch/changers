@@ -37,7 +37,7 @@ os.makedirs(dst, exist_ok=True)
 
 SUBDIRS = ["app", "components", "lib", "public", "db", "types", "src"]
 FILES = ["package.json", "package-lock.json", "tsconfig.json", "next-env.d.ts",
-         "next.config.ts", "eslint.config.mjs", ".env.local"]
+         "next.config.ts", "eslint.config.mjs", "vitest.config.ts", ".env.local"]
 
 def size(p):
     try:
@@ -82,16 +82,16 @@ if [[ ! -d "$DST/node_modules" ]]; then
 fi
 
 case "$CMD" in
-  type-check|lint|build)
+  type-check|lint|build|test)
     echo "Running: npm run $CMD"
     (cd "$DST" && npm run "$CMD")
     ;;
   all)
-    echo "Running: npm run type-check && npm run lint && npm run build"
-    (cd "$DST" && npm run type-check && npm run lint && npm run build)
+    echo "Running: npm run type-check && npm run lint && npm run test && npm run build"
+    (cd "$DST" && npm run type-check && npm run lint && npm run test && npm run build)
     ;;
   *)
-    echo "Usage: $0 [type-check|lint|build|all]" >&2
+    echo "Usage: $0 [type-check|lint|build|test|all]" >&2
     exit 2
     ;;
 esac

@@ -6,7 +6,7 @@ on:
 
 jobs:
   web:
-    name: Web — type-check, lint, build
+    name: Web — type-check, lint, test, build
     runs-on: ubuntu-latest
     env:
       NEXT_TELEMETRY_DISABLED: "1"
@@ -35,6 +35,10 @@ jobs:
       - name: Lint
         working-directory: web
         run: npm run lint
+
+      - name: Test
+        working-directory: web
+        run: npm run test
 
       - name: Build
         working-directory: web

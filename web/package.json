@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
+    "test": "vitest run",
     "check:local": "bash scripts/check-local.sh all",
     "check:local:type": "bash scripts/check-local.sh type-check",
     "check:local:lint": "bash scripts/check-local.sh lint",
@@ -38,7 +39,8 @@
     "eslint-config-next": "16.2.10",
     "postcss": "^8.4.23",
     "tailwindcss": "^3.3.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "vitest": "^3.2.7"
   },
   "engines": {
     "node": ">=18.0.0",

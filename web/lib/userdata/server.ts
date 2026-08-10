@@ -53,7 +53,8 @@ function getServerApiKey(): string | null {
 }
 
 function collectionUrl(collectionId: string) {
-  return `${appwriteConfig.endpoint}/databases/${appwriteConfig.databaseId}/collections/${collectionId}/documents`;
+  // Path only — apiFetch prepends the endpoint.
+  return `/databases/${appwriteConfig.databaseId}/collections/${collectionId}/documents`;
 }
 
 async function apiFetch(path: string, init: RequestInit = {}) {
