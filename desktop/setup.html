@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Bridge Desktop Setup</title>
+    <title>Changers Desktop Setup</title>
     <style>
       :root {
         color-scheme: light;
@@ -111,22 +111,23 @@
   </head>
   <body>
     <main class="panel">
-      <p class="eyebrow">Bridge Desktop</p>
+      <p class="eyebrow">Changers Desktop</p>
       <h1>Connect your live site.</h1>
       <p>
-        Bridge desktop wraps your deployed website so you get the same realtime
-        social platform on macOS, Windows, and Linux without opening a terminal.
+        Changers desktop wraps the full platform so you get the same realtime
+        changemaker social network on macOS, Windows, and Linux without opening a
+        terminal. It defaults to the production site.
       </p>
-      <label for="app-url">Vercel or production URL</label>
+      <label for="app-url">Changers URL</label>
       <input
         id="app-url"
         type="url"
-        placeholder="https://your-bridge-app.vercel.app"
+        placeholder="https://changers-three.vercel.app"
         autocomplete="off"
       />
       <div class="actions">
-        <button class="primary" id="save-button">Save and open Bridge</button>
-        <button class="ghost" id="docs-button">Open Vercel</button>
+        <button class="primary" id="save-button">Save and open Changers</button>
+        <button class="ghost" id="docs-button">Open production site</button>
       </div>
       <p class="status" id="status"></p>
     </main>
@@ -137,7 +138,7 @@
       const docsButton = document.getElementById("docs-button");
 
       async function bootstrap() {
-        const config = await window.bridgeDesktop.getConfig();
+        const config = await window.changersDesktop.getConfig();
         if (config.appUrl) {
           urlInput.value = config.appUrl;
         }
@@ -152,15 +153,15 @@
             throw new Error("Add your deployed Bridge URL first.");
           }
 
-          await window.bridgeDesktop.saveConfig(value);
-          statusNode.textContent = "Opening Bridge...";
+          await window.changersDesktop.saveConfig(value);
+          statusNode.textContent = "Opening Changers...";
         } catch (error) {
           statusNode.textContent = error.message || "Unable to save that URL.";
         }
       });
 
       docsButton.addEventListener("click", async () => {
-        await window.bridgeDesktop.openExternal("https://vercel.com/new");
+        await window.changersDesktop.openExternal("https://changers-three.vercel.app");
       });
 
       bootstrap();

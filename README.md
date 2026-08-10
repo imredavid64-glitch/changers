@@ -1,11 +1,19 @@
-# Bridge Platform
+# Changers Platform
 
-Bridge is a changemaker social network with one live backend and multiple clients:
+Changers is a changemaker social network with one live backend and multiple clients:
 
-- `web/`: Next.js website and API routes
-- `mobile/`: Expo app for iPhone and Android
-- `desktop/`: Electron app for macOS, Windows, and Linux
+- `web/`: Next.js website, API routes, and the installable PWA
+- `mobile/`: Expo (React Native) app for iPhone and Android — a native WebView shell around the full platform
+- `desktop/`: Electron app for macOS, Windows, and Linux — the full platform in a native window
 - `docker-compose.yml`: Dell PC production stack with Postgres, web, Caddy, and local media storage
+
+### App strategy
+
+The web app (`web/`) is the full platform: auth, social feed, rooms, messaging, video calls, projects, tools, admin. The other clients are thin shells around it so every feature stays in one codebase:
+
+- **PWA** — `web/public/manifest.json` + `sw.js` make the web app installable on iOS (Add to Home Screen), Android (Chrome install prompt), and desktop browsers, with offline app-shell caching and push notifications.
+- **Desktop** — `desktop/` Electron wrapper loads the local dev server in development and `https://changers-three.vercel.app` (or a saved URL) when packaged.
+- **Mobile** — `mobile/` Expo app wraps the same deployed URL in a native shell with safe-area chrome, back/forward/reload, and offline handling. Point it at a local dev server with `EXPO_PUBLIC_APP_URL=http://127.0.0.1:3000`.
 
 ## One-click local launch
 
@@ -19,10 +27,10 @@ These launch the web app and desktop shell together so you do not need to juggle
 
 1. Run `npm install` in the repository root.
 2. Run `npm run install:all`.
-3. Add Appwrite web env vars to `web/.env.local` and Expo Firebase env vars to `mobile/.env`.
+3. Add Appwrite web env vars to `web/.env.local`. (Mobile has no env requirement; optionally `EXPO_PUBLIC_APP_URL` to override the wrapped URL.)
 4. Add Postgres/media env vars for the web app: `DATABASE_URL` and `MEDIA_ROOT`.
 5. For Dell PC hosting, copy `.env.dell.example` to `.env.dell` and run `docker compose --env-file .env.dell up -d --build`.
-6. Point the packaged desktop app to your live URL on first launch, or set `BRIDGE_DESKTOP_URL`.
+6. The packaged desktop app defaults to production; point it at another URL on first launch or set `CHANGERS_DESKTOP_URL`.
 
 ## Build targets
 
@@ -40,9 +48,9 @@ This repo lives on iCloud-synced storage where bulk reads make `tsc`, `eslint`, 
 - `npm --prefix web run check:local:build` — `tsc --noEmit && next build`
 - `npm --prefix web run check:local` — all three in sequence
 
-The sync is file-by-file with per-file timeouts (slow iCloud reads can never hang the run) and skips already-copied files; dependencies install automatically on first use. See `web/scripts/check-local.sh`. All three checks pass green (lint: 0 errors; `react-hooks/purity` and `react-hooks/set-state-in-effect` are intentionally warnings — see the comment in `web/eslint.config.mjs`).
+The sync is file-by-file with per-file timeouts (slow iCloud reads can never hang the run) and skips already-copied files; dependencies install automatically on first use. See `web/scripts/check-local.sh`. All checks pass green (lint: 0 errors; `react-hooks/purity` and `react-hooks/set-state-in-effect` are intentionally warnings — see the comment in `web/eslint.config.mjs`).
 
-`check:local` also runs the unit test suite (`npm run test`, vitest): 22 tests cover the user-data erase/anonymize flows against a mocked Appwrite fetch layer, contact-route validation/honeypot/rate-limiting, email-forwarding gating, and media storage safety — all without a live backend. The same checks run in CI on a clean machine via `.github/workflows/ci.yml` (Node 24, `npm ci`, then `npm run type-check`, `npm run lint`, `npm run test`, `npm run build`).
+`check:local` also runs the unit test suite (`npm run test`, vitest): 46 tests cover the user-data erase/anonymize flows against a mocked Appwrite fetch layer, the call-signaling flow (validation, breakout assignment, route auth, connection-quality summarizer), contact-route validation/honeypot/rate-limiting, email-forwarding gating, and media storage safety — all without a live backend. The same checks run in CI on a clean machine via `.github/workflows/ci.yml` (Node 24, `npm ci`, then `npm run type-check`, `npm run lint`, `npm run test`, `npm run build`).
 
 ## Live backend
 
@@ -65,6 +73,8 @@ Environment variables:
 - `SMTP_FROM` — optional; sender address for forwarded emails (defaults to `SMTP_USER`).
 - `CONTACT_FORWARD_TO` — comma-separated recipient list, e.g. `30dimrekatai@student.aisb.hu, davidimrekatai@gmail.com`. Forwarding is inert until this and the SMTP vars are set.
 
+**To activate email forwarding:** `CONTACT_FORWARD_TO` is already set in the Vercel production environment; only the SMTP credentials are missing. Add `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` (optionally `SMTP_PORT`/`SMTP_FROM`) to the Vercel project (or the Dell stack env), and both forwarding of new submissions and admin reply-by-email go live. Any SMTP provider works — Gmail app password, Brevo, Resend, Mailgun, etc. The code treats forwarding as best-effort, so the contact form keeps working even if SMTP is absent or fails.
+
 The table auto-creates on first use, so no manual SQL is needed in dev.
 
 ## Video calls
@@ -72,7 +82,7 @@ The table auto-creates on first use, so no manual SQL is needed in dev.
 Rooms have a **Start video call** button (room workspace header) linking to `/call/<roomId>`. Calls are peer-to-peer WebRTC (STUN included; optional TURN via `NEXT_PUBLIC_TURN_URL` / `NEXT_PUBLIC_TURN_USERNAME` / `NEXT_PUBLIC_TURN_CREDENTIAL` for restrictive networks), with signaling over an Appwrite collection:
 
 - **Signaling** — the `call-signals` collection is the message bus. `POST /api/call/signal` (signed-in) writes signal documents server-side; clients subscribe to the collection channel via Appwrite realtime and filter by room. **Setup:** create a `call-signals` collection in Appwrite with fields `room_id`, `sender_id`, `kind`, `payload`, `created_at_ms`, and read access for signed-in users (set `NEXT_PUBLIC_APPWRITE_COLLECTION_CALL_SIGNALS` if you use a different id). Without it, the call UI shows a clear configuration message.
-- **Features** — camera/mic toggles, screen share, participant grid, in-call chat, a collaborative **whiteboard** (strokes, color/size, undo, clear), **breakout rooms** (host assigns round-robin groups; other groups are muted/dimmed), a shared **timer** (presets + custom, with a completion chime), and emoji **reactions**.
+- **Features** — camera/mic toggles, screen share, participant grid, in-call chat, a collaborative **whiteboard** (strokes, color/size, undo, clear), **breakout rooms** (host assigns round-robin groups; other groups are muted/dimmed), a shared **timer** (presets + custom, with a completion chime), emoji **reactions**, and **live connection quality** (per-participant and overall badge driven by WebRTC stats: packet loss, jitter, RTT, estimated bandwidth — hover a badge for the numbers).
 
 Messaging outside calls uses the existing private threads (`/messages`) and per-room chat.
 
@@ -92,23 +102,11 @@ Admins can also erase any user's data from the Admin Dashboard (Users tab → Er
 
 Every admin erase/anonymize action is recorded in the `admin_actions` Postgres table (`web/db/migrations/003_admin_audit.sql`, same DB as contact messages) and shown on the Admin Dashboard **Audit** tab: who acted on whom, which mode, item counts, and errors.
 
-## Firebase checklist
+## Firebase remnants
 
-The mobile app and bot layer still contain Firebase-era code. Keep these services available until the mobile app and functions are migrated to the same Postgres/Appwrite architecture:
+The platform runs on Appwrite + Postgres; the `mobile/` app is now a WebView shell and no longer uses Firebase. Remaining Firebase-era artifacts (kept for reference, not wired in):
 
-- Authentication with Email/Password
-- Cloud Firestore
-- Firebase Storage
-- Cloud Functions
+- `functions/`, `firestore.rules`, `storage.rules`, `firebase.json` — the old bot layer (`Bridge Guide`, `Bridge Signal`).
+- `legacy-static/` — static assets from before the Appwrite migration.
 
-The current app expects:
-
-- Firestore rules from `firestore.rules`
-- Storage rules from `storage.rules`
-- Web public env vars in `web/.env.local`
-- Functions deployed from `functions/`
-
-The bot layer currently includes:
-
-- `Bridge Guide`: sends a welcome notification when a new profile is created
-- `Bridge Signal`: auto-comments on new posts with strand-aware coaching and discovery hints
+These can be removed once nothing references them.

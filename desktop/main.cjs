@@ -2,10 +2,13 @@ const { app, BrowserWindow, ipcMain, shell } = require("electron");
 const fs = require("fs");
 const path = require("path");
 
+const PRODUCTION_URL = "https://changers-three.vercel.app";
+const DEV_URL = "http://127.0.0.1:3000";
+
 let mainWindow = null;
 
 function configPath() {
-  return path.join(app.getPath("userData"), "bridge-desktop.json");
+  return path.join(app.getPath("userData"), "changers-desktop.json");
 }
 
 function readConfig() {
@@ -21,18 +24,20 @@ function writeConfig(config) {
 }
 
 function resolveAppUrl() {
-  if (process.env.BRIDGE_DESKTOP_URL) {
-    return process.env.BRIDGE_DESKTOP_URL;
+  if (process.env.CHANGERS_DESKTOP_URL) {
+    return process.env.CHANGERS_DESKTOP_URL;
   }
 
   if (!app.isPackaged) {
-    return "http://127.0.0.1:3000";
+    // Development: load the local Next.js dev server.
+    return DEV_URL;
   }
 
-  return readConfig().appUrl;
+  // Packaged: the saved URL if the user set one, otherwise production.
+  return readConfig().appUrl || PRODUCTION_URL;
 }
 
-async function loadBridgeWindow(window) {
+async function loadChangersWindow(window) {
   const appUrl = resolveAppUrl();
 
   if (appUrl) {
@@ -55,7 +60,7 @@ function createWindow() {
     minWidth: 1100,
     minHeight: 760,
     backgroundColor: "#f4efe6",
-    title: "Bridge",
+    title: "Changers",
     webPreferences: {
       preload: path.join(__dirname, "preload.cjs"),
       contextIsolation: true,
@@ -69,25 +74,25 @@ function createWindow() {
   });
 
   mainWindow.webContents.on("will-navigate", (event, url) => {
-    if (!url.startsWith("http://127.0.0.1:3000") && !url.startsWith("https://")) {
+    if (!url.startsWith(DEV_URL) && !url.startsWith("https://")) {
       event.preventDefault();
     }
   });
 
-  loadBridgeWindow(mainWindow);
+  loadChangersWindow(mainWindow);
 }
 
-ipcMain.handle("bridge:get-config", async () => {
+ipcMain.handle("changers:get-config", async () => {
   return {
     appUrl: readConfig().appUrl || "",
   };
 });
 
-ipcMain.handle("bridge:save-config", async (_event, appUrl) => {
+ipcMain.handle("changers:save-config", async (_event, appUrl) => {
   const parsed = new URL(appUrl);
 
   if (!["http:", "https:"].includes(parsed.protocol)) {
-    throw new Error("Bridge desktop needs an http or https URL.");
+    throw new Error("Changers desktop needs an http or https URL.");
   }
 
   writeConfig({ appUrl: parsed.toString() });
@@ -99,7 +104,7 @@ ipcMain.handle("bridge:save-config", async (_event, appUrl) => {
   return { ok: true };
 });
 
-ipcMain.handle("bridge:open-external", async (_event, url) => {
+ipcMain.handle("changers:open-external", async (_event, url) => {
   await shell.openExternal(url);
 });
 

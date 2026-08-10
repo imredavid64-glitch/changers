@@ -1,8 +1,8 @@
 {
-  "name": "bridge-platform",
+  "name": "changers-platform",
   "version": "1.0.0",
   "private": true,
-  "description": "Bridge is a cross-platform changemaker social network spanning web, desktop, and mobile.",
+  "description": "Changers is a cross-platform changemaker social network spanning web, desktop, and mobile.",
   "scripts": {
     "start": "npm run desktop:dev",
     "install:all": "npm install --prefix web && npm install --prefix mobile && npm install --prefix desktop",

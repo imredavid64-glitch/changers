@@ -1,5 +1,5 @@
 {
-  "name": "bridge-desktop",
+  "name": "changers-desktop",
   "version": "1.0.0",
   "private": true,
   "main": "main.cjs",
@@ -12,8 +12,8 @@
     "electron-builder": "^26.0.12"
   },
   "build": {
-    "appId": "com.bridge.changemakers",
-    "productName": "Bridge",
+    "appId": "com.changers.platform",
+    "productName": "Changers",
     "directories": {
       "output": "dist"
     },
