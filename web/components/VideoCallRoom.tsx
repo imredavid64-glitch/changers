@@ -36,6 +36,7 @@ import {
   shouldMutePeer,
   summarizePeerStats,
 } from "@/lib/call/logic";
+import { PeerManager } from "@/lib/call/peer-manager";
 
 const STUN_SERVERS: RTCIceServer[] = [
   { urls: "stun:stun.l.google.com:19302" },
@@ -137,7 +138,8 @@ export default function VideoCallRoom({
 
   const [reactions, setReactions] = useState<ReactionBurst[]>([]);
 
-  const peersRef = useRef(new Map<string, RTCPeerConnection>());
+  const localStreamRef = useRef<MediaStream | null>(null);
+  const managerRef = useRef<PeerManager | null>(null);
   const myIdRef = useRef("");
   const lastSeenRef = useRef(new Map<string, number>());
   const strokesRef = useRef<Array<Array<{ x: number; y: number; color?: string; size?: number }>>>([]);
@@ -195,6 +197,48 @@ export default function VideoCallRoom({
     [publish, selfName],
   );
 
+  // ---- Peer management (delegated to PeerManager for testability) ----------
+
+  if (!managerRef.current) {
+    managerRef.current = new PeerManager({
+      getLocalStream: () => localStreamRef.current,
+      getMyId: () => myIdRef.current,
+      publishRtc: (payload) => publish("rtc", JSON.stringify(payload)),
+      onRemoteStream: (peerId, stream) => {
+        setRemoteStreams((prev) => ({ ...prev, [peerId]: stream }));
+        setParticipants((prev) =>
+          prev.some((p) => p.id === peerId)
+            ? prev
+            : [...prev, { id: peerId, name: "Participant" }],
+        );
+      },
+      onPeerRemoved: (peerId) => {
+        clearPeerState(peerId);
+      },
+      peerFactory: () =>
+        new RTCPeerConnection({ iceServers: [...STUN_SERVERS, ...getTurnServers()] }),
+    });
+  }
+
+  function clearPeerState(peerId: string) {
+    setRemoteStreams((prev) => {
+      const next = { ...prev };
+      delete next[peerId];
+      return next;
+    });
+    setParticipants((prev) => prev.filter((p) => p.id !== peerId));
+    setQualityByPeer((prev) => {
+      const next = { ...prev };
+      delete next[peerId];
+      return next;
+    });
+  }
+
+  function removePeer(peerId: string) {
+    managerRef.current?.removePeer(peerId);
+    clearPeerState(peerId);
+  }
+
   // ---- Local media ---------------------------------------------------------
 
   useEffect(() => {
@@ -210,6 +254,7 @@ export default function VideoCallRoom({
           stream.getTracks().forEach((track) => track.stop());
           return;
         }
+        localStreamRef.current = stream;
         setLocalStream(stream);
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = stream;
@@ -223,6 +268,7 @@ export default function VideoCallRoom({
 
     return () => {
       cancelled = true;
+      localStreamRef.current = null;
     };
   }, [user]);
 
@@ -251,24 +297,19 @@ export default function VideoCallRoom({
           lastSeenRef.current.delete(peerId);
         }
       }
-    }, 20_000);
-
-    return () => {
-      window.clearInterval(heartbeat);
-      window.clearInterval(cleanup);
-      sendPresence("leave");
-      unsubscribe();
-      // Close every peer connection.
-      for (const [peerId, pc] of peersRef.current) {
-        pc.close();
-        peersRef.current.delete(peerId);
-      }
-      setParticipants([]);
-      setRemoteStreams({});
-      setQualityByPeer({});
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId, user]);
+    }, 20_000);      return () => {
+        window.clearInterval(heartbeat);
+        window.clearInterval(cleanup);
+        sendPresence("leave");
+        unsubscribe();
+        // Close every peer connection.
+        managerRef.current?.closeAll();
+        setParticipants([]);
+        setRemoteStreams({});
+        setQualityByPeer({});
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [roomId, user]);
 
   // ---- Connection quality ------------------------------------------------
 
@@ -276,8 +317,12 @@ export default function VideoCallRoom({
   // quality: packet loss, jitter, round-trip time, and estimated bandwidth.
   useEffect(() => {
     if (participants.length === 0) return;
+    const manager = managerRef.current;
+    if (!manager) return;
     const interval = window.setInterval(() => {
-      for (const [peerId, pc] of peersRef.current) {
+      for (const peerId of manager.peerIds()) {
+        const pc = manager.getPeer(peerId);
+        if (!pc) continue;
         pc.getStats()
           .then((stats) => {
             setQualityByPeer((prev) => ({ ...prev, [peerId]: summarizePeerStats(stats) }));
@@ -290,109 +335,14 @@ export default function VideoCallRoom({
     return () => window.clearInterval(interval);
   }, [participants.length]);
 
-  // ---- Peer management -----------------------------------------------------
-
-  function ensurePeer(peerId: string): RTCPeerConnection | null {
-    const existing = peersRef.current.get(peerId);
-    if (existing) return existing;
-
-    const stream = localStream;
-    if (!stream) return null;
-
-    const pc = new RTCPeerConnection({
-      iceServers: [...STUN_SERVERS, ...getTurnServers()],
-    });
-
-    for (const track of stream.getTracks()) {
-      pc.addTrack(track, stream);
-    }
-
-    pc.onicecandidate = (event) => {
-      if (event.candidate) {
-        const payload: CallRtcPayload = { type: "ice", to: peerId, data: event.candidate.toJSON() };
-        publish("rtc", JSON.stringify(payload));
-      }
-    };
-
-    pc.ontrack = (event) => {
-      const [remoteStream] = event.streams;
-      if (!remoteStream) return;
-      setRemoteStreams((prev) => ({ ...prev, [peerId]: remoteStream }));
-      setParticipants((prev) => (prev.some((p) => p.id === peerId) ? prev : [...prev, { id: peerId, name: "Participant" }]));
-    };
-
-    pc.onconnectionstatechange = () => {
-      if (pc.connectionState === "failed" || pc.connectionState === "closed" || pc.connectionState === "disconnected") {
-        removePeer(peerId);
-      }
-    };
-
-    peersRef.current.set(peerId, pc);
-    return pc;
-  }
+  // ---- Peer management (implemented in lib/call/peer-manager.ts) -----------
 
   async function connectToPeer(peerId: string) {
-    const pc = ensurePeer(peerId);
-    if (!pc) return;
-    try {
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-      const payload: CallRtcPayload = { type: "offer", to: peerId, data: offer };
-      publish("rtc", JSON.stringify(payload));
-    } catch (error) {
-      console.error("Offer failed:", error);
-    }
-  }
-
-  function removePeer(peerId: string) {
-    const pc = peersRef.current.get(peerId);
-    if (pc) {
-      pc.close();
-      peersRef.current.delete(peerId);
-    }
-    setRemoteStreams((prev) => {
-      const next = { ...prev };
-      delete next[peerId];
-      return next;
-    });
-    setParticipants((prev) => prev.filter((p) => p.id !== peerId));
-    setQualityByPeer((prev) => {
-      const next = { ...prev };
-      delete next[peerId];
-      return next;
-    });
+    await managerRef.current?.connectToPeer(peerId);
   }
 
   async function handleRtcSignal(senderId: string, payload: CallRtcPayload) {
-    if (payload.to && payload.to !== myIdRef.current) return;
-    const pc = ensurePeer(senderId);
-    if (!pc) return;
-
-    try {
-      if (payload.type === "offer") {
-        const offer = payload.data as RTCSessionDescriptionInit;
-        // Glare handling: if we already set a local description, roll it back
-        // so the incoming offer can be applied cleanly.
-        if (pc.signalingState !== "stable") {
-          try {
-            await pc.setLocalDescription({ type: "rollback" });
-          } catch {
-            // Rollback unsupported — proceed anyway.
-          }
-        }
-        await pc.setRemoteDescription(offer);
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-        const answerPayload: CallRtcPayload = { type: "answer", to: senderId, data: answer };
-        publish("rtc", JSON.stringify(answerPayload));
-      } else if (payload.type === "answer") {
-        await pc.setRemoteDescription(payload.data as RTCSessionDescriptionInit);
-      } else if (payload.type === "ice") {
-        await pc.addIceCandidate(payload.data as RTCIceCandidateInit);
-      }
-    } catch (error) {
-      console.error("RTC signal failed:", error);
-    }
+    await managerRef.current?.handleSignal(senderId, payload);
   }
 
   // ---- Signal dispatch -----------------------------------------------------
@@ -497,10 +447,7 @@ export default function VideoCallRoom({
       screenTrack.onended = () => stopScreenShare();
       setScreenStream(stream);
 
-      for (const pc of peersRef.current.values()) {
-        const sender = pc.getSenders().find((s) => s.track?.kind === "video");
-        if (sender) await sender.replaceTrack(screenTrack);
-      }
+      await managerRef.current?.replaceVideoTrack(screenTrack);
     } catch {
       // User cancelled the share picker.
     }
@@ -512,10 +459,7 @@ export default function VideoCallRoom({
       return null;
     });
     const cameraTrack = localStream?.getVideoTracks()[0] ?? null;
-    for (const pc of peersRef.current.values()) {
-      const sender = pc.getSenders().find((s) => s.track?.kind === "video");
-      if (sender && cameraTrack) void sender.replaceTrack(cameraTrack);
-    }
+    void managerRef.current?.replaceVideoTrack(cameraTrack);
   }
 
   // ---- Chat ----------------------------------------------------------------
@@ -725,23 +669,18 @@ export default function VideoCallRoom({
   function endBreakout() {
     setBreakout(null);
     setMutedByBreakout({});
-    for (const pc of peersRef.current.values()) {
-      for (const receiver of pc.getReceivers()) {
-        if (receiver.track) receiver.track.enabled = true;
-      }
-    }
+    managerRef.current?.setReceiversEnabled(true);
     publish("breakout", JSON.stringify({ action: "end" }));
   }
 
   function applyBreakoutMutes(assignment: Record<string, number>, rooms: number) {
     const myId = myIdRef.current;
     const muted: Record<string, boolean> = {};
-    for (const [peerId, pc] of peersRef.current) {
+    const manager = managerRef.current;
+    for (const peerId of manager?.peerIds() ?? []) {
       const shouldMute = shouldMutePeer(assignment, myId, peerId, rooms);
       muted[peerId] = shouldMute;
-      for (const receiver of pc.getReceivers()) {
-        if (receiver.track) receiver.track.enabled = !shouldMute;
-      }
+      manager?.setPeerReceiversEnabled(peerId, !shouldMute);
     }
     setMutedByBreakout(muted);
   }
@@ -750,11 +689,7 @@ export default function VideoCallRoom({
     if (payload.action === "end") {
       setBreakout(null);
       setMutedByBreakout({});
-      for (const pc of peersRef.current.values()) {
-        for (const receiver of pc.getReceivers()) {
-          if (receiver.track) receiver.track.enabled = true;
-        }
-      }
+      managerRef.current?.setReceiversEnabled(true);
       return;
     }
     const assignment = payload.assignment || computeBreakoutAssignment([myIdRef.current, ...participantsRef.current.map((p) => p.id)], payload.rooms || 2);
@@ -790,7 +725,7 @@ export default function VideoCallRoom({
       <section style={{ textAlign: "center", padding: "48px 24px" }}>
         <h2>Video calls</h2>
         <p className="muted">Sign in to join the call — camera, chat, whiteboard, breakout rooms, and a shared timer.</p>
-        <Link href="/auth" className="primary" style={{ display: "inline-block", marginTop: 8, textDecoration: "none" }}>
+        <Link href="/sign-in" className="primary" style={{ display: "inline-block", marginTop: 8, textDecoration: "none" }}>
           Sign in
         </Link>
       </section>
