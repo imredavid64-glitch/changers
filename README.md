@@ -86,6 +86,16 @@ Rooms have a **Start video call** button (room workspace header) linking to `/ca
 
 Messaging outside calls uses the existing private threads (`/messages`) and per-room chat.
 
+## Email digest
+
+Signed-in users get a daily digest of **unanswered messages** (messages from other people across their threads in the last 7 days) and **trending posts**, matching what the notifications page promises. Endpoints:
+
+- `GET /api/digest` — preview your digest (counts + senders) without sending anything.
+- `POST /api/digest` — composes and sends your digest to your account email via SMTP.
+- `POST /api/digest/cron` — scheduled sender, protected by `Authorization: Bearer <APPWRITE_API_KEY>`; sends a digest to every profile with `email_notifications: true`. Wired to a daily 08:00 cron in `web/vercel.json`.
+
+Composition lives in the pure, unit-tested `web/lib/digest/compose.ts`; data assembly + sending in `web/lib/digest/server.ts`. Sending is gated on the same SMTP config as contact forwarding — it stays inert until `SMTP_HOST`/`SMTP_USER`/`SMTP_PASS` are set. The cron route needs `users.read` scope on the Appwrite API key to look up account emails.
+
 ## Privacy & user data
 
 `web/app/privacy/page.tsx` documents what Changers collects (account, content, social activity, contact submissions, media, and technical data) and gives signed-in users two self-service controls:
