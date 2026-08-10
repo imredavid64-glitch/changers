@@ -126,6 +126,9 @@ export default function SharedShell({ children }: { children: React.ReactNode })
                 Admin
               </Link>
             )}
+            <Link href="/contact" className={`nav-link ${pathname === '/contact' ? 'active' : ''}`}>
+              Contact Us
+            </Link>
           </div>
           <div className="nav-card">
             <p className="eyebrow">Changers to Impact</p>
@@ -191,6 +194,8 @@ export default function SharedShell({ children }: { children: React.ReactNode })
           <Link href="/rooms">Rooms</Link>
           <Link href="/events">Events</Link>
           <Link href="/impact">Impact</Link>
+          <Link href="/contact">Contact</Link>
+          <Link href="/privacy">Privacy</Link>
         </div>
       </footer>
     </div>

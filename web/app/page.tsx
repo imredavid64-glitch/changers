@@ -378,7 +378,7 @@ export default function WelcomePage() {
             {[
               ["Platform", [["Home Feed", "/posts"], ["Projects", "/projects"], ["Events", "/events"], ["Rooms", "/rooms"], ["Impact", "/impact"]]],
               ["Tools", [["Documents", "/documents"], ["Slideshows", "/slideshows"], ["Tables", "/tools/tables"], ["Code Maker", "/tools/code"], ["Designer", "/tools/design"], ["Film Maker", "/tools/films"]]],
-              ["Community", [["Network", "/network"], ["Mentors", "/mentors"], ["Messages", "/messages"], ["Notifications", "/notifications"], ["Search", "/search"]]],
+              ["Community", [["Network", "/network"], ["Mentors", "/mentors"], ["Messages", "/messages"], ["Notifications", "/notifications"], ["Search", "/search"], ["Contact", "/contact"], ["Privacy", "/privacy"]]],
             ].map(([title, links]) => (
               <div key={title as string}>
                 <p style={{ color: "white", fontWeight: 600, marginBottom: 12, fontSize: "0.9rem" }}>{title}</p>
