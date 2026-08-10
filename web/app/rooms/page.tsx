@@ -8,7 +8,7 @@ import { useAuth } from "@/components/AuthProvider";
 import {
   COLLECTIONS,
   createDocument,
-  publicReadAuthenticatedUpdatePermissions,
+  publicReadMemberUpdatePermissions,
   watchDocuments,
 } from "@/lib/appwrite/bridge";
 import { Query } from "@/lib/appwrite/client";
@@ -82,7 +82,7 @@ export default function RoomsPage() {
           created_at_ms: now,
           updated_at_ms: now,
         },
-        publicReadAuthenticatedUpdatePermissions(user.$id),
+        publicReadMemberUpdatePermissions(user.$id, []),
       );
 
       event.currentTarget.reset();

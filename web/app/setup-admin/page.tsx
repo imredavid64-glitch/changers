@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
+import { account } from "@/lib/appwrite/client";
 
 export default function SetupAdminPage() {
   const { user, profile } = useAuth();
@@ -15,10 +16,14 @@ export default function SetupAdminPage() {
     setStatus(null);
 
     try {
+      const jwt = await account.createJWT();
       const response = await fetch("/api/setup-admin", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.$id, email: user.email }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt.jwt}`,
+        },
+        body: JSON.stringify({}),
       });
 
       const data = await response.json();

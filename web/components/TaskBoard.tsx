@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Circle, Loader2, Plus, Trash2 } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import { COLLECTIONS, createDocument, deleteDocument, publicReadAuthenticatedUpdatePermissions, updateDocument, watchDocuments } from "@/lib/appwrite/bridge";
+import { COLLECTIONS, createDocument, deleteDocument, publicReadMemberUpdatePermissions, updateDocument, watchDocuments } from "@/lib/appwrite/bridge";
 import { Query } from "@/lib/appwrite/client";
 import { AppProject, AppTask, TaskPriority, TaskStatus } from "@/lib/social/types";
 import { getDisplayName, normalizeTask, timestampToMillis } from "@/lib/social/utils";
@@ -71,10 +71,6 @@ export function TaskBoard({ project }: TaskBoardProps) {
     return grouped;
   }, [tasks]);
 
-  const assigneeOptions = useMemo(
-    () => project.members.filter((memberId) => memberId !== user?.$id),
-    [project.members, user],
-  );
 
   async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -103,7 +99,7 @@ export function TaskBoard({ project }: TaskBoardProps) {
           created_at_ms: now,
           updated_at_ms: now,
         },
-        publicReadAuthenticatedUpdatePermissions(user.$id),
+        publicReadMemberUpdatePermissions(user.$id, project.members),
       );
       setTitle("");
       setDescription("");

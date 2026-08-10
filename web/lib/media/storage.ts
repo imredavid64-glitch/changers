@@ -127,6 +127,28 @@ export function getMediaVariantFileName(variant: MediaVariant, mimeType?: Suppor
   return variant === "thumbnail" ? "thumbnail.webp" : "preview.webp";
 }
 
+function assertVideoContainer(buffer: Buffer, mimeType: SupportedMediaMimeType) {
+  if (buffer.length < 12) {
+    throw new Error("The uploaded video is too small to be a valid video file.");
+  }
+
+  if (mimeType === "video/webm") {
+    // WebM/Matroska EBML magic: 1A 45 DF A3.
+    const isEbml =
+      buffer[0] === 0x1a && buffer[1] === 0x45 && buffer[2] === 0xdf && buffer[3] === 0xa3;
+    if (!isEbml) {
+      throw new Error("The uploaded file is not a valid WebM video.");
+    }
+    return;
+  }
+
+  // MP4 and MOV are ISO Base Media (BMFF) files: bytes 4-7 hold the "ftyp" box.
+  const brand = buffer.subarray(4, 8).toString("latin1");
+  if (brand !== "ftyp") {
+    throw new Error("The uploaded file is not a valid MP4/MOV video.");
+  }
+}
+
 function encodeSharpImage(image: sharp.Sharp, mimeType: SupportedMediaMimeType) {
   switch (mimeType) {
     case "image/jpeg":
@@ -150,6 +172,7 @@ export async function writeMediaAssetFiles(input: WriteMediaAssetFilesInput): Pr
   const sha256 = crypto.createHash("sha256").update(input.buffer).digest("hex");
 
   if (input.mimeType.startsWith("video/")) {
+    assertVideoContainer(input.buffer, input.mimeType);
     const ext = input.mimeType === "video/mp4" ? "mp4" : input.mimeType === "video/webm" ? "webm" : "mov";
     const originalPath = path.join(assetDir, `original.${ext}`);
     await fs.writeFile(originalPath, input.buffer);

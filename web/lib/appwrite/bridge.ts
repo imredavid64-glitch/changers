@@ -20,10 +20,11 @@ export function publicReadOwnerWritePermissions(userId: string) {
   ];
 }
 
-export function publicReadAuthenticatedUpdatePermissions(ownerId: string) {
+export function publicReadMemberUpdatePermissions(ownerId: string, memberIds: string[]) {
+  const editors = [...new Set([ownerId, ...memberIds])];
   return [
     Permission.read(Role.any()),
-    Permission.update(Role.users()),
+    ...editors.map((memberId) => Permission.update(Role.user(memberId))),
     Permission.delete(Role.user(ownerId)),
   ];
 }

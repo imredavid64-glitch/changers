@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAuthenticatedAppwriteUser } from "@/lib/media/server";
 
 export async function POST(request: NextRequest) {
-  const apiKey = process.env.APPWRITE_API_KEY || process.env.NEXT_PUBLIC_APPWRITE_API_KEY;
+  const apiKey = process.env.APPWRITE_API_KEY?.trim();
   const adminEmail = process.env.ADMIN_EMAIL;
   const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || "https://cloud.appwrite.io/v1";
   const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
@@ -9,7 +10,7 @@ export async function POST(request: NextRequest) {
   const profilesCollection = process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_PROFILES || "profiles";
 
   if (!apiKey || !projectId) {
-    return NextResponse.json({ error: "Appwrite not configured" }, { status: 500 });
+    return NextResponse.json({ error: "APPWRITE_API_KEY not set on server." }, { status: 500 });
   }
 
   if (!adminEmail) {
@@ -20,21 +21,26 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { userId, email } = await request.json();
-
-    if (!userId || !email) {
-      return NextResponse.json({ error: "userId and email required" }, { status: 400 });
+    // Only grant admin to the *authenticated session*. The userId/email in the
+    // request body are attacker-controlled and must never be trusted: anyone
+    // who knows the admin email could otherwise grant themselves admin.
+    const user = await getAuthenticatedAppwriteUser(request);
+    if (!user) {
+      return NextResponse.json(
+        { error: "Sign in first. Your session could not be verified." },
+        { status: 401 }
+      );
     }
 
-    if (email.toLowerCase().trim() !== adminEmail.toLowerCase().trim()) {
+    if (!user.email || user.email.toLowerCase().trim() !== adminEmail.toLowerCase().trim()) {
       return NextResponse.json(
-        { error: "Your email does not match the designated admin email. Access denied." },
+        { error: "Your account email does not match the designated admin email. Access denied." },
         { status: 403 }
       );
     }
 
     const response = await fetch(
-      `${endpoint}/databases/${databaseId}/collections/${profilesCollection}/documents/${userId}`,
+      `${endpoint}/databases/${databaseId}/collections/${profilesCollection}/documents/${user.$id}`,
       {
         method: "PATCH",
         headers: {

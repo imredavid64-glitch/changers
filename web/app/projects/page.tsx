@@ -3,18 +3,18 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FolderKanban, Heart, Plus, Search, Sparkles, Users } from "lucide-react";
+import { FolderKanban, Plus, Search, Sparkles, Users } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import {
   COLLECTIONS,
   createDocument,
-  publicReadAuthenticatedUpdatePermissions,
+  publicReadMemberUpdatePermissions,
   updateDocument,
   watchDocuments,
 } from "@/lib/appwrite/bridge";
 import { Query } from "@/lib/appwrite/client";
 import { AppProject, Strand } from "@/lib/social/types";
-import { STRAND_LABELS, STRAND_OPTIONS, buildSearchIndex, getDisplayName, normalizeProject, parseTagInput, timestampToMillis } from "@/lib/social/utils";
+import { STRAND_LABELS, STRAND_OPTIONS, buildSearchIndex, normalizeProject, parseTagInput, timestampToMillis } from "@/lib/social/utils";
 import { ProjectIdea, callGenerateProjectIdeas } from "@/lib/ai/tools";
 import { refreshBadges } from "@/lib/badges/refresh";
 
@@ -123,7 +123,7 @@ export default function ProjectsPage() {
           created_at_ms: now,
           updated_at_ms: now,
         },
-        publicReadAuthenticatedUpdatePermissions(user.$id),
+        publicReadMemberUpdatePermissions(user.$id, []),
       );
       event.currentTarget.reset();
       setIsCreating(false);
@@ -154,7 +154,7 @@ export default function ProjectsPage() {
     setGeneratingIdeas(false);
   }
 
-  function handleUseIdea(idea: ProjectIdea) {
+  function handleUseIdea() {
     if (ideaStrand) {
       setIdeaStrand(ideaStrand);
     }
@@ -263,7 +263,7 @@ export default function ProjectsPage() {
                         <p style={{ fontWeight: 700, fontSize: "0.95rem" }}>{idea.title}</p>
                         <p className="muted" style={{ fontSize: "0.85rem" }}>{idea.description}</p>
                       </div>
-                      <button className="ghost" onClick={() => handleUseIdea(idea)}>
+                      <button className="ghost" onClick={() => handleUseIdea()}>
                         Use idea
                       </button>
                     </div>
