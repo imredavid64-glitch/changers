@@ -161,12 +161,20 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     );
   }, [profileId]);
 
-  useEffect(() => {
+  // Reset follow/block flags only when the view or signed-in user transitions to a
+  // state where no subscription applies; otherwise the callbacks own these values.
+  const [prevFollowKey, setPrevFollowKey] = useState(`${currentUser?.$id ?? ""}:${isOwner ? "1" : "0"}`);
+  const followKey = `${currentUser?.$id ?? ""}:${isOwner ? "1" : "0"}`;
+  if (followKey !== prevFollowKey) {
+    setPrevFollowKey(followKey);
     if (!currentUser || isOwner) {
       setIsFollowing(false);
       setIsBlocked(false);
-      return;
     }
+  }
+
+  useEffect(() => {
+    if (!currentUser || isOwner) return;
 
     const unsubFollow = watchDocument(
       COLLECTIONS.follows,
@@ -187,11 +195,15 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     return () => { unsubFollow(); unsubBlock(); };
   }, [currentUser, followDocumentId, isOwner, profileId]);
 
+  const [prevSavedKey, setPrevSavedKey] = useState(`${currentUser?.$id ?? ""}:${isOwner ? "1" : "0"}`);
+  const savedKey = `${currentUser?.$id ?? ""}:${isOwner ? "1" : "0"}`;
+  if (savedKey !== prevSavedKey) {
+    setPrevSavedKey(savedKey);
+    if (!isOwner || !currentUser) setSavedPosts([]);
+  }
+
   useEffect(() => {
-    if (!isOwner || !currentUser) {
-      setSavedPosts([]);
-      return;
-    }
+    if (!isOwner || !currentUser) return;
 
     return watchDocuments(
       COLLECTIONS.savedPosts,

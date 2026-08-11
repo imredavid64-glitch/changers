@@ -40,9 +40,13 @@ export default function ProjectsPage() {
   const [ideas, setIdeas] = useState<ProjectIdea[]>([]);
   const [generatingIdeas, setGeneratingIdeas] = useState(false);
 
-  useEffect(() => {
+  // Sync saved-project ids from the profile when it (re)loads, without clobbering
+  // optimistic local toggles: adjust state only when the profile object changes.
+  const [prevProfileForSaved, setPrevProfileForSaved] = useState(profile);
+  if (profile !== prevProfileForSaved) {
+    setPrevProfileForSaved(profile);
     setSavedProjectIds(Array.isArray(profile?.saved_project_ids) ? profile!.saved_project_ids : []);
-  }, [profile]);
+  }
 
   useEffect(() => {
     return watchDocuments(
@@ -60,7 +64,10 @@ export default function ProjectsPage() {
     );
   }, []);
 
-  const preferredStrands = (profile?.interests?.length ? profile.interests : ["S"]) as Strand[];
+  const preferredStrands = useMemo(
+    () => (profile?.interests?.length ? profile.interests : ["S"]) as Strand[],
+    [profile],
+  );
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -170,6 +177,7 @@ export default function ProjectsPage() {
       await updateDocument(COLLECTIONS.projects, project.id, {
         members: nextMembers,
         member_count: nextMembers.length,
+        // eslint-disable-next-line react-hooks/purity -- Date.now() timestamps in event handlers are explicitly permitted by React.
         updated_at_ms: Date.now(),
       });
       setStatus(`You joined ${project.name}.`);
@@ -189,6 +197,7 @@ export default function ProjectsPage() {
     try {
       await updateDocument(COLLECTIONS.profiles, user.$id, {
         saved_project_ids: next,
+        // eslint-disable-next-line react-hooks/purity -- Date.now() timestamps in event handlers are explicitly permitted by React.
         updated_at_ms: Date.now(),
       });
       setStatus(has ? `Removed ${project.name} from your interests.` : `Saved ${project.name} to your interests.`);

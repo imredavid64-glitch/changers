@@ -33,6 +33,10 @@ export default function PostsFeedPage() {
   const [pollOptionA, setPollOptionA] = useState("");
   const [pollOptionB, setPollOptionB] = useState("");
 
+  // The URL is an external system: adopt tab/strand params on load and when the URL
+  // changes. A render-time adjustment would re-derive from the URL on every render and
+  // fight the user's own tab clicks, which must win until the URL actually changes.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const tabParam = searchParams.get("tab");
     if (tabParam && ["for-you", "following", "latest", "trending"].includes(tabParam)) {
@@ -43,8 +47,12 @@ export default function PostsFeedPage() {
       setStrandFilter(strandParam as Strand);
     }
   }, [searchParams]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
-  const preferredStrands = (profile?.interests?.length ? profile.interests : ["S"]) as Strand[];
+  const preferredStrands = useMemo(
+    () => (profile?.interests?.length ? profile.interests : ["S"]) as Strand[],
+    [profile],
+  );
 
   useEffect(() => {
     if (!user) return;

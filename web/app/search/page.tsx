@@ -50,19 +50,9 @@ function SearchResults() {
   const [status, setStatus] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!queryText) {
-      setResults([]);
-      setLoading(false);
-      setStatus(null);
-      return;
-    }
-
-    if (!appwriteEnabled) {
-      setResults([]);
-      setLoading(false);
-      setStatus("Add your Appwrite website environment variables to enable search.");
-      return;
-    }
+    // The empty-query and no-backend cases are handled by the derived visible* values
+    // below, so the effect never resets state synchronously.
+    if (!queryText || !appwriteEnabled) return;
 
     async function performSearch() {
       setLoading(true);
@@ -212,6 +202,14 @@ function SearchResults() {
 
   const visibleResults =
     filter === "all" ? results : results.filter((result) => result.type === filter);
+  // When the query is empty (or the backend is disabled), present the reset state
+  // without writing it to state.
+  const visibleLoading = queryText && appwriteEnabled ? loading : false;
+  const visibleStatus = queryText
+    ? appwriteEnabled
+      ? status
+      : "Add your Appwrite website environment variables to enable search."
+    : null;
 
   return (
     <section className="card" style={{ minHeight: "60vh" }}>
@@ -219,7 +217,7 @@ function SearchResults() {
         <div>
           <h2>Search Results</h2>
           <p className="muted">
-            {loading ? "Searching Changers..." : `Found ${visibleResults.length} results for "${rawQuery}"`}
+            {visibleLoading ? "Searching Changers..." : `Found ${visibleResults.length} results for "${rawQuery}"`}
           </p>
         </div>
 
@@ -245,10 +243,10 @@ function SearchResults() {
       </div>
 
       <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 12 }}>
-        {loading ? (
+        {visibleLoading ? (
           <p className="muted">Searching across people, posts, and rooms...</p>
-        ) : status ? (
-          <p className="notice">{status}</p>
+        ) : visibleStatus ? (
+          <p className="notice">{visibleStatus}</p>
         ) : visibleResults.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px", color: "var(--moss)", opacity: 0.5 }}>
             <SearchIcon size={48} style={{ margin: "0 auto 16px" }} />

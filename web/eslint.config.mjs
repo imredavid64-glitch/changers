@@ -8,14 +8,13 @@ const eslintConfig = defineConfig([
   {
     rules: {
       // Next 16's core-web-vitals preset enables the React Compiler-era lint
-      // rules from eslint-plugin-react-hooks 7. This codebase predates them:
-      // `react-hooks/purity` flags legitimate Date.now() timestamp writes inside
-      // event handlers (which React explicitly permits), and
-      // `react-hooks/set-state-in-effect` flags legacy prop-to-state sync and
-      // reset-in-effect patterns. Keep both visible as warnings while they are
-      // migrated so they never fail CI on their own.
-      "react-hooks/purity": "warn",
-      "react-hooks/set-state-in-effect": "warn",
+      // rules from eslint-plugin-react-hooks 7. All legacy warning sites were
+      // migrated: derived state is computed in render, prop/URL-to-state sync
+      // uses adjust-during-render or a documented eslint-disable, and the only
+      // remaining react-hooks/purity hits are Date.now() timestamps inside event
+      // handlers, which React explicitly permits (disabled with justification).
+      "react-hooks/purity": "error",
+      "react-hooks/set-state-in-effect": "error",
     },
   },
   // Override default ignores of eslint-config-next.

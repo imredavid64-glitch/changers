@@ -68,18 +68,31 @@ export function PostCard({
   const [userPollVote, setUserPollVote] = useState<string | null>(null);
   const isPostAuthor = Boolean(user && post.author_id === user.$id);
 
-  useEffect(() => {
+  // Sync optimistic counters when the post (or signed-in user) changes, without
+  // clobbering in-flight optimistic updates between renders.
+  const [prevPostSyncKey, setPrevPostSyncKey] = useState("");
+  const postSyncKey = `${user?.$id ?? ""}:${post.id}`;
+  if (postSyncKey !== prevPostSyncKey) {
+    setPrevPostSyncKey(postSyncKey);
     setLikesCount(post.likes_count || post.likes.length);
     setCommentsCount(post.comments_count || 0);
     setIsLiked(Boolean(user && post.likes.includes(user.$id)));
-  }, [post, user]);
+  }
 
-  useEffect(() => {
-    if (!user) {
+  // Reset the saved-state only when the user transitions to signed-out; while signed
+  // in the subscription callback owns these values end-to-end.
+  const [prevSavedUserId, setPrevSavedUserId] = useState<string | null>(user?.$id ?? null);
+  const savedUserId = user?.$id ?? null;
+  if (savedUserId !== prevSavedUserId) {
+    setPrevSavedUserId(savedUserId);
+    if (savedUserId === null) {
       setIsSaved(false);
       setSavedDocId(null);
-      return;
     }
+  }
+
+  useEffect(() => {
+    if (!user) return;
 
     return watchDocuments(
       COLLECTIONS.savedPosts,

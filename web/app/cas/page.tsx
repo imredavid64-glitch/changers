@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Download, GraduationCap, Printer } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import { COLLECTIONS, getDocument, listDocuments, watchDocuments } from "@/lib/appwrite/bridge";
+import { COLLECTIONS, getDocument, listDocuments } from "@/lib/appwrite/bridge";
 import { Query } from "@/lib/appwrite/client";
 import {
   CAS_CATEGORY_EMOJI,

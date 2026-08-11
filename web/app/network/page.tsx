@@ -44,8 +44,17 @@ export default function NetworkPage() {
   const [category, setCategory] = useState<Category>("all");
   const [sortMode, setSortMode] = useState<SortMode>("recent");
 
+  // Reset the signed-out loading state only when the user actually transitions away;
+  // while signed in the load() path owns `loading` end-to-end.
+  const [prevNetworkUserId, setPrevNetworkUserId] = useState<string | null>(user?.$id ?? null);
+  const networkUserId = user?.$id ?? null;
+  if (networkUserId !== prevNetworkUserId) {
+    setPrevNetworkUserId(networkUserId);
+    if (networkUserId === null) setLoading(false);
+  }
+
   useEffect(() => {
-    if (!user) { setLoading(false); return; }
+    if (!user) return;
 
     let active = true;
     const userId = user.$id;
@@ -144,7 +153,12 @@ export default function NetworkPage() {
     try {
       await createDocument(
         COLLECTIONS.follows,
-        { follower_id: user.$id, followee_id: targetId, created_at_ms: Date.now() },
+        {
+          follower_id: user.$id,
+          followee_id: targetId,
+          // eslint-disable-next-line react-hooks/purity -- Date.now() timestamps in event handlers are explicitly permitted by React.
+          created_at_ms: Date.now(),
+        },
         publicReadOwnerWritePermissions(user.$id),
         `${user.$id}_${targetId}`,
       );
@@ -157,6 +171,7 @@ export default function NetworkPage() {
           actor_id: user.$id,
           read: false,
           message: `${myProfile?.full_name || user.name || "Someone"} started following you.`,
+          // eslint-disable-next-line react-hooks/purity -- Date.now() timestamps in event handlers are explicitly permitted by React.
           created_at_ms: Date.now(),
         },
         privateReadWritePermissions(targetId),

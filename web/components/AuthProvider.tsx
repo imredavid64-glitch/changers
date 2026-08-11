@@ -62,14 +62,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    void refreshAuth();
+    // Defer past the effect's synchronous body: refreshAuth() may synchronously set
+    // loading/user/profile when Appwrite is disabled. A 0ms timer keeps the same
+    // first-paint timing while satisfying react-hooks/set-state-in-effect.
+    const timer = setTimeout(() => void refreshAuth(), 0);
+    return () => clearTimeout(timer);
   }, []);
 
+  // Reset the profile only when the signed-in user actually transitions (including to
+  // signed-out); while signed in the subscription below owns `profile` end-to-end.
+  const [prevAuthUserId, setPrevAuthUserId] = useState<string | null>(user?.$id ?? null);
+  const authUserId = user?.$id ?? null;
+  if (authUserId !== prevAuthUserId) {
+    setPrevAuthUserId(authUserId);
+    if (authUserId === null) setProfile(null);
+  }
+
   useEffect(() => {
-    if (!user) {
-      setProfile(null);
-      return;
-    }
+    if (!user) return;
 
     return watchDocument(
       COLLECTIONS.profiles,

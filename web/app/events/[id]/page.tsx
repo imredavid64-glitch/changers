@@ -39,8 +39,17 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     );
   }, [eventId]);
 
+  // Reset the RSVP badge only when the user or event transitions away; the fetch
+  // below and handleRsvp own the value while both are present.
+  const [prevRsvpKey, setPrevRsvpKey] = useState(`${user?.$id ?? ""}:${event?.id ?? ""}`);
+  const rsvpKey = `${user?.$id ?? ""}:${event?.id ?? ""}`;
+  if (rsvpKey !== prevRsvpKey) {
+    setPrevRsvpKey(rsvpKey);
+    if (!user || !event) setRsvpStatus(null);
+  }
+
   useEffect(() => {
-    if (!user || !event) { setRsvpStatus(null); return; }
+    if (!user || !event) return;
     getDocument(COLLECTIONS.eventRsvps, `${eventId}_${user.$id}`).then((doc) => {
       if (doc) setRsvpStatus(String(doc.status || ""));
     });

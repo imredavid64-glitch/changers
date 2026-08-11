@@ -113,7 +113,7 @@ export default function VideoCallRoom({
   const [screenStream, setScreenStream] = useState<MediaStream | null>(null);
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
-  const [selfName, setSelfName] = useState("");
+  const selfName = user?.name || "Anonymous";
 
   const [participants, setParticipants] = useState<CallParticipant[]>([]);
   const [remoteStreams, setRemoteStreams] = useState<Record<string, MediaStream>>({});
@@ -244,7 +244,6 @@ export default function VideoCallRoom({
   useEffect(() => {
     if (!user) return;
     myIdRef.current = user.$id;
-    setSelfName(user.name || "Anonymous");
 
     let cancelled = false;
     async function start() {
@@ -277,8 +276,6 @@ export default function VideoCallRoom({
   useEffect(() => {
     if (!user) return;
     myIdRef.current = user.$id;
-    const name = user.name || "Anonymous";
-    setSelfName(name);
 
     const unsubscribe = subscribeToCallRoom(roomId, (signal) => {
       if (signal.sender_id === myIdRef.current) return;

@@ -21,7 +21,7 @@ class MockPeerConnection {
   ontrack: ((event: { streams: MediaStream[] }) => void) | null = null;
   onconnectionstatechange: (() => void) | null = null;
 
-  constructor(_config?: RTCConfiguration) {
+  constructor() {
     this.sender = {
       track: { kind: "video" } as MediaStreamTrack,
       replaceTrack: vi.fn(async () => {}),
@@ -197,7 +197,6 @@ describe("PeerManager two-peer signaling", () => {
   it("removes a peer and notifies when its connection fails", async () => {
     resetInstances();
     const outA: CallRtcPayload[] = [];
-    const managerA = makeManager("A", outA);
     const onPeerRemoved = vi.fn();
     const managerWithCallback = makeManager("A", outA, { onPeerRemoved });
 

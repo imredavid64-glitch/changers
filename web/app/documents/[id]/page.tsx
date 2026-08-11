@@ -27,6 +27,10 @@ export default function DocumentDetailPage() {
   const applyingExternalRef = useRef(false);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Realtime subscription must stay stable for the lifetime of this document view:
+  // re-subscribing on every keystroke (title/body change) would tear down and recreate
+  // the channel mid-edit. The callback reads the latest values from state and refs.
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     if (!user || !id) return;
 
@@ -71,6 +75,7 @@ export default function DocumentDetailPage() {
 
     return unsub;
   }, [user, id]);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   function triggerDownload(filename: string, content: string, type = "text/plain") {
     const blob = new Blob([content], { type });
@@ -96,7 +101,7 @@ export default function DocumentDetailPage() {
     triggerDownload(`${title || "document"}.txt`, title + "\n\n" + body);
   }
 
-  async function handleSave() {
+  const handleSave = useCallback(async () => {
     if (!title.trim() || !document || !user) return;
     setSaving(true);
     setSaveState("saving");
@@ -121,7 +126,7 @@ export default function DocumentDetailPage() {
       setSaveState("idle");
     }
     setSaving(false);
-  }
+  }, [body, document, title, user]);
 
   const autosave = useCallback(() => {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
@@ -130,7 +135,7 @@ export default function DocumentDetailPage() {
         void handleSave();
       }
     }, 2500);
-  }, [dirty, document, title, body]);
+  }, [dirty, document, handleSave]);
 
   function handleTitleChange(value: string) {
     setTitle(value);

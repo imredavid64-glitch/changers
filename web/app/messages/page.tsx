@@ -19,12 +19,20 @@ export default function MessagesInboxPage() {
   const [threads, setThreads] = useState<ThreadWithOtherUser[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user) {
+  // Reset the thread list only when the user actually transitions to signed-out;
+  // while signed in the subscription callback owns `threads`/`loading` end-to-end.
+  const [prevMessagesUserId, setPrevMessagesUserId] = useState<string | null>(user?.$id ?? null);
+  const messagesUserId = user?.$id ?? null;
+  if (messagesUserId !== prevMessagesUserId) {
+    setPrevMessagesUserId(messagesUserId);
+    if (messagesUserId === null) {
       setThreads([]);
       setLoading(false);
-      return;
     }
+  }
+
+  useEffect(() => {
+    if (!user) return;
 
     return watchDocuments(
       COLLECTIONS.threads,

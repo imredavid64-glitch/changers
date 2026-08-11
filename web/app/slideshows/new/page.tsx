@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
@@ -21,16 +21,18 @@ export default function NewSlideshowPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (templateId) {
-      const template = getTemplateById(templateId);
-      if (template) {
-        setTitle(template.name);
-        const { slides: initialSlides } = generateSlideContent(templateId);
-        setSlides(initialSlides);
-      }
+  // Apply the ?template= preset when it first appears (sentinel forces the mount
+  // case) and when it changes to another preset — never on later user edits.
+  const [prevTemplateId, setPrevTemplateId] = useState<string | null>("__init__");
+  if (templateId !== prevTemplateId) {
+    setPrevTemplateId(templateId);
+    const template = templateId ? getTemplateById(templateId) : null;
+    if (template && templateId) {
+      setTitle(template.name);
+      const { slides: initialSlides } = generateSlideContent(templateId);
+      setSlides(initialSlides);
     }
-  }, [templateId]);
+  }
 
   function addSlide() {
     setSlides([...slides, { layout: "content", heading: "New Slide", body: "" }]);

@@ -40,13 +40,21 @@ export default function DirectMessageThread({ params }: { params: Promise<{ id: 
   const [isBlocked, setIsBlocked] = useState(false);
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!currentUser) {
+  // Reset cached thread state only when the user transitions to signed-out; while
+  // signed in the subscription callbacks own these values end-to-end.
+  const [prevThreadUserId, setPrevThreadUserId] = useState<string | null>(currentUser?.$id ?? null);
+  const threadUserId = currentUser?.$id ?? null;
+  if (threadUserId !== prevThreadUserId) {
+    setPrevThreadUserId(threadUserId);
+    if (threadUserId === null) {
       setThread(null);
       setOtherUser(null);
       setLoadingThread(false);
-      return;
     }
+  }
+
+  useEffect(() => {
+    if (!currentUser) return;
 
     return watchDocument(
       COLLECTIONS.threads,
@@ -64,34 +72,36 @@ export default function DirectMessageThread({ params }: { params: Promise<{ id: 
     );
   }, [currentUser, threadId]);
 
+  const [prevOtherKey, setPrevOtherKey] = useState(`${currentUser?.$id ?? ""}:${thread?.id ?? ""}`);
+  const otherKey = `${currentUser?.$id ?? ""}:${thread?.id ?? ""}`;
+  if (otherKey !== prevOtherKey) {
+    setPrevOtherKey(otherKey);
+    if (!currentUser || !thread) setOtherUser(null);
+  }
+
   useEffect(() => {
-    if (!currentUser || !thread) {
-      setOtherUser(null);
-      return;
-    }
+    if (!currentUser || !thread) return;
 
-    const otherUserId = thread.participants.find((participantId) => participantId !== currentUser.$id);
-    if (!otherUserId) {
-      setOtherUser({ id: currentUser.$id, name: profile?.full_name || getDisplayName(currentUser) });
-      return;
-    }
-
-    const resolvedOtherUserId = otherUserId;
+    // A solo thread has no other participant; fall back to the current user (their
+    // own profile) so the header still renders.
+    const currentUserId = currentUser.$id;
+    const otherUserId =
+      thread.participants.find((participantId) => participantId !== currentUserId) || currentUserId;
     let active = true;
 
     async function loadOtherUser() {
-      const profileDocument = await getDocument(COLLECTIONS.profiles, resolvedOtherUserId);
+      const profileDocument = await getDocument(COLLECTIONS.profiles, otherUserId);
       if (!active) return;
 
       if (profileDocument) {
         const normalized = normalizeProfile(profileDocument.$id, profileDocument);
-        setOtherUser({ id: resolvedOtherUserId, name: normalized.full_name });
+        setOtherUser({ id: otherUserId, name: normalized.full_name });
       } else {
-        setOtherUser({ id: resolvedOtherUserId, name: "Unknown" });
+        setOtherUser({ id: otherUserId, name: "Unknown" });
       }
 
       // Check if blocked
-      const blockDoc = currentUser ? await getDocument(COLLECTIONS.blocks, `${resolvedOtherUserId}_${currentUser.$id}`) : null;
+      const blockDoc = await getDocument(COLLECTIONS.blocks, `${otherUserId}_${currentUserId}`);
       if (active) {
         setIsBlocked(Boolean(blockDoc));
       }
@@ -104,13 +114,21 @@ export default function DirectMessageThread({ params }: { params: Promise<{ id: 
     };
   }, [currentUser, profile, thread]);
 
-  useEffect(() => {
-    const isParticipant = Boolean(currentUser && thread?.participants.includes(currentUser.$id));
-    if (!currentUser || !thread || !isParticipant) {
+  const isMessagesParticipant = Boolean(currentUser && thread?.participants.includes(currentUser.$id));
+  const [prevMessagesKey, setPrevMessagesKey] = useState(
+    `${currentUser?.$id ?? ""}:${thread?.id ?? ""}:${isMessagesParticipant ? "1" : "0"}`,
+  );
+  const messagesKey = `${currentUser?.$id ?? ""}:${thread?.id ?? ""}:${isMessagesParticipant ? "1" : "0"}`;
+  if (messagesKey !== prevMessagesKey) {
+    setPrevMessagesKey(messagesKey);
+    if (!currentUser || !thread || !isMessagesParticipant) {
       setMessages([]);
       setLoadingMessages(false);
-      return;
     }
+  }
+
+  useEffect(() => {
+    if (!currentUser || !thread || !isMessagesParticipant) return;
 
     return watchDocuments(
       COLLECTIONS.threadMessages,
@@ -137,7 +155,7 @@ export default function DirectMessageThread({ params }: { params: Promise<{ id: 
         setStatus("Messages could not load.");
       },
     );
-  }, [currentUser, thread, threadId]);
+  }, [currentUser, thread, threadId, isMessagesParticipant]);
 
   useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });

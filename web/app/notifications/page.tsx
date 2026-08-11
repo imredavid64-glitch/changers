@@ -55,12 +55,19 @@ export default function NotificationsPage() {
   }, [user]);
 
   useEffect(() => {
+    // Browser-capability detection must run post-hydration: computing it in render
+    // would mismatch the SSR output (window/navigator don't exist server-side).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPushSupported("Notification" in window && "serviceWorker" in navigator);
   }, []);
 
-  useEffect(() => {
+  // Sync the email toggle from the profile when it (re)loads, without clobbering the
+  // optimistic toggle: adjust state only when the profile object changes.
+  const [prevProfileForEmail, setPrevProfileForEmail] = useState(profile);
+  if (profile !== prevProfileForEmail) {
+    setPrevProfileForEmail(profile);
     setEmailEnabled(Boolean(profile?.email_notifications));
-  }, [profile]);
+  }
 
   const unreadCount = useMemo(() => notifications.filter((n) => !n.read).length, [notifications]);
 

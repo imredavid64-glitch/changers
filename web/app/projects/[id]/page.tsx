@@ -89,6 +89,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     try {
       await updateDocument(COLLECTIONS.projects, projectId, {
         status: nextStatus,
+        // eslint-disable-next-line react-hooks/purity -- Date.now() timestamps in event handlers are explicitly permitted by React.
         updated_at_ms: Date.now(),
       });
       setStatus(`Project marked as ${nextStatus}.`);
@@ -105,6 +106,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       await updateDocument(COLLECTIONS.projects, projectId, {
         members: nextMembers,
         member_count: nextMembers.length,
+        // eslint-disable-next-line react-hooks/purity -- Date.now() timestamps in event handlers are explicitly permitted by React.
         updated_at_ms: Date.now(),
       });
       setStatus("Member removed.");

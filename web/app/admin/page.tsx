@@ -32,8 +32,16 @@ export default function AdminPage() {
 
   const isAdmin = profile?.is_admin === true;
 
+  // Reset the loading flag only when the admin flag transitions away; while admin,
+  // load() owns `loading` end-to-end.
+  const [prevIsAdmin, setPrevIsAdmin] = useState<boolean | null>(null);
+  if (isAdmin !== prevIsAdmin) {
+    setPrevIsAdmin(isAdmin);
+    if (!isAdmin) setLoading(false);
+  }
+
   useEffect(() => {
-    if (!isAdmin) { setLoading(false); return; }
+    if (!isAdmin) return;
 
     async function load() {
       try {
@@ -84,6 +92,9 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (activeTab === "messages" && !messagesLoaded && isAdmin) {
+      // Lazy-loads external data the first time the tab opens; every setState happens
+      // in async callbacks.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       void loadMessages();
     }
   }, [activeTab, messagesLoaded, isAdmin]);
@@ -109,6 +120,9 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (activeTab === "audit" && !auditLoaded && isAdmin) {
+      // Lazy-loads external data the first time the tab opens; every setState happens
+      // in async callbacks.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       void loadAuditActions();
     }
   }, [activeTab, auditLoaded, isAdmin]);
@@ -199,6 +213,7 @@ export default function AdminPage() {
 
   async function handleToggleAdmin(userId: string, currentValue: boolean) {
     try {
+      // eslint-disable-next-line react-hooks/purity -- Date.now() timestamps in event handlers are explicitly permitted by React.
       await updateDocument(COLLECTIONS.profiles, userId, { is_admin: !currentValue, updated_at_ms: Date.now() });
       setProfiles((prev) => prev.map((p) => p.id === userId ? { ...p, is_admin: !currentValue } : p));
       setStatus(`Admin toggled for user.`);

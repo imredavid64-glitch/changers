@@ -118,6 +118,7 @@ export function TaskBoard({ project }: TaskBoardProps) {
     try {
       await updateDocument(COLLECTIONS.tasks, task.id, {
         status: nextStatus,
+        // eslint-disable-next-line react-hooks/purity -- Date.now() timestamps in event handlers are explicitly permitted by React.
         updated_at_ms: Date.now(),
       });
     } catch (error) {

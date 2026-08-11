@@ -63,7 +63,9 @@ export default function MentorsPage() {
           {
             participants,
             last_message: "",
+            // eslint-disable-next-line react-hooks/purity -- Date.now() timestamps in event handlers are explicitly permitted by React.
             created_at_ms: Date.now(),
+            // eslint-disable-next-line react-hooks/purity -- Date.now() timestamps in event handlers are explicitly permitted by React.
             updated_at_ms: Date.now(),
           },
           sharedReadPermissions(participants),
