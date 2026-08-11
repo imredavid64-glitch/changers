@@ -70,6 +70,9 @@ export default function SharedShell({ children }: { children: React.ReactNode })
             <Link href="/impact" className={`nav-link ${pathname === '/impact' ? 'active' : ''}`}>
               Impact Map
             </Link>
+            <Link href="/badges" className={`nav-link ${pathname === '/badges' ? 'active' : ''}`}>
+              Badges
+            </Link>
             {user && (
               <Link href="/network" className={`nav-link ${pathname === '/network' ? 'active' : ''}`}>
                 My Network
@@ -115,6 +118,12 @@ export default function SharedShell({ children }: { children: React.ReactNode })
                 </Link>
                 <Link href="/notifications" className={`nav-link ${pathname === '/notifications' ? 'active' : ''}`}>
                   Notifications
+                </Link>
+                <Link href="/cas" className={`nav-link ${pathname === '/cas' ? 'active' : ''}`}>
+                  CAS Journal
+                </Link>
+                <Link href="/settings" className={`nav-link ${pathname === '/settings' ? 'active' : ''}`}>
+                  Settings
                 </Link>
                 <Link href={`/profile/${user.$id}`} className={`nav-link ${pathname.startsWith('/profile') ? 'active' : ''}`}>
                   My Profile
