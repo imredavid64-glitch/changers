@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ImagePlus, PenLine, Video } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { PostCard } from "@/components/PostCard";
+import { OnboardingChecklist } from "@/components/OnboardingChecklist";
 import { COLLECTIONS, createDocument, publicReadOwnerWritePermissions, watchDocuments } from "@/lib/appwrite/bridge";
 import { Query } from "@/lib/appwrite/client";
 import { AppPost, Strand } from "@/lib/social/types";
@@ -210,6 +211,8 @@ export default function PostsFeedPage() {
           {isComposing ? "Close" : <><PenLine size={16} style={{ marginRight: 6 }} /> Compose</>}
         </button>
       </div>
+
+      <OnboardingChecklist />
 
       {isComposing && (
         <form className="composer-form card" onSubmit={handleCreatePost} style={{ padding: 20 }}>

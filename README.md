@@ -96,6 +96,10 @@ Signed-in users get a daily digest of **unanswered messages** (messages from oth
 
 Composition lives in the pure, unit-tested `web/lib/digest/compose.ts`; data assembly + sending in `web/lib/digest/server.ts`. Sending is gated on the same SMTP config as contact forwarding — it stays inert until `SMTP_HOST`/`SMTP_USER`/`SMTP_PASS` are set. The cron route needs `users.read` scope on the Appwrite API key to look up account emails.
 
+## Onboarding
+
+New users see a first-run checklist card on the home feed (`web/components/OnboardingChecklist.tsx`): complete your profile, share a first post, join a co-lab room, and start a project. Completion is **derived from existing data** — the profile fields and the user's post/room/project counts — so nothing extra is stored and the card re-evaluates itself on every visit. The checklist logic lives in the pure, unit-tested `web/lib/onboarding/checklist.ts`; the card hides once all steps are done and can be dismissed per-browser.
+
 ## Privacy & user data
 
 `web/app/privacy/page.tsx` documents what Changers collects (account, content, social activity, contact submissions, media, and technical data) and gives signed-in users two self-service controls:
