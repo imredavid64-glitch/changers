@@ -96,6 +96,12 @@ Signed-in users get a daily digest of **unanswered messages** (messages from oth
 
 Composition lives in the pure, unit-tested `web/lib/digest/compose.ts`; data assembly + sending in `web/lib/digest/server.ts`. Sending is gated on the same SMTP config as contact forwarding — it stays inert until `SMTP_HOST`/`SMTP_USER`/`SMTP_PASS` are set. The cron route needs `users.read` scope on the Appwrite API key to look up account emails.
 
+## Login throttling
+
+Brute-force protection groundwork lives in the pure, unit-tested `web/lib/auth/throttle.ts`: a sliding-window rate limiter keyed per IP and per account (normalized email), with an in-memory store for single-instance dev and a store-agnostic interface (swap in Postgres/Redis for multi-instance serverless). Defaults: 20 attempts/IP and 6 attempts/account per 15 minutes, with a `recordSuccess` reset so legitimate users never trip it.
+
+**Enforcement is intentionally server-side:** the server must observe login *failures* to throttle meaningfully, so the throttle is consumed by the auth API routes rather than a client-side preflight. It is wired up as part of the server-side auth flow (the same migration that moves sessions to HTTP-only cookies); until that lands, the module ships ready to integrate.
+
 ## Onboarding
 
 New users see a first-run checklist card on the home feed (`web/components/OnboardingChecklist.tsx`): complete your profile, share a first post, join a co-lab room, and start a project. Completion is **derived from existing data** — the profile fields and the user's post/room/project counts — so nothing extra is stored and the card re-evaluates itself on every visit. The checklist logic lives in the pure, unit-tested `web/lib/onboarding/checklist.ts`; the card hides once all steps are done and can be dismissed per-browser.
