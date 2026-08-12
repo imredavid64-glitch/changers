@@ -131,7 +131,7 @@ export default function WelcomePage() {
     <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f0faf5, #ecfdf5, #f0fdfa)" }}>
       <nav style={{
         position: "sticky", top: 0, zIndex: 50,
-        background: "rgba(255,255,255,0.8)", backdropFilter: "blur(12px)",
+        background: "var(--surface-ghost)", backdropFilter: "blur(12px)",
         borderBottom: "1px solid var(--border-card)",
       }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "16px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>

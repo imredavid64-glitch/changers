@@ -107,7 +107,7 @@ export default function ImpactPage() {
               initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.06, duration: 0.25 }}
-              style={{ background: "rgba(255, 255, 255, 0.92)" }}
+              style={{ background: "var(--surface-card-solid)" }}
             >
               <p className="impact-label">{strand.label}</p>
               <p className="impact-value" style={{ fontSize: "2rem", marginTop: 10 }}>{strand.count}</p>

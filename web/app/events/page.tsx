@@ -229,7 +229,7 @@ export default function EventsPage() {
                     minHeight: 84,
                     borderRadius: 12,
                     padding: 8,
-                    background: isToday ? TINTS.teal12 : "rgba(255,255,255,0.7)",
+                    background: isToday ? TINTS.teal12 : "var(--surface-ghost)",
                     border: isToday ? "1px solid var(--teal)" : "1px solid color-mix(in srgb, var(--ink) 6%, transparent)",
                     display: "flex",
                     flexDirection: "column",
