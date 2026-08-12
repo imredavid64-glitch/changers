@@ -37,12 +37,50 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/**
+ * QA/test hook: setting localStorage["changers-fake-user"] = "1" renders the
+ * signed-in shell (topbar, nav, theme toggle) with a mock identity so UI can be
+ * exercised without a live backend (used by the Playwright theme suite). It is
+ * UI-only — every API route still requires a real Appwrite JWT, and the mock is
+ * dormant unless the flag is set in the browser.
+ */
+const FAKE_USER_KEY = "changers-fake-user";
+
+export function readFakeUser(): Models.User<Models.Preferences> | null {
+  if (typeof window === "undefined") return null;
+  if (window.localStorage.getItem(FAKE_USER_KEY) !== "1") return null;
+  return {
+    $id: "e2e-qa-user",
+    name: "QA Tester",
+    email: "qa@test.hu",
+    registration: "",
+    status: true,
+    emailVerification: false,
+    prefs: {},
+    passwordUpdate: "",
+    phone: "",
+    phoneVerification: false,
+    labels: [],
+    accessedAt: "",
+    $createdAt: "",
+    $updatedAt: "",
+  };
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<Models.User<Models.Preferences> | null>(null);
   const [profile, setProfile] = useState<AppProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function refreshAuth() {
+    const fakeUser = readFakeUser();
+    if (fakeUser) {
+      setUser(fakeUser);
+      setProfile(null);
+      setLoading(false);
+      return;
+    }
+
     if (!appwriteEnabled) {
       setLoading(false);
       setUser(null);
