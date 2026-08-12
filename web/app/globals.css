@@ -4,9 +4,9 @@
   --ink: #0d1b1a;
   --ink-soft: #162827;
   --moss: #1f5e54;
-  --teal: #2c8a7d;
+  --teal: #20796c; /* AA on light surfaces (4.86:1 body, 5.20:1 card) */
   --sage: #9bc7b1;
-  --coral: #ff6f4f;
+  --coral: #c93f24; /* AA on light surfaces (4.62:1 body, 4.95:1 card) */
   --sun: #f4b860;
   --sand: #f4efe6;
   --cloud: #fdfbf7;
