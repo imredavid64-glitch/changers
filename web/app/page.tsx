@@ -14,7 +14,7 @@ const STRANDS = [
   { key: "N", label: "Nature", emoji: "🌿", color: TINTS.teal14, description: "Climate, conservation, and regeneration projects that restore the natural world." },
   { key: "E", label: "Economy", emoji: "💡", color: TINTS.sun22, description: "Circular systems, ethical jobs, and fair access to opportunity and resources." },
   { key: "S", label: "Society", emoji: "🤝", color: "color-mix(in srgb, var(--coral) 14%, transparent)", description: "Community, inclusion, and justice — building belonging for everyone." },
-  { key: "W", label: "Wellbeing", emoji: "🧘", color: "rgba(147,197,253,0.25)", description: "Health, safety, and belonging — for people and the planet alike." },
+  { key: "W", label: "Wellbeing", emoji: "🧘", color: "rgba(59,130,246,0.20)", description: "Health, safety, and belonging — for people and the planet alike." },
 ];
 
 const FEATURE_GROUPS: { title: string; blurb: string; items: { emoji: string; name: string; href: string; desc: string }[] }[] = [
@@ -128,7 +128,7 @@ export default function WelcomePage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f0faf5, #ecfdf5, #f0fdfa)" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, color-mix(in srgb, var(--moss) 6%, var(--sand)), color-mix(in srgb, var(--teal) 4%, var(--sand)), color-mix(in srgb, var(--moss) 7%, var(--sand)))" }}>
       <nav style={{
         position: "sticky", top: 0, zIndex: 50,
         background: "var(--surface-ghost)", backdropFilter: "blur(12px)",
@@ -260,7 +260,7 @@ export default function WelcomePage() {
                   key={item.name}
                   href={item.href}
                   className="feature hover-lift"
-                  style={{ display: "block", background: "rgba(255,255,255,0.85)", borderRadius: 20, padding: 28, textDecoration: "none", color: "inherit", border: "1px solid color-mix(in srgb, var(--ink) 6%, transparent)" }}
+                  style={{ display: "block", background: "var(--surface-card-solid)", borderRadius: 20, padding: 28, textDecoration: "none", color: "inherit", border: "1px solid color-mix(in srgb, var(--ink) 6%, transparent)" }}
                 >
                   <div style={{ fontSize: "2.2rem", marginBottom: 14 }}>{item.emoji}</div>
                   <h3 style={{ fontSize: "1.2rem", fontFamily: "var(--font-head)", marginBottom: 8, color: "var(--ink)" }}>{item.name}</h3>
@@ -299,7 +299,7 @@ export default function WelcomePage() {
                 key={title as string}
                 href={href as string}
                 className="feature hover-lift"
-                style={{ display: "block", background: "rgba(255,255,255,0.85)", borderRadius: 20, padding: 28, textDecoration: "none", color: "inherit", border: "1px solid color-mix(in srgb, var(--ink) 6%, transparent)" }}
+                style={{ display: "block", background: "var(--surface-card-solid)", borderRadius: 20, padding: 28, textDecoration: "none", color: "inherit", border: "1px solid color-mix(in srgb, var(--ink) 6%, transparent)" }}
               >
                 <div style={{ fontSize: "2.2rem", marginBottom: 14 }}>{emoji}</div>
                 <h3 style={{ fontSize: "1.2rem", fontFamily: "var(--font-head)", marginBottom: 8, color: "var(--ink)" }}>{title}</h3>
@@ -373,11 +373,13 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      <footer className="footer" style={{ background: "var(--ink)", color: "rgba(255,255,255,0.6)", padding: "48px 24px" }}>
+      {/* The footer band flips with the theme: --ink is dark in light mode and
+          light in dark mode, so its text uses the inverse token (surface-solid). */}
+      <footer className="footer" style={{ background: "var(--ink)", color: "color-mix(in srgb, var(--surface-card-solid) 68%, transparent)", padding: "48px 24px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 32, marginBottom: 32 }}>
             <div>
-              <p style={{ fontSize: "1.2rem", fontFamily: "var(--font-head)", color: "white", marginBottom: 8 }}>🌿 Changers</p>
+              <p style={{ fontSize: "1.2rem", fontFamily: "var(--font-head)", color: "var(--surface-card-solid)", marginBottom: 8 }}>🌿 Changers</p>
               <p style={{ fontSize: "0.85rem" }}>A changemaker community platform. Built for students, by changemakers.</p>
             </div>
             {[
@@ -386,10 +388,10 @@ export default function WelcomePage() {
               ["Community", [["Network", "/network"], ["Mentors", "/mentors"], ["Messages", "/messages"], ["Notifications", "/notifications"], ["Search", "/search"], ["Contact", "/contact"], ["Privacy", "/privacy"]]],
             ].map(([title, links]) => (
               <div key={title as string}>
-                <p style={{ color: "white", fontWeight: 600, marginBottom: 12, fontSize: "0.9rem" }}>{title}</p>
+                <p style={{ color: "var(--surface-card-solid)", fontWeight: 600, marginBottom: 12, fontSize: "0.9rem" }}>{title}</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {(links as [string, string][]).map(([label, href]) => (
-                    <Link key={href} href={href} style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.6)" }}>{label}</Link>
+                    <Link key={href} href={href} style={{ fontSize: "0.85rem", color: "color-mix(in srgb, var(--surface-card-solid) 68%, transparent)" }}>{label}</Link>
                   ))}
                 </div>
               </div>

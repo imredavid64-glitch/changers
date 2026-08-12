@@ -13,7 +13,7 @@
   --white: #ffffff;
   --shadow: 0 24px 60px rgba(16, 24, 32, 0.12);
   /* Theme-aware tokens (flipped by [data-theme="dark"]). */
-  --text-faint: rgba(16, 24, 32, 0.6);
+  --text-faint: rgba(16, 24, 32, 0.65);
   --text-soft: rgba(16, 24, 32, 0.75);
   --text-body: rgba(16, 24, 32, 0.8);
   --border-card: rgba(16, 24, 32, 0.08);
