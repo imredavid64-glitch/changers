@@ -335,6 +335,9 @@ button:hover {
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  /* Override the browser's faded UA color for :disabled (rgba(16,16,16,0.3))
+     with the theme token so disabled labels stay legible in both themes. */
+  color: var(--text-faint);
 }
 
 .primary {

@@ -1,3 +1,5 @@
+import { readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
 /**
@@ -19,12 +21,17 @@ import { expect, test, type Page } from "@playwright/test";
  * (web/lib/qa/fixtures.ts).
  */
 test.describe("contrast audit", () => {
+  // The full-matrix tests walk 46 routes per theme/mode — well past the
+  // 30s default. The coverage test below is unaffected (runs in ms).
+  test.describe.configure({ timeout: 120_000 });
+
   const ROUTES = [
     "/",
     "/posts",
     "/projects",
     "/rooms",
     "/events",
+    "/messages",
     "/network",
     "/mentors",
     "/impact",
@@ -39,6 +46,12 @@ test.describe("contrast audit", () => {
     "/tools/films",
     "/tools/tables",
     "/slideshows",
+    "/documents/new",
+    "/slideshows/new",
+    "/tools/code/new",
+    "/tools/design/new",
+    "/tools/films/new",
+    "/tools/tables/new",
     "/search?q=plastic",
     "/contact",
     "/privacy",
@@ -47,6 +60,25 @@ test.describe("contrast audit", () => {
     "/sign-in",
     "/sign-up",
     "/setup-admin",
+  ];
+
+  // Dynamic detail pages ([id] segments) can't be enumerated statically, so
+  // each is audited with a representative sample id. The coverage test below
+  // keeps this list in sync with the app directory.
+  const DYNAMIC_ROUTES = [
+    "/call/sample",
+    "/documents/sample",
+    "/events/sample",
+    "/messages/sample",
+    "/posts/sample",
+    "/profile/sample",
+    "/projects/sample",
+    "/rooms/sample",
+    "/slideshows/sample",
+    "/tools/code/sample",
+    "/tools/design/sample",
+    "/tools/films/sample",
+    "/tools/tables/sample",
   ];
 
   const THEMES = [
@@ -134,6 +166,16 @@ test.describe("contrast audit", () => {
         // Only leaf text owners (the element whose own text this is).
         const owns = el.children.length === 0 || (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3);
         if (!owns) continue;
+        // WCAG 2.1 exempts inactive UI components: text on disabled form
+        // controls doesn't need 4.5:1 (e.g. a disabled Save button).
+        if (
+          el instanceof HTMLButtonElement ||
+          el instanceof HTMLInputElement ||
+          el instanceof HTMLTextAreaElement ||
+          el instanceof HTMLSelectElement
+        ) {
+          if ((el as HTMLButtonElement).disabled) continue;
+        }
 
         const cs = getComputedStyle(el);
         // Walk ancestors collecting translucent layers, stopping at the first
@@ -208,6 +250,58 @@ test.describe("contrast audit", () => {
     }
   }
 
+  /**
+   * Coverage guard: CI fails if a page route exists in the app directory but
+   * isn't audited here, or if an audited route no longer exists in the app.
+   * Keeps the contrast net from silently missing new pages.
+   */
+  function pageFiles(dir: string): string[] {
+    const out: string[] = [];
+    for (const entry of readdirSync(dir)) {
+      const full = join(dir, entry);
+      if (statSync(full).isDirectory()) out.push(...pageFiles(full));
+      else if (entry.endsWith(".tsx")) out.push(full);
+    }
+    return out;
+  }
+
+  test("audit covers every page route in the app directory", () => {
+    const pages = pageFiles("app")
+      .filter((p) => !p.startsWith(join("app", "api")) && p.endsWith("/page.tsx"))
+      .map((p) => p.replace(/^app\//, "").replace(/(^|\/)page\.tsx$/, ""));
+
+    const staticRoutes = new Set(pages.filter((p) => !/\[[^\]]+\]/.test(p)).map((p) => "/" + p));
+    const dynamicRoutes = new Set(
+      pages
+        .filter((p) => /\[[^\]]+\]/.test(p))
+        .map((p) => "/" + p.replace(/\[[^\]]+\]/g, "sample")),
+    );
+
+    const audited = new Set([...ROUTES, ...DYNAMIC_ROUTES].map((r) => r.split("?")[0]));
+
+    const missingStatic = [...staticRoutes].filter((r) => !audited.has(r));
+    const missingDynamic = [...dynamicRoutes].filter((r) => !audited.has(r));
+    const unknown = [...audited].filter((r) => !staticRoutes.has(r) && !dynamicRoutes.has(r));
+
+    const problems: string[] = [];
+    if (missingStatic.length > 0) {
+      problems.push(
+        `pages exist in app/ but are missing from ROUTES:\n  ${missingStatic.join("\n  ")}`,
+      );
+    }
+    if (missingDynamic.length > 0) {
+      problems.push(
+        `dynamic pages exist in app/ but are missing from DYNAMIC_ROUTES:\n  ${missingDynamic.join("\n  ")}`,
+      );
+    }
+    if (unknown.length > 0) {
+      problems.push(
+        `audited routes that don't exist in app/ (remove from ROUTES/DYNAMIC_ROUTES):\n  ${unknown.join("\n  ")}`,
+      );
+    }
+    expect(problems, problems.join("\n\n")).toEqual([]);
+  });
+
   for (const theme of THEMES) {
     for (const mode of MODES) {
       test(`${mode.name} · ${theme.name} theme`, async ({ page }) => {
@@ -215,7 +309,7 @@ test.describe("contrast audit", () => {
         await page.emulateMedia({ reducedMotion: "reduce", colorScheme: theme.colorScheme });
 
         const violations: { route: string; el: string; ratio: number; fg: string; bg: string }[] = [];
-        for (const route of ROUTES) {
+        for (const route of [...ROUTES, ...DYNAMIC_ROUTES]) {
           violations.push(...(await audit(page, theme, route)));
         }
         assertNoViolations(violations);
