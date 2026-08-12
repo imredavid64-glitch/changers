@@ -7,6 +7,7 @@ import { Trophy } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { COLLECTIONS, watchDocuments } from "@/lib/appwrite/bridge";
 import { Query } from "@/lib/appwrite/client";
+import { FAKE_EARNED_BADGES, FAKE_STATS, isFakeDataMode } from "@/lib/qa/fixtures";
 import { AppBadge, BadgeCategory, UserStats } from "@/lib/social/types";
 import { normalizeBadge } from "@/lib/social/utils";
 import { getCategoryColor, getCategoryLabel } from "@/lib/badges/definitions";
@@ -22,6 +23,18 @@ export default function BadgesPage() {
 
   useEffect(() => {
     if (!user || !profile) return;
+
+    // QA data seam: render the earned/partial badge grid from fixtures so the
+    // audit can cover states that need backend data. Deferred 0ms to keep the
+    // same first-paint timing and satisfy react-hooks/set-state-in-effect.
+    if (isFakeDataMode()) {
+      const timer = setTimeout(() => {
+        setEarnedBadges(FAKE_EARNED_BADGES);
+        setStats(FAKE_STATS);
+        setLoading(false);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
 
     let cancelled = false;
 

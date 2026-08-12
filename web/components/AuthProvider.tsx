@@ -11,6 +11,7 @@ import {
   watchDocument,
 } from "@/lib/appwrite/bridge";
 import { appwriteEnabled } from "@/lib/appwrite/config";
+import { FAKE_PROFILE, isFakeDataMode } from "@/lib/qa/fixtures";
 import { AppProfile } from "@/lib/social/types";
 import { buildProfileSearchIndex, normalizeProfile } from "@/lib/social/utils";
 
@@ -76,7 +77,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const fakeUser = readFakeUser();
     if (fakeUser) {
       setUser(fakeUser);
-      setProfile(null);
+      // The data seam (changers-fake-data) also provides a fixture profile so
+      // data-driven pages render their real states; otherwise profile stays
+      // null exactly as before.
+      setProfile(isFakeDataMode() ? FAKE_PROFILE : null);
       setLoading(false);
       return;
     }
@@ -118,6 +122,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!user) return;
+    // The data seam's profile is fixture data — skip the (backend-less) watch
+    // so it doesn't overwrite FAKE_PROFILE with a default document.
+    if (isFakeDataMode()) return;
 
     return watchDocument(
       COLLECTIONS.profiles,

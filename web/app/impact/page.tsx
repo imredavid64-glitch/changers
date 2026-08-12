@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Activity, TrendingUp, Users } from "lucide-react";
 import { COLLECTIONS, watchDocuments } from "@/lib/appwrite/bridge";
 import { Query } from "@/lib/appwrite/client";
+import { FAKE_POSTS, isFakeDataMode } from "@/lib/qa/fixtures";
 import { AppPost } from "@/lib/social/types";
 import { STRAND_LABELS, STRAND_OPTIONS, normalizePost } from "@/lib/social/utils";
 
@@ -14,6 +15,18 @@ export default function ImpactPage() {
   const [status, setStatus] = useState<string | null>(null);
 
   useEffect(() => {
+    // QA data seam: render the strand scoreboard from fixtures so the audit
+    // covers non-zero impact-score states without a backend. Deferred 0ms to
+    // satisfy react-hooks/set-state-in-effect.
+    if (isFakeDataMode()) {
+      const timer = setTimeout(() => {
+        setPosts(FAKE_POSTS);
+        setStatus(null);
+        setLoading(false);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+
     return watchDocuments(
       COLLECTIONS.posts,
       [Query.orderDesc("created_at_ms"), Query.limit(200)],
