@@ -154,7 +154,7 @@ export default function WelcomePage() {
           Build projects that{" "}
           <span style={{ color: "var(--teal)" }}>change the world</span>
         </h1>
-        <p style={{ fontSize: "clamp(1.1rem, 2vw, 1.4rem)", color: "rgba(16,24,32,0.7)", maxWidth: 680, margin: "0 auto 40px", lineHeight: 1.7 }}>
+        <p style={{ fontSize: "clamp(1.1rem, 2vw, 1.4rem)", color: "var(--text-soft)", maxWidth: 680, margin: "0 auto 40px", lineHeight: 1.7 }}>
           A collaboration-first platform for changemakers. Share ideas, launch projects,
           use AI-powered creative tools, and watch your impact grow — without addictive feeds.
         </p>

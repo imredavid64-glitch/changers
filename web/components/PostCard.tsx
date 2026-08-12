@@ -467,7 +467,7 @@ export function PostCard({
       ) : (
         <div style={{ display: "grid", gap: 12 }}>
           <h3 style={{ fontSize: "1.25rem", lineHeight: 1.2 }}>{post.title}</h3>
-          <p style={{ color: "rgba(16, 24, 32, 0.82)" }}>{post.body}</p>
+          <p style={{ color: "var(--text-body)" }}>{post.body}</p>
 
           {post.image_url && (
             <Image

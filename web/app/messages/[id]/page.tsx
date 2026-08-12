@@ -263,7 +263,7 @@ export default function DirectMessageThread({ params }: { params: Promise<{ id: 
               return (
                 <div key={msg.id} style={{ display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start" }}>
                   {!isMe && (
-                    <span style={{ fontSize: "0.75rem", color: "rgba(16, 24, 32, 0.5)", marginBottom: 4, fontWeight: 600 }}>
+                    <span style={{ fontSize: "0.75rem", color: "var(--text-faint)", marginBottom: 4, fontWeight: 600 }}>
                       {msg.sender_name}
                     </span>
                   )}

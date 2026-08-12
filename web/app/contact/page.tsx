@@ -139,7 +139,7 @@ export default function ContactPage() {
             <textarea name="message" required maxLength={5000} rows={6} placeholder="Tell us what you're working on and how we can help." style={{ ...INPUT_STYLE, resize: "vertical", lineHeight: 1.6 }} />
           </label>
 
-          <label style={{ display: "flex", gap: 10, alignItems: "flex-start", fontSize: "0.85rem", color: "rgba(16,24,32,0.75)", lineHeight: 1.5 }}>
+          <label style={{ display: "flex", gap: 10, alignItems: "flex-start", fontSize: "0.85rem", color: "var(--text-soft)", lineHeight: 1.5 }}>
             <input type="checkbox" name="consent" required style={{ marginTop: 3, width: 16, height: 16 }} />
             <span>
               I agree that Changers stores my name, email, and message — along with the page I was on — so the team can
@@ -167,7 +167,7 @@ export default function ContactPage() {
 
       <div className="card" style={{ padding: 24, maxWidth: 720, margin: "24px auto 0", display: "flex", gap: 16, alignItems: "flex-start", background: "rgba(44,138,125,0.06)" }}>
         <Building2 size={20} style={{ color: "var(--moss)", flexShrink: 0, marginTop: 2 }} />
-        <div style={{ fontSize: "0.9rem", color: "rgba(16,24,32,0.8)", lineHeight: 1.7 }}>
+        <div style={{ fontSize: "0.9rem", color: "var(--text-body)", lineHeight: 1.7 }}>
           <strong>For businesses:</strong> Changers is a student-led changemaker platform. If you&apos;d like to sponsor an event,
           run a workshop, or bring your organization&apos;s mission to our community, email{" "}
           <a href={`mailto:${BUSINESS_EMAIL}`} style={{ color: "var(--moss)", fontWeight: 600 }}>{BUSINESS_EMAIL}</a> —

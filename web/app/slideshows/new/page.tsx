@@ -148,7 +148,7 @@ export default function NewSlideshowPage() {
               >
                 <span>{i + 1}. {slide.heading.slice(0, 20)}</span>
                 <button onClick={(e) => { e.stopPropagation(); removeSlide(i); }}
-                  style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(16,24,32,0.4)", padding: "2px 6px" }}>
+                  style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-faint)", padding: "2px 6px" }}>
                   ×
                 </button>
               </div>

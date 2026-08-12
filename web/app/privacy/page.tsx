@@ -112,7 +112,7 @@ export default function PrivacyPage() {
           {COLLECTION_GROUPS.map((group) => (
             <div key={group.title} style={{ background: "rgba(31,94,84,0.05)", borderRadius: 16, padding: 20 }}>
               <p style={{ fontWeight: 700, marginBottom: 10 }}>{group.icon} {group.title}</p>
-              <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6, fontSize: "0.9rem", color: "rgba(16,24,32,0.8)", lineHeight: 1.6 }}>
+              <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6, fontSize: "0.9rem", color: "var(--text-body)", lineHeight: 1.6 }}>
                 {group.items.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
@@ -127,7 +127,7 @@ export default function PrivacyPage() {
           <ShieldCheck size={22} style={{ color: "var(--moss)" }} />
           <h2 style={{ fontSize: "1.3rem", fontFamily: "var(--font-head)", color: "var(--ink)" }}>How we use and protect it</h2>
         </div>
-        <div style={{ display: "grid", gap: 12, fontSize: "0.95rem", color: "rgba(16,24,32,0.85)", lineHeight: 1.7 }}>
+        <div style={{ display: "grid", gap: 12, fontSize: "0.95rem", color: "var(--text-body)", lineHeight: 1.7 }}>
           <p style={{ margin: 0 }}>
             <strong>Why we collect it:</strong> to run your account, show you your content, let others find and
             collaborate with you, reply to contact messages, and keep the platform safe from abuse and spam.

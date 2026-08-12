@@ -252,7 +252,7 @@ export default function RoomWorkspace({ params }: { params: Promise<{ id: string
               const isMe = message.author_id === currentUser?.$id;
               return (
                 <div key={message.id} style={{ display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start" }}>
-                  <span style={{ fontSize: "0.75rem", color: "rgba(16, 24, 32, 0.5)", marginBottom: 4, fontWeight: 600 }}>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-faint)", marginBottom: 4, fontWeight: 600 }}>
                     {message.author_name}
                   </span>
                   <div
@@ -268,7 +268,7 @@ export default function RoomWorkspace({ params }: { params: Promise<{ id: string
                     <p style={{ margin: 0 }}>{message.text}</p>
                   </div>
                   {pendingMessageIds.has(message.id) && (
-                    <span style={{ fontSize: "0.7rem", color: "rgba(16, 24, 32, 0.45)", marginTop: 4 }}>
+                    <span style={{ fontSize: "0.7rem", color: "var(--text-faint)", marginTop: 4 }}>
                       sending...
                     </span>
                   )}
