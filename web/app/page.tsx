@@ -10,9 +10,9 @@ import { databases, Query } from "@/lib/appwrite/client";
 import { appwriteEnabled, appwriteConfig } from "@/lib/appwrite/config";
 
 const STRANDS = [
-  { key: "N", label: "Nature", emoji: "🌿", color: "rgba(44,138,125,0.14)", description: "Climate, conservation, and regeneration projects that restore the natural world." },
-  { key: "E", label: "Economy", emoji: "💡", color: "rgba(244,184,96,0.22)", description: "Circular systems, ethical jobs, and fair access to opportunity and resources." },
-  { key: "S", label: "Society", emoji: "🤝", color: "rgba(255,111,79,0.14)", description: "Community, inclusion, and justice — building belonging for everyone." },
+  { key: "N", label: "Nature", emoji: "🌿", color: "color-mix(in srgb, var(--teal) 14%, transparent)", description: "Climate, conservation, and regeneration projects that restore the natural world." },
+  { key: "E", label: "Economy", emoji: "💡", color: "color-mix(in srgb, var(--sun) 22%, transparent)", description: "Circular systems, ethical jobs, and fair access to opportunity and resources." },
+  { key: "S", label: "Society", emoji: "🤝", color: "color-mix(in srgb, var(--coral) 14%, transparent)", description: "Community, inclusion, and justice — building belonging for everyone." },
   { key: "W", label: "Wellbeing", emoji: "🧘", color: "rgba(147,197,253,0.25)", description: "Health, safety, and belonging — for people and the planet alike." },
 ];
 
@@ -146,7 +146,7 @@ export default function WelcomePage() {
       </nav>
 
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(31,94,84,0.1)", color: "var(--moss)", padding: "8px 20px", borderRadius: 999, fontSize: "0.85rem", fontWeight: 600, marginBottom: 32 }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "color-mix(in srgb, var(--moss) 10%, transparent)", color: "var(--moss)", padding: "8px 20px", borderRadius: 999, fontSize: "0.85rem", fontWeight: 600, marginBottom: 32 }}>
           <span>🌱</span>
           <span>A changemaker community for students & young leaders</span>
         </div>
@@ -189,7 +189,7 @@ export default function WelcomePage() {
                   </div>
                 ))}
               </div>
-              <div style={{ background: "linear-gradient(135deg, rgba(31,94,84,0.1), rgba(155,199,177,0.15))", borderRadius: 20, padding: 32 }}>
+              <div style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--moss) 10%, transparent), rgba(155,199,177,0.15))", borderRadius: 20, padding: 32 }}>
                 <div className="card" style={{ padding: 24 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
                     <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--teal)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: "1.1rem" }}>Y</div>
@@ -204,7 +204,7 @@ export default function WelcomePage() {
                     ["✅", "Task Board", "6 done · 2 in progress"],
                     ["📽️", "Pitch Slideshow", "8 slides ready"],
                   ].map(([icon, title, meta]) => (
-                    <div key={title} style={{ background: "rgba(31,94,84,0.06)", borderRadius: 12, padding: 12, marginBottom: 8 }}>
+                    <div key={title} style={{ background: "color-mix(in srgb, var(--moss) 6%, transparent)", borderRadius: 12, padding: 12, marginBottom: 8 }}>
                       <p style={{ fontWeight: 600, fontSize: "0.9rem" }}>{icon} {title}</p>
                       <p className="muted" style={{ fontSize: "0.8rem" }}>{meta}</p>
                     </div>
@@ -216,7 +216,7 @@ export default function WelcomePage() {
         </section>
       )}
 
-      <section style={{ background: "white", padding: "80px 24px" }}>
+      <section style={{ background: "var(--surface-card-solid)", padding: "80px 24px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <p className="eyebrow">The Impact Compass</p>
@@ -247,7 +247,7 @@ export default function WelcomePage() {
       </section>
 
       {FEATURE_GROUPS.map((group) => (
-        <section key={group.title} style={{ background: group.title === "AI-powered" ? "linear-gradient(135deg, rgba(31,94,84,0.06), rgba(155,199,177,0.12))" : "var(--sand)", padding: "80px 24px" }}>
+        <section key={group.title} style={{ background: group.title === "AI-powered" ? "linear-gradient(135deg, color-mix(in srgb, var(--moss) 6%, transparent), rgba(155,199,177,0.12))" : "var(--sand)", padding: "80px 24px" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: 40 }}>
               <p className="eyebrow">{group.title}</p>
@@ -274,7 +274,7 @@ export default function WelcomePage() {
         </section>
       ))}
 
-      <section style={{ background: "linear-gradient(135deg, rgba(31,94,84,0.08), rgba(155,199,177,0.16))", padding: "80px 24px" }}>
+      <section style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--moss) 8%, transparent), rgba(155,199,177,0.16))", padding: "80px 24px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <p className="eyebrow">Sustainable AI</p>
@@ -309,7 +309,7 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      <section style={{ background: "white", padding: "80px 24px" }}>
+      <section style={{ background: "var(--surface-card-solid)", padding: "80px 24px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", textAlign: "center" }}>
           <h2 style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)", fontFamily: "var(--font-head)", color: "var(--ink)", marginBottom: 12 }}>
             Built for changemakers, not for addiction
@@ -319,7 +319,7 @@ export default function WelcomePage() {
           </p>
           <div className="feature-grid" style={{ textAlign: "left" }}>
             {PRINCIPLES.map((principle) => (
-              <div key={principle.title} className="feature" style={{ background: "rgba(31,94,84,0.05)", borderRadius: 20, padding: 32 }}>
+              <div key={principle.title} className="feature" style={{ background: "color-mix(in srgb, var(--moss) 5%, transparent)", borderRadius: 20, padding: 32 }}>
                 <div style={{ fontSize: "2.5rem", marginBottom: 16 }}>{principle.emoji}</div>
                 <h3 style={{ fontSize: "1.3rem", fontFamily: "var(--font-head)", marginBottom: 8 }}>{principle.title}</h3>
                 <p className="muted" style={{ lineHeight: 1.7 }}>{principle.desc}</p>
@@ -352,7 +352,7 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      <section style={{ background: "white", padding: "80px 24px", textAlign: "center" }}>
+      <section style={{ background: "var(--surface-card-solid)", padding: "80px 24px", textAlign: "center" }}>
         <div style={{ maxWidth: 760, margin: "0 auto" }}>
           <SpotlightCard />
         </div>

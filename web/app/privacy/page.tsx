@@ -110,7 +110,7 @@ export default function PrivacyPage() {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
           {COLLECTION_GROUPS.map((group) => (
-            <div key={group.title} style={{ background: "rgba(31,94,84,0.05)", borderRadius: 16, padding: 20 }}>
+            <div key={group.title} style={{ background: "color-mix(in srgb, var(--moss) 5%, transparent)", borderRadius: 16, padding: 20 }}>
               <p style={{ fontWeight: 700, marginBottom: 10 }}>{group.icon} {group.title}</p>
               <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6, fontSize: "0.9rem", color: "var(--text-body)", lineHeight: 1.6 }}>
                 {group.items.map((item) => (
@@ -163,7 +163,7 @@ export default function PrivacyPage() {
 
         {user ? (
           <div style={{ display: "grid", gap: 20 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", justifyContent: "space-between", background: "rgba(31,94,84,0.05)", borderRadius: 16, padding: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", justifyContent: "space-between", background: "color-mix(in srgb, var(--moss) 5%, transparent)", borderRadius: 16, padding: 20 }}>
               <div style={{ flex: 1, minWidth: 240 }}>
                 <p style={{ fontWeight: 700 }}>Export my data</p>
                 <p className="muted" style={{ fontSize: "0.85rem", lineHeight: 1.5, margin: 0 }}>
@@ -175,7 +175,7 @@ export default function PrivacyPage() {
               </button>
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", justifyContent: "space-between", background: "rgba(255,111,79,0.06)", borderRadius: 16, padding: 20, border: "1px solid rgba(255,111,79,0.15)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", justifyContent: "space-between", background: "color-mix(in srgb, var(--coral) 6%, transparent)", borderRadius: 16, padding: 20, border: "1px solid color-mix(in srgb, var(--coral) 15%, transparent)" }}>
               <div style={{ flex: 1, minWidth: 240 }}>
                 <p style={{ fontWeight: 700, color: "var(--coral)" }}>Delete my data</p>
                 <p className="muted" style={{ fontSize: "0.85rem", lineHeight: 1.5, margin: 0 }}>
@@ -189,13 +189,13 @@ export default function PrivacyPage() {
                   value={confirmText}
                   onChange={(event) => setConfirmText(event.target.value)}
                   placeholder='Type "DELETE" to confirm'
-                  style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid rgba(255,111,79,0.4)", background: "var(--surface-card-solid)", fontSize: "0.9rem" }}
+                  style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid color-mix(in srgb, var(--coral) 40%, transparent)", background: "var(--surface-card-solid)", fontSize: "0.9rem" }}
                 />
                 <button
                   className="ghost"
                   onClick={handleDelete}
                   disabled={confirmText !== "DELETE" || busy !== null}
-                  style={{ padding: "12px 24px", borderRadius: 999, color: "var(--coral)", borderColor: "rgba(255,111,79,0.35)", fontWeight: 600 }}
+                  style={{ padding: "12px 24px", borderRadius: 999, color: "var(--coral)", borderColor: "color-mix(in srgb, var(--coral) 35%, transparent)", fontWeight: 600 }}
                 >
                   <Trash2 size={16} style={{ display: "inline", marginRight: 6, verticalAlign: "middle" }} />
                   {busy === "delete" ? "Deleting..." : "Delete everything"}
@@ -210,7 +210,7 @@ export default function PrivacyPage() {
         )}
 
         {status && (
-          <p className="notice" style={{ margin: "16px 0 0", ...(status.kind === "success" ? { background: "rgba(44,138,125,0.12)", color: "var(--moss)" } : {}) }}>
+          <p className="notice" style={{ margin: "16px 0 0", ...(status.kind === "success" ? { background: "color-mix(in srgb, var(--teal) 12%, transparent)", color: "var(--moss)" } : {}) }}>
             {status.text}
           </p>
         )}

@@ -158,7 +158,7 @@ export function OnboardingChecklist() {
               padding: "10px 12px",
               borderRadius: 12,
               border: "1px solid rgba(16,24,32,0.08)",
-              background: step.complete ? "rgba(16,24,32,0.03)" : "white",
+              background: step.complete ? "rgba(16,24,32,0.03)" : "var(--surface-card-solid)",
               opacity: step.complete ? 0.6 : 1,
               textDecoration: "none",
               color: "inherit",

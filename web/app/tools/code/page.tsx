@@ -95,7 +95,7 @@ export default function CodeSnippetsPage() {
                   borderRadius: 999,
                   fontSize: "0.7rem",
                   fontWeight: 600,
-                  background: "rgba(44, 138, 125, 0.12)",
+                  background: "color-mix(in srgb, var(--teal) 12%, transparent)",
                   color: "var(--moss)",
                   textTransform: "uppercase",
                 }}

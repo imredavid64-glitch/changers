@@ -149,7 +149,7 @@ export default function ContactPage() {
           </label>
 
           {status && (
-            <p className={`notice ${status.kind === "success" ? "" : ""}`} style={{ margin: 0, ...(status.kind === "success" ? { background: "rgba(44,138,125,0.12)", color: "var(--moss)" } : {}) }}>
+            <p className={`notice ${status.kind === "success" ? "" : ""}`} style={{ margin: 0, ...(status.kind === "success" ? { background: "color-mix(in srgb, var(--teal) 12%, transparent)", color: "var(--moss)" } : {}) }}>
               {status.text}
             </p>
           )}
@@ -165,7 +165,7 @@ export default function ContactPage() {
         </form>
       </div>
 
-      <div className="card" style={{ padding: 24, maxWidth: 720, margin: "24px auto 0", display: "flex", gap: 16, alignItems: "flex-start", background: "rgba(44,138,125,0.06)" }}>
+      <div className="card" style={{ padding: 24, maxWidth: 720, margin: "24px auto 0", display: "flex", gap: 16, alignItems: "flex-start", background: "color-mix(in srgb, var(--teal) 6%, transparent)" }}>
         <Building2 size={20} style={{ color: "var(--moss)", flexShrink: 0, marginTop: 2 }} />
         <div style={{ fontSize: "0.9rem", color: "var(--text-body)", lineHeight: 1.7 }}>
           <strong>For businesses:</strong> Changers is a student-led changemaker platform. If you&apos;d like to sponsor an event,

@@ -136,7 +136,7 @@ export function AIPanel({ title, content, onApplyTitle, onApplyContent }: AIPane
       )}
 
       {summary && (
-        <div className="bridge-results" style={{ marginTop: 12, background: "rgba(244,184,96,0.14)" }}>
+        <div className="bridge-results" style={{ marginTop: 12, background: "color-mix(in srgb, var(--sun) 14%, transparent)" }}>
           <p style={{ fontWeight: 700, marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
             <FileText size={14} /> Summary
           </p>
@@ -174,7 +174,7 @@ export function AIPanel({ title, content, onApplyTitle, onApplyContent }: AIPane
           <p style={{ fontWeight: 700, marginBottom: 8 }}>Suggestions</p>
           <div style={{ display: "grid", gap: 8 }}>
             {suggestions.map((s) => (
-              <div key={s.id} style={{ padding: 12, borderRadius: 14, background: "rgba(44,138,125,0.08)", fontSize: "0.9rem" }}>
+              <div key={s.id} style={{ padding: 12, borderRadius: 14, background: "color-mix(in srgb, var(--teal) 8%, transparent)", fontSize: "0.9rem" }}>
                 {s.text}
               </div>
             ))}
@@ -189,7 +189,7 @@ export function AIPanel({ title, content, onApplyTitle, onApplyContent }: AIPane
           </p>
           <div style={{ display: "grid", gap: 8 }}>
             {outline.map((section) => (
-              <div key={section.heading} style={{ padding: 12, borderRadius: 14, background: "rgba(31,94,84,0.06)" }}>
+              <div key={section.heading} style={{ padding: 12, borderRadius: 14, background: "color-mix(in srgb, var(--moss) 6%, transparent)" }}>
                 <p style={{ fontWeight: 700, fontSize: "0.9rem" }}>{section.heading}</p>
                 <ul style={{ marginTop: 6, paddingLeft: 18, display: "grid", gap: 2 }}>
                   {section.subpoints.map((point) => (
@@ -222,7 +222,7 @@ export function AIPanel({ title, content, onApplyTitle, onApplyContent }: AIPane
         </div>
         {sustainability && (
           <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
-            <div style={{ padding: 12, borderRadius: 14, background: "rgba(44,138,125,0.1)" }}>
+            <div style={{ padding: 12, borderRadius: 14, background: "color-mix(in srgb, var(--teal) 10%, transparent)" }}>
               <p style={{ fontWeight: 700, fontSize: "0.9rem" }}>
                 Sustainability score: {Math.round(sustainability.sustainabilityScore * 100)}%
               </p>
@@ -234,7 +234,7 @@ export function AIPanel({ title, content, onApplyTitle, onApplyContent }: AIPane
             {sustainability.sustainabilityTips.length > 0 && (
               <div style={{ display: "grid", gap: 6 }}>
                 {sustainability.sustainabilityTips.map((tip) => (
-                  <p key={tip} className="muted" style={{ fontSize: "0.85rem", background: "rgba(244,184,96,0.12)", padding: "10px 12px", borderRadius: 12 }}>{tip}</p>
+                  <p key={tip} className="muted" style={{ fontSize: "0.85rem", background: "color-mix(in srgb, var(--sun) 12%, transparent)", padding: "10px 12px", borderRadius: 12 }}>{tip}</p>
                 ))}
               </div>
             )}

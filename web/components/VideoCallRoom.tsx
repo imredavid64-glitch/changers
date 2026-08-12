@@ -125,7 +125,7 @@ export default function VideoCallRoom({
   const [chatMessages, setChatMessages] = useState<Array<{ id: number; sender: string; text: string; breakout: number | null }>>([]);
 
   const [showBoard, setShowBoard] = useState(false);
-  const [penColor, setPenColor] = useState("#2c8a7d");
+  const [penColor, setPenColor] = useState("#20796c");
   const [penSize, setPenSize] = useState(3);
 
   const [timer, setTimer] = useState<TimerState>({ running: false, endsAt: null, durationSec: null, show: false });
@@ -746,7 +746,7 @@ export default function VideoCallRoom({
                   marginLeft: 8,
                   padding: "1px 8px",
                   borderRadius: 999,
-                  background: "rgba(44,138,125,0.1)",
+                  background: "color-mix(in srgb, var(--teal) 10%, transparent)",
                 }}
                 title="Live connection quality across all participants"
               >
@@ -791,7 +791,7 @@ export default function VideoCallRoom({
             {selfName} (you){!micOn ? " · muted" : ""}
           </span>
           {screenStream && (
-            <span style={{ position: "absolute", top: 8, right: 8, background: "rgba(44,138,125,0.9)", color: "#fff", borderRadius: 8, padding: "2px 8px", fontSize: "0.75rem" }}>
+            <span style={{ position: "absolute", top: 8, right: 8, background: "color-mix(in srgb, var(--teal) 90%, transparent)", color: "#fff", borderRadius: 8, padding: "2px 8px", fontSize: "0.75rem" }}>
               Sharing screen
             </span>
           )}

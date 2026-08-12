@@ -7,7 +7,7 @@ import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import { Viewport } from "next";
 
 export const viewport: Viewport = {
-  themeColor: "#2c8a7d",
+  themeColor: "#20796c",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,

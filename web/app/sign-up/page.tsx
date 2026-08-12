@@ -114,7 +114,7 @@ export default function SignUpPage() {
                     alignItems: "center",
                     padding: "10px 12px",
                     borderRadius: 14,
-                    background: "rgba(44, 138, 125, 0.08)",
+                    background: "color-mix(in srgb, var(--teal) 8%, transparent)",
                   }}
                 >
                   <input

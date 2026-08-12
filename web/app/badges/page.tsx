@@ -130,7 +130,7 @@ export default function BadgesPage() {
                       style={{
                         padding: "14px",
                         borderRadius: 16,
-                        background: earned ? "white" : "rgba(16,24,32,0.03)",
+                        background: earned ? "var(--surface-card-solid)" : "rgba(16,24,32,0.03)",
                         border: earned ? "1px solid rgba(16,24,32,0.1)" : "1px dashed rgba(16,24,32,0.12)",
                         display: "grid",
                         gap: 8,

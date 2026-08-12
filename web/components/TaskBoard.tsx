@@ -22,9 +22,9 @@ const PRIORITIES: { value: TaskPriority; label: string }[] = [
 ];
 
 const PRIORITY_COLOR: Record<TaskPriority, string> = {
-  low: "rgba(44,138,125,0.15)",
-  medium: "rgba(244,184,96,0.25)",
-  high: "rgba(255,111,79,0.2)",
+  low: "color-mix(in srgb, var(--teal) 15%, transparent)",
+  medium: "color-mix(in srgb, var(--sun) 25%, transparent)",
+  high: "color-mix(in srgb, var(--coral) 20%, transparent)",
 };
 
 interface TaskBoardProps {

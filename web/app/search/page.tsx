@@ -283,7 +283,7 @@ function SearchResults() {
                 >
                   <div
                     style={{
-                      background: "rgba(44, 138, 125, 0.1)",
+                      background: "color-mix(in srgb, var(--teal) 10%, transparent)",
                       padding: "12px",
                       borderRadius: "8px",
                       color: "var(--moss)",

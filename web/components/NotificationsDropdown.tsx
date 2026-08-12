@@ -91,7 +91,7 @@ export function NotificationsDropdown({ user }: { user: Models.User<Models.Prefe
                       style={{
                         padding: "12px 16px",
                         borderBottom: "1px solid rgba(16,24,32,0.04)",
-                        background: n.read ? "transparent" : "rgba(44, 138, 125, 0.05)",
+                        background: n.read ? "transparent" : "color-mix(in srgb, var(--teal) 5%, transparent)",
                         cursor: "pointer",
                         transition: "background 0.2s ease",
                       }}

@@ -48,17 +48,17 @@ type ProfileFormState = {
 type ThemeOption = { value: AppProfile["theme"]; label: string; swatch: string };
 
 const THEME_OPTIONS: ThemeOption[] = [
-  { value: "moss", label: "Moss", swatch: "#2c8a7d" },
+  { value: "moss", label: "Moss", swatch: "#20796c" },
   { value: "ocean", label: "Ocean", swatch: "#1f5e8f" },
   { value: "sunset", label: "Sunset", swatch: "#e0784f" },
   { value: "rose", label: "Rose", swatch: "#c2547a" },
 ];
 
 const THEME_GRADIENTS: Record<AppProfile["theme"], string> = {
-  moss: "linear-gradient(130deg, rgba(31, 94, 84, 0.95), rgba(44, 138, 125, 0.82), rgba(244, 184, 96, 0.72))",
+  moss: "linear-gradient(130deg, color-mix(in srgb, var(--moss) 95%, transparent), color-mix(in srgb, var(--teal) 82%, transparent), color-mix(in srgb, var(--sun) 72%, transparent))",
   ocean: "linear-gradient(130deg, rgba(20, 60, 99, 0.95), rgba(31, 105, 164, 0.85), rgba(116, 178, 224, 0.7))",
-  sunset: "linear-gradient(130deg, rgba(178, 72, 46, 0.95), rgba(224, 120, 79, 0.85), rgba(244, 184, 96, 0.75))",
-  rose: "linear-gradient(130deg, rgba(150, 50, 92, 0.95), rgba(194, 84, 122, 0.85), rgba(244, 184, 96, 0.7))",
+  sunset: "linear-gradient(130deg, rgba(178, 72, 46, 0.95), rgba(224, 120, 79, 0.85), color-mix(in srgb, var(--sun) 75%, transparent))",
+  rose: "linear-gradient(130deg, rgba(150, 50, 92, 0.95), rgba(194, 84, 122, 0.85), color-mix(in srgb, var(--sun) 70%, transparent))",
 };
 
 export default function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
@@ -475,8 +475,8 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                 borderRadius: 56,
                 display: "grid",
                 placeItems: "center",
-                background: "white",
-                border: "4px solid white",
+                background: "var(--surface-card-solid)",
+                border: "4px solid var(--surface-card-solid)",
                 boxShadow: "var(--shadow)",
               }}
             >
@@ -672,7 +672,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                       padding: "10px 12px",
                       borderRadius: 14,
                       background: editForm.interests.includes(strand.value)
-                        ? "rgba(44, 138, 125, 0.12)"
+                        ? "color-mix(in srgb, var(--teal) 12%, transparent)"
                         : "rgba(16, 24, 32, 0.05)",
                     }}
                   >
@@ -694,7 +694,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                 alignItems: "center",
                 padding: "10px 12px",
                 borderRadius: 14,
-                background: "rgba(44, 138, 125, 0.08)",
+                background: "color-mix(in srgb, var(--teal) 8%, transparent)",
               }}
             >
               <input
@@ -729,7 +729,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                       padding: "10px 12px",
                       borderRadius: 14,
                       border: editForm.theme === themeOption.value ? "2px solid var(--teal)" : "1px solid rgba(16,24,32,0.1)",
-                      background: editForm.theme === themeOption.value ? "rgba(44,138,125,0.08)" : "white",
+                      background: editForm.theme === themeOption.value ? "color-mix(in srgb, var(--teal) 8%, transparent)" : "var(--surface-card-solid)",
                       cursor: "pointer",
                       font: "inherit",
                     }}
@@ -756,7 +756,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                       padding: "10px 12px",
                       borderRadius: 14,
                       border: editForm.theme === themeOption.value ? "2px solid var(--teal)" : "1px solid rgba(16,24,32,0.1)",
-                      background: editForm.theme === themeOption.value ? "rgba(44,138,125,0.08)" : "white",
+                      background: editForm.theme === themeOption.value ? "color-mix(in srgb, var(--teal) 8%, transparent)" : "var(--surface-card-solid)",
                       cursor: "pointer",
                       font: "inherit",
                     }}

@@ -112,7 +112,7 @@ export default function SettingsPage() {
               className="card hover-lift"
               style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none", color: "inherit", padding: "16px 18px", border: "1px solid rgba(16,24,32,0.08)" }}
             >
-              <span style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(44,138,125,0.1)", color: "var(--moss)", display: "grid", placeItems: "center" }}>
+              <span style={{ width: 38, height: 38, borderRadius: 12, background: "color-mix(in srgb, var(--teal) 10%, transparent)", color: "var(--moss)", display: "grid", placeItems: "center" }}>
                 {link.icon}
               </span>
               <div style={{ flex: 1 }}>
@@ -162,7 +162,7 @@ export default function SettingsPage() {
             minLength={8}
           />
           {status && (
-            <p className="notice" style={{ ...(statusKind === "success" ? { background: "rgba(44,138,125,0.12)", color: "var(--moss)" } : {}) }}>
+            <p className="notice" style={{ ...(statusKind === "success" ? { background: "color-mix(in srgb, var(--teal) 12%, transparent)", color: "var(--moss)" } : {}) }}>
               {status}
             </p>
           )}
@@ -177,7 +177,7 @@ export default function SettingsPage() {
       <section className="card">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <span style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(255,111,79,0.1)", color: "var(--coral)", display: "grid", placeItems: "center" }}>
+            <span style={{ width: 38, height: 38, borderRadius: 12, background: "color-mix(in srgb, var(--coral) 10%, transparent)", color: "var(--coral)", display: "grid", placeItems: "center" }}>
               <Trash2 size={18} />
             </span>
             <div>

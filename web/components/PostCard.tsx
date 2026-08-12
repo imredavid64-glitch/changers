@@ -386,7 +386,7 @@ export function PostCard({
                 borderRadius: 24,
                 display: "grid",
                 placeItems: "center",
-                background: "linear-gradient(120deg, rgba(44, 138, 125, 0.18), rgba(244, 184, 96, 0.22))",
+                background: "linear-gradient(120deg, color-mix(in srgb, var(--teal) 18%, transparent), color-mix(in srgb, var(--sun) 22%, transparent))",
                 color: "var(--moss)",
                 fontWeight: 700,
               }}
@@ -417,7 +417,7 @@ export function PostCard({
                   fontSize: "0.75rem",
                   fontWeight: 600,
                   color: "var(--moss)",
-                  background: "rgba(44, 138, 125, 0.12)",
+                  background: "color-mix(in srgb, var(--teal) 12%, transparent)",
                 }}
               >
                 {insight}
@@ -521,7 +521,7 @@ export function PostCard({
                       padding: "10px 14px",
                       borderRadius: 12,
                       border: `1px solid ${voted ? "var(--teal)" : "rgba(16,24,32,0.12)"}`,
-                      background: voted ? "rgba(44,138,125,0.1)" : "var(--cloud)",
+                      background: voted ? "color-mix(in srgb, var(--teal) 10%, transparent)" : "var(--cloud)",
                       cursor: userPollVote && !voted ? "default" : "pointer",
                       textAlign: "left",
                       position: "relative",
@@ -532,7 +532,7 @@ export function PostCard({
                       position: "absolute",
                       inset: 0,
                       width: `${pct}%`,
-                      background: "rgba(44,138,125,0.08)",
+                      background: "color-mix(in srgb, var(--teal) 8%, transparent)",
                       transition: "width 0.3s ease",
                     }} />
                     <span style={{ position: "relative", zIndex: 1, flex: 1, fontWeight: voted ? 700 : 400 }}>
@@ -582,8 +582,8 @@ export function PostCard({
               alignItems: "center",
               gap: 8,
               color: isLiked ? "var(--coral)" : "inherit",
-              borderColor: isLiked ? "rgba(255, 111, 79, 0.3)" : undefined,
-              background: isLiked ? "rgba(255, 111, 79, 0.08)" : undefined,
+              borderColor: isLiked ? "color-mix(in srgb, var(--coral) 30%, transparent)" : undefined,
+              background: isLiked ? "color-mix(in srgb, var(--coral) 8%, transparent)" : undefined,
             }}
           >
             <Heart size={16} fill={isLiked ? "var(--coral)" : "none"} />
@@ -606,8 +606,8 @@ export function PostCard({
               display: "inline-flex",
               alignItems: "center",
               gap: 8,
-              background: isSaved ? "rgba(44, 138, 125, 0.08)" : undefined,
-              borderColor: isSaved ? "rgba(44, 138, 125, 0.2)" : undefined,
+              background: isSaved ? "color-mix(in srgb, var(--teal) 8%, transparent)" : undefined,
+              borderColor: isSaved ? "color-mix(in srgb, var(--teal) 20%, transparent)" : undefined,
             }}
           >
             <Bookmark size={16} fill={isSaved ? "currentColor" : "none"} />
@@ -678,7 +678,7 @@ export function PostCard({
                             borderRadius: 18,
                             display: "grid",
                             placeItems: "center",
-                            background: "rgba(44, 138, 125, 0.14)",
+                            background: "color-mix(in srgb, var(--teal) 14%, transparent)",
                             color: "var(--moss)",
                             fontSize: "0.8rem",
                             fontWeight: 700,

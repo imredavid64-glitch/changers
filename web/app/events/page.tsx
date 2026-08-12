@@ -228,7 +228,7 @@ export default function EventsPage() {
                     minHeight: 84,
                     borderRadius: 12,
                     padding: 8,
-                    background: isToday ? "rgba(44,138,125,0.12)" : "rgba(255,255,255,0.7)",
+                    background: isToday ? "color-mix(in srgb, var(--teal) 12%, transparent)" : "rgba(255,255,255,0.7)",
                     border: isToday ? "1px solid var(--teal)" : "1px solid rgba(16,24,32,0.06)",
                     display: "flex",
                     flexDirection: "column",
@@ -240,7 +240,7 @@ export default function EventsPage() {
                     <Link
                       key={evt.id}
                       href={`/events/${evt.id}`}
-                      style={{ fontSize: "0.7rem", lineHeight: 1.3, background: "rgba(255,111,79,0.12)", borderRadius: 8, padding: "4px 6px", color: "var(--ink)", textDecoration: "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                      style={{ fontSize: "0.7rem", lineHeight: 1.3, background: "color-mix(in srgb, var(--coral) 12%, transparent)", borderRadius: 8, padding: "4px 6px", color: "var(--ink)", textDecoration: "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
                     >
                       {evt.title}
                     </Link>

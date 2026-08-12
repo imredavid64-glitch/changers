@@ -239,7 +239,7 @@ export default function ProjectsPage() {
             exit={{ opacity: 0, height: 0 }}
             style={{ overflow: "hidden" }}
           >
-            <div className="card" style={{ padding: 20, background: "linear-gradient(135deg, rgba(255,111,79,0.08), rgba(244,184,96,0.12))" }}>
+            <div className="card" style={{ padding: 20, background: "linear-gradient(135deg, color-mix(in srgb, var(--coral) 8%, transparent), color-mix(in srgb, var(--sun) 12%, transparent))" }}>
               <div className="section-header" style={{ marginBottom: 0 }}>
                 <div>
                   <h3 style={{ fontFamily: "var(--font-head)", display: "flex", alignItems: "center", gap: 8 }}>
@@ -285,7 +285,7 @@ export default function ProjectsPage() {
       </AnimatePresence>
 
       {suggested.length > 0 && (
-        <div className="card" style={{ padding: 20, background: "linear-gradient(135deg, rgba(44,138,125,0.08), rgba(244,184,96,0.1))" }}>
+        <div className="card" style={{ padding: 20, background: "linear-gradient(135deg, color-mix(in srgb, var(--teal) 8%, transparent), color-mix(in srgb, var(--sun) 10%, transparent))" }}>
           <div className="section-header" style={{ marginBottom: 0 }}>
             <div>
               <h3 style={{ fontFamily: "var(--font-head)" }}>✨ Suggested for you</h3>

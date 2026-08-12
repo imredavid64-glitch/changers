@@ -33,7 +33,7 @@ const STRAND_COLORS: Record<Strand, string> = {
   N: "#2e8b57",
   E: "#1f5e54",
   S: "#f4b860",
-  W: "#2c8a7d",
+  W: "#20796c",
 };
 
 export default function NetworkPage() {
@@ -262,7 +262,7 @@ export default function NetworkPage() {
                     padding: "12px 14px",
                     borderRadius: 14,
                     textDecoration: "none",
-                    background: isMutual ? "rgba(44,138,125,0.06)" : "white",
+                    background: isMutual ? "color-mix(in srgb, var(--teal) 6%, transparent)" : "var(--surface-card-solid)",
                     border: isMutual ? "1.5px solid var(--teal)" : "1px solid rgba(16,24,32,0.08)",
                   }}
                 >
@@ -352,11 +352,11 @@ function NetworkMap({ connections }: { connections: Connection[] }) {
 
   return (
     <svg viewBox="0 0 420 420" style={{ width: "100%", height: "auto" }}>
-      <circle cx={center} cy={center} r={200 * 0.55} fill="none" stroke="rgba(31,94,84,0.12)" strokeDasharray="4 6" />
-      <circle cx={center} cy={center} r={200 * 0.9} fill="none" stroke="rgba(31,94,84,0.12)" strokeDasharray="4 6" />
+      <circle cx={center} cy={center} r={200 * 0.55} fill="none" stroke="color-mix(in srgb, var(--moss) 12%, transparent)" strokeDasharray="4 6" />
+      <circle cx={center} cy={center} r={200 * 0.9} fill="none" stroke="color-mix(in srgb, var(--moss) 12%, transparent)" strokeDasharray="4 6" />
       {positioned.map(({ x, y }, index) =>
         positioned.slice(index + 1).map(({ x: x2, y: y2 }, j) => (
-          <line key={`${index}-${j}`} x1={x} y1={y} x2={x2} y2={y2} stroke="rgba(31,94,84,0.06)" strokeWidth="1" />
+          <line key={`${index}-${j}`} x1={x} y1={y} x2={x2} y2={y2} stroke="color-mix(in srgb, var(--moss) 6%, transparent)" strokeWidth="1" />
         )),
       )}
       <circle cx={center} cy={center} r={16} fill="var(--teal)" />

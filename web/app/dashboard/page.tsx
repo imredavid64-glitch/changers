@@ -143,7 +143,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="card" style={{ background: "linear-gradient(135deg, rgba(44,138,125,0.08), rgba(244,184,96,0.08))" }}>
+      <div className="card" style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--teal) 8%, transparent), color-mix(in srgb, var(--sun) 8%, transparent))" }}>
         <h3 style={{ marginBottom: 8, fontFamily: "var(--font-head)" }}>🌱 Your changemaker journey</h3>
         <p className="muted" style={{ marginBottom: 16 }}>
           Start by creating a project, joining a room, or writing your first document.

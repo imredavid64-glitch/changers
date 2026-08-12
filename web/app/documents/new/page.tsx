@@ -162,10 +162,10 @@ export default function NewDocumentPage() {
                   borderRadius: 16,
                   background:
                     s.type === "suggestion"
-                      ? "rgba(44, 138, 125, 0.08)"
+                      ? "color-mix(in srgb, var(--teal) 8%, transparent)"
                       : s.type === "rewrite"
-                        ? "rgba(244, 184, 96, 0.12)"
-                        : "rgba(255, 111, 79, 0.1)",
+                        ? "color-mix(in srgb, var(--sun) 12%, transparent)"
+                        : "color-mix(in srgb, var(--coral) 10%, transparent)",
                   border: "1px solid rgba(16,24,32,0.06)",
                 }}
               >

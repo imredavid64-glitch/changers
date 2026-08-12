@@ -318,11 +318,11 @@ export function getCategoryLabel(category: BadgeCategory): string {
 
 export function getCategoryColor(category: BadgeCategory): string {
   const colors: Record<BadgeCategory, string> = {
-    milestone: "rgba(44,138,125,0.15)",
-    social: "rgba(255,111,79,0.15)",
-    creation: "rgba(244,184,96,0.15)",
+    milestone: "color-mix(in srgb, var(--teal) 15%, transparent)",
+    social: "color-mix(in srgb, var(--coral) 15%, transparent)",
+    creation: "color-mix(in srgb, var(--sun) 15%, transparent)",
     impact: "rgba(155,199,177,0.2)",
-    streak: "rgba(255,111,79,0.2)",
+    streak: "color-mix(in srgb, var(--coral) 20%, transparent)",
     special: "rgba(147,197,253,0.2)",
   };
   return colors[category] || "rgba(16,24,32,0.1)";

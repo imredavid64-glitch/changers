@@ -58,9 +58,9 @@
 }
 
 [data-theme="dark"] body {
-  background: radial-gradient(circle at 10% 20%, rgba(31, 94, 84, 0.22) 0%, transparent 50%),
-    radial-gradient(circle at 90% 10%, rgba(44, 138, 125, 0.14) 0%, transparent 55%),
-    radial-gradient(circle at 70% 90%, rgba(255, 111, 79, 0.1) 0%, transparent 50%),
+  background: radial-gradient(circle at 10% 20%, color-mix(in srgb, var(--moss) 22%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 90% 10%, color-mix(in srgb, var(--teal) 14%, transparent) 0%, transparent 55%),
+    radial-gradient(circle at 70% 90%, color-mix(in srgb, var(--coral) 10%, transparent) 0%, transparent 50%),
     var(--sand);
 }
 
@@ -90,7 +90,7 @@
 }
 
 [data-theme="dark"] .nav-card {
-  background: linear-gradient(160deg, rgba(44, 138, 125, 0.22), rgba(244, 184, 96, 0.14));
+  background: linear-gradient(160deg, color-mix(in srgb, var(--teal) 22%, transparent), color-mix(in srgb, var(--sun) 14%, transparent));
 }
 
 [data-theme="dark"] .orb-1,
@@ -100,37 +100,37 @@
 }
 
 [data-theme="dark"] .hero {
-  background: linear-gradient(140deg, rgba(31, 94, 84, 0.25), rgba(244, 184, 96, 0.16));
+  background: linear-gradient(140deg, color-mix(in srgb, var(--moss) 25%, transparent), color-mix(in srgb, var(--sun) 16%, transparent));
 }
 
 [data-theme="dark"] .filter {
-  background: rgba(31, 94, 84, 0.25);
+  background: color-mix(in srgb, var(--moss) 25%, transparent);
 }
 
 [data-theme="dark"] .filter.active {
-  background: rgba(31, 94, 84, 0.42);
+  background: color-mix(in srgb, var(--moss) 42%, transparent);
 }
 
 [data-theme="dark"] .chip,
 [data-theme="dark"] .tag,
 [data-theme="dark"] .demo-badge {
-  background: rgba(44, 138, 125, 0.2);
+  background: color-mix(in srgb, var(--teal) 20%, transparent);
 }
 
 [data-theme="dark"] .compass-item {
-  background: rgba(31, 94, 84, 0.28);
+  background: color-mix(in srgb, var(--moss) 28%, transparent);
 }
 
 [data-theme="dark"] .bridge-results {
-  background: rgba(44, 138, 125, 0.15);
+  background: color-mix(in srgb, var(--teal) 15%, transparent);
 }
 
 [data-theme="dark"] .strand {
-  background: rgba(255, 111, 79, 0.22);
+  background: color-mix(in srgb, var(--coral) 22%, transparent);
 }
 
 [data-theme="dark"] .mini-card.highlight {
-  background: rgba(255, 111, 79, 0.2);
+  background: color-mix(in srgb, var(--coral) 20%, transparent);
 }
 
 [data-theme="dark"] ::selection {
@@ -192,7 +192,7 @@ input:focus,
 textarea:focus,
 select:focus {
   border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(44, 138, 125, 0.18);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--teal) 18%, transparent);
   outline: none;
 }
 
@@ -303,7 +303,7 @@ h4 {
   height: 14px;
   border-radius: 999px;
   background: linear-gradient(120deg, var(--coral), var(--sun));
-  box-shadow: 0 0 0 4px rgba(255, 111, 79, 0.15);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--coral) 15%, transparent);
 }
 
 .top-search input {
@@ -340,7 +340,7 @@ button:disabled {
 .primary {
   background: linear-gradient(120deg, var(--coral), var(--sun));
   color: var(--ink);
-  box-shadow: 0 16px 30px rgba(255, 111, 79, 0.25);
+  box-shadow: 0 16px 30px color-mix(in srgb, var(--coral) 25%, transparent);
 }
 
 .ghost {
@@ -386,7 +386,7 @@ button:disabled {
 
 .nav-link.active,
 .nav-link:hover {
-  background: rgba(44, 138, 125, 0.12);
+  background: color-mix(in srgb, var(--teal) 12%, transparent);
   color: var(--ink);
 }
 
@@ -395,8 +395,8 @@ button:disabled {
   border-radius: 20px;
   background: linear-gradient(
     160deg,
-    rgba(44, 138, 125, 0.16),
-    rgba(244, 184, 96, 0.12)
+    color-mix(in srgb, var(--teal) 16%, transparent),
+    color-mix(in srgb, var(--sun) 12%, transparent)
   );
   box-shadow: var(--shadow);
 }
@@ -426,8 +426,8 @@ button:disabled {
   align-items: center;
   background: linear-gradient(
     140deg,
-    rgba(31, 94, 84, 0.15),
-    rgba(244, 184, 96, 0.2)
+    color-mix(in srgb, var(--moss) 15%, transparent),
+    color-mix(in srgb, var(--sun) 20%, transparent)
   );
 }
 
@@ -483,7 +483,7 @@ button:disabled {
   position: absolute;
   inset: 20px 10px auto 10px;
   height: 160px;
-  border: 2px dashed rgba(31, 94, 84, 0.4);
+  border: 2px dashed color-mix(in srgb, var(--moss) 40%, transparent);
   border-radius: 999px;
 }
 
@@ -502,8 +502,8 @@ button:disabled {
 }
 
 .mini-card.highlight {
-  background: rgba(255, 111, 79, 0.15);
-  border-color: rgba(255, 111, 79, 0.3);
+  background: color-mix(in srgb, var(--coral) 15%, transparent);
+  border-color: color-mix(in srgb, var(--coral) 30%, transparent);
 }
 
 .mini-title {
@@ -527,7 +527,7 @@ button:disabled {
 }
 
 .chip {
-  background: rgba(44, 138, 125, 0.12);
+  background: color-mix(in srgb, var(--teal) 12%, transparent);
   border-radius: 999px;
   padding: 6px 12px;
   font-size: 0.8rem;
@@ -571,7 +571,7 @@ button:disabled {
 }
 
 .filter {
-  background: rgba(31, 94, 84, 0.08);
+  background: color-mix(in srgb, var(--moss) 8%, transparent);
   border-radius: 999px;
   padding: 6px 12px;
   border: none;
@@ -580,7 +580,7 @@ button:disabled {
 }
 
 .filter.active {
-  background: rgba(31, 94, 84, 0.2);
+  background: color-mix(in srgb, var(--moss) 20%, transparent);
 }
 
 .post-header {
@@ -600,7 +600,7 @@ button:disabled {
 }
 
 .strand {
-  background: rgba(255, 111, 79, 0.15);
+  background: color-mix(in srgb, var(--coral) 15%, transparent);
   border-radius: 999px;
   padding: 4px 10px;
   font-size: 0.75rem;
@@ -608,11 +608,11 @@ button:disabled {
 }
 
 .strand.completed {
-  background: rgba(44, 138, 125, 0.15);
+  background: color-mix(in srgb, var(--teal) 15%, transparent);
 }
 
 .strand.paused {
-  background: rgba(244, 184, 96, 0.2);
+  background: color-mix(in srgb, var(--sun) 20%, transparent);
 }
 
 .post-actions {
@@ -678,7 +678,7 @@ button:disabled {
 }
 
 .tag {
-  background: rgba(44, 138, 125, 0.12);
+  background: color-mix(in srgb, var(--teal) 12%, transparent);
   border-radius: 999px;
   padding: 4px 10px;
   font-size: 0.75rem;
@@ -710,7 +710,7 @@ button:disabled {
 .bridge-results {
   padding: 16px;
   border-radius: 16px;
-  background: rgba(44, 138, 125, 0.08);
+  background: color-mix(in srgb, var(--teal) 8%, transparent);
 }
 
 .impact-card {
@@ -756,7 +756,7 @@ button:disabled {
   padding: 12px;
   border-radius: 12px;
   text-align: center;
-  background: rgba(31, 94, 84, 0.12);
+  background: color-mix(in srgb, var(--moss) 12%, transparent);
   font-weight: 700;
 }
 
@@ -778,7 +778,7 @@ button:disabled {
 .demo-badge {
   padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(44, 138, 125, 0.12);
+  background: color-mix(in srgb, var(--teal) 12%, transparent);
   font-weight: 600;
   font-size: 0.8rem;
 }
@@ -897,14 +897,14 @@ html {
 }
 
 ::selection {
-  background: rgba(44, 138, 125, 0.28);
+  background: color-mix(in srgb, var(--teal) 28%, transparent);
   color: var(--ink);
 }
 
 /* Subtle themed scrollbars (progressive enhancement). */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(44, 138, 125, 0.35) transparent;
+  scrollbar-color: color-mix(in srgb, var(--teal) 35%, transparent) transparent;
 }
 
 ::-webkit-scrollbar {
@@ -913,14 +913,14 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(44, 138, 125, 0.35);
+  background: color-mix(in srgb, var(--teal) 35%, transparent);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(44, 138, 125, 0.55);
+  background-color: color-mix(in srgb, var(--teal) 55%, transparent);
 }
 
 ::-webkit-scrollbar-track {
@@ -954,7 +954,7 @@ button:active {
 .impact-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 14px 36px rgba(16, 24, 32, 0.1);
-  border-color: rgba(44, 138, 125, 0.3);
+  border-color: color-mix(in srgb, var(--teal) 30%, transparent);
 }
 
 /* Main-column sections rise into view on load, slightly staggered. */
@@ -997,10 +997,10 @@ button:active {
 @keyframes mark-glow {
   0%,
   100% {
-    box-shadow: 0 0 0 4px rgba(255, 111, 79, 0.15);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--coral) 15%, transparent);
   }
   50% {
-    box-shadow: 0 0 0 9px rgba(255, 111, 79, 0.05);
+    box-shadow: 0 0 0 9px color-mix(in srgb, var(--coral) 5%, transparent);
   }
 }
 

@@ -214,7 +214,7 @@ export default function DocumentDetailPage() {
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {isCoEditing && (
-            <span className="chip" style={{ background: "rgba(244,184,96,0.2)" }}>
+            <span className="chip" style={{ background: "color-mix(in srgb, var(--sun) 20%, transparent)" }}>
               ✍️ {coEditorName} is editing — changes synced
             </span>
           )}

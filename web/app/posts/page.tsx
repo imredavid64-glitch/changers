@@ -260,7 +260,7 @@ export default function PostsFeedPage() {
           </div>
 
           {isPoll && (
-            <div className="composer-form" style={{ padding: 12, background: "rgba(44,138,125,0.05)", borderRadius: 14, display: "grid", gap: 8 }}>
+            <div className="composer-form" style={{ padding: 12, background: "color-mix(in srgb, var(--teal) 5%, transparent)", borderRadius: 14, display: "grid", gap: 8 }}>
               <input type="text" value={pollQuestion} onChange={(e) => setPollQuestion(e.target.value)} placeholder="Poll question" />
               <input type="text" value={pollOptionA} onChange={(e) => setPollOptionA(e.target.value)} placeholder="Option A" />
               <input type="text" value={pollOptionB} onChange={(e) => setPollOptionB(e.target.value)} placeholder="Option B" />

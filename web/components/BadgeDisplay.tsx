@@ -99,7 +99,7 @@ export function BadgeDisplay({ profile, compact = false }: BadgeDisplayProps) {
               style={{
                 padding: "14px",
                 borderRadius: "16px",
-                background: isEarned ? "white" : "rgba(16,24,32,0.03)",
+                background: isEarned ? "var(--surface-card-solid)" : "rgba(16,24,32,0.03)",
                 border: isEarned ? "1px solid rgba(16,24,32,0.1)" : "1px dashed rgba(16,24,32,0.12)",
                 opacity: isEarned ? 1 : 0.55,
                 display: "flex",

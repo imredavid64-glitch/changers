@@ -124,11 +124,11 @@ export default function SlideshowDetailPage() {
   const slideBg = slides[currentSlide]?.layout || "content";
   const bgStyle: Record<string, string> = {
     title: "linear-gradient(135deg, var(--moss), var(--teal))",
-    content: "white",
-    "two-column": "rgba(44, 138, 125, 0.06)",
-    image: "rgba(244, 184, 96, 0.1)",
-    quote: "rgba(255, 111, 79, 0.08)",
-    impact: "linear-gradient(135deg, rgba(44, 138, 125, 0.1), rgba(244, 184, 96, 0.1))",
+    content: "var(--surface-card-solid)",
+    "two-column": "color-mix(in srgb, var(--teal) 6%, transparent)",
+    image: "color-mix(in srgb, var(--sun) 10%, transparent)",
+    quote: "color-mix(in srgb, var(--coral) 8%, transparent)",
+    impact: "linear-gradient(135deg, color-mix(in srgb, var(--teal) 10%, transparent), color-mix(in srgb, var(--sun) 10%, transparent))",
     cta: "linear-gradient(135deg, var(--coral), var(--sun))",
   };
 
@@ -202,7 +202,7 @@ export default function SlideshowDetailPage() {
                 onClick={() => { setCurrentSlide(i); setEditing(true); }}
                 style={{
                   padding: "8px 10px", borderRadius: 10, cursor: "pointer", fontSize: "0.85rem",
-                  background: i === currentSlide ? "rgba(44, 138, 125, 0.12)" : "transparent",
+                  background: i === currentSlide ? "color-mix(in srgb, var(--teal) 12%, transparent)" : "transparent",
                   display: "flex", justifyContent: "space-between", alignItems: "center",
                 }}
               >
