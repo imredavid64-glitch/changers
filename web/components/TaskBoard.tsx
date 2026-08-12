@@ -238,7 +238,7 @@ export function TaskBoard({ project }: TaskBoardProps) {
                   {columnTasks.map((task) => (
                     <div
                       key={task.id}
-                      style={{ padding: 12, borderRadius: 12, background: "white", border: "1px solid rgba(16,24,32,0.08)", boxShadow: "0 2px 8px rgba(16,24,32,0.04)" }}
+                      style={{ padding: 12, borderRadius: 12, background: "var(--surface-card-solid)", border: "1px solid var(--border-card)", boxShadow: "0 2px 8px rgba(16,24,32,0.04)" }}
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start" }}>
                         <p style={{ fontWeight: 600, fontSize: "0.9rem", lineHeight: 1.4 }}>{task.title}</p>

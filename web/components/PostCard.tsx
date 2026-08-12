@@ -722,7 +722,7 @@ export function PostCard({
                   onChange={(event) => setNewComment(event.target.value)}
                   placeholder={user ? "Add a thoughtful comment..." : "Sign in to comment"}
                   disabled={!user}
-                  style={{ flex: 1, background: "white" }}
+                  style={{ flex: 1, background: "var(--surface-card-solid)" }}
                 />
                 <button
                   type="submit"

@@ -266,7 +266,7 @@ export default function ProjectsPage() {
                   {ideas.map((idea) => (
                     <div
                       key={idea.title}
-                      style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", padding: 14, borderRadius: 14, background: "white", border: "1px solid rgba(16,24,32,0.08)" }}
+                      style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", padding: 14, borderRadius: 14, background: "var(--surface-card-solid)", border: "1px solid rgba(16,24,32,0.08)" }}
                     >
                       <div>
                         <p style={{ fontWeight: 700, fontSize: "0.95rem" }}>{idea.title}</p>
@@ -395,7 +395,7 @@ export default function ProjectsPage() {
         {loading ? (
           <p className="muted">Loading projects...</p>
         ) : filtered.length === 0 ? (
-          <div className="card" style={{ textAlign: "center", padding: "48px 24px", background: "white" }}>
+          <div className="card" style={{ textAlign: "center", padding: "48px 24px", background: "var(--surface-card-solid)" }}>
             <div style={{ fontSize: "2.6rem", marginBottom: 12 }}>🔎</div>
             <p className="muted">No projects match those filters. Try widening your search.</p>
           </div>

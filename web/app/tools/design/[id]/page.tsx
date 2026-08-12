@@ -15,7 +15,7 @@ const inputStyle = {
   border: "1px solid rgba(16,24,32,0.15)",
   fontSize: "0.85rem",
   marginTop: 2,
-  background: "white",
+  background: "var(--surface-card-solid)",
 };
 
 export default function DesignDetailPage() {

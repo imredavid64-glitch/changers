@@ -885,7 +885,7 @@ export default function VideoCallRoom({
             right: 0,
             bottom: 0,
             width: "min(420px, 92vw)",
-            background: "white",
+            background: "var(--surface-card-solid)",
             boxShadow: "0 0 40px rgba(0,0,0,0.18)",
             zIndex: 60,
             display: "grid",
@@ -1030,7 +1030,7 @@ export default function VideoCallRoom({
 
       {/* Timer panel */}
       {timer.show && (
-        <div style={{ background: "white", border: "1px solid rgba(16,24,32,0.1)", borderRadius: 14, padding: 16, display: "grid", gap: 10, maxWidth: 420 }}>
+        <div style={{ background: "var(--surface-card-solid)", border: "1px solid var(--border-card)", borderRadius: 14, padding: 16, display: "grid", gap: 10, maxWidth: 420 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <strong>Timer</strong>
             <span style={{ fontSize: "1.6rem", fontVariantNumeric: "tabular-nums", fontWeight: 700 }}>
@@ -1066,7 +1066,7 @@ export default function VideoCallRoom({
 
       {/* Breakout panel */}
       {!breakout?.active && (
-        <div style={{ background: "white", border: "1px solid rgba(16,24,32,0.1)", borderRadius: 14, padding: 16, display: "flex", gap: 10, alignItems: "center", maxWidth: 420 }}>
+        <div style={{ background: "var(--surface-card-solid)", border: "1px solid var(--border-card)", borderRadius: 14, padding: 16, display: "flex", gap: 10, alignItems: "center", maxWidth: 420 }}>
           <Users size={18} />
           <span style={{ fontSize: "0.9rem" }}>Breakout rooms</span>
           <input

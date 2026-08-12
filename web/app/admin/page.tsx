@@ -373,7 +373,7 @@ export default function AdminPage() {
         <div style={{ display: "grid", gap: 12 }}>
           {profiles.length === 0 ? <p className="muted">No users found.</p> : (
             profiles.map((prof) => (
-              <div key={prof.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(16,24,32,0.08)", background: "white" }}>
+              <div key={prof.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(16,24,32,0.08)", background: "var(--surface-card-solid)" }}>
                 <div style={{ flex: 1 }}>
                   <p style={{ fontWeight: 600 }}>{prof.full_name} {prof.is_admin && <span className="chip">Admin</span>}</p>
                   <p className="muted" style={{ fontSize: "0.85rem" }}>{prof.role} · {prof.id.slice(0, 12)}...</p>
@@ -383,7 +383,7 @@ export default function AdminPage() {
                     <select
                       value={eraseMode}
                       onChange={(event) => setEraseMode(event.target.value === "anonymize" ? "anonymize" : "delete")}
-                      style={{ padding: "6px 10px", borderRadius: 10, border: "1px solid rgba(16,24,32,0.15)", background: "white", fontSize: "0.8rem" }}
+                      style={{ padding: "6px 10px", borderRadius: 10, border: "1px solid rgba(16,24,32,0.15)", background: "var(--surface-card-solid)", fontSize: "0.8rem" }}
                       title="Hard delete removes everything; anonymize keeps community content but strips the person's identity"
                     >
                       <option value="delete">Hard delete</option>
@@ -394,7 +394,7 @@ export default function AdminPage() {
                       value={eraseConfirmText}
                       onChange={(event) => setEraseConfirmText(event.target.value)}
                       placeholder='Type "DELETE"'
-                      style={{ width: 110, padding: "6px 10px", borderRadius: 10, border: "1px solid rgba(255,111,79,0.4)", background: "white", fontSize: "0.8rem" }}
+                      style={{ width: 110, padding: "6px 10px", borderRadius: 10, border: "1px solid rgba(255,111,79,0.4)", background: "var(--surface-card-solid)", fontSize: "0.8rem" }}
                     />
                     <button className="primary" onClick={() => handleEraseUser(prof.id)} disabled={eraseConfirmText !== "DELETE"} style={{ fontSize: "0.8rem", padding: "8px 14px" }}>
                       Confirm {eraseMode === "anonymize" ? "anonymize" : "erase"}
@@ -425,7 +425,7 @@ export default function AdminPage() {
             <p className="muted">No contact messages yet.</p>
           ) : (
             messages.map((msg) => (
-              <div key={msg.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(16,24,32,0.08)", background: "white" }}>
+              <div key={msg.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(16,24,32,0.08)", background: "var(--surface-card-solid)" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontWeight: 600 }}>
                     {msg.name}{" "}
@@ -466,7 +466,7 @@ export default function AdminPage() {
                         onChange={(event) => setReplyText(event.target.value)}
                         placeholder={`Reply to ${msg.name}...`}
                         rows={4}
-                        style={{ width: "100%", padding: "8px 10px", borderRadius: 10, border: "1px solid rgba(16,24,32,0.15)", background: "white", fontSize: "0.85rem", resize: "vertical" }}
+                        style={{ width: "100%", padding: "8px 10px", borderRadius: 10, border: "1px solid rgba(16,24,32,0.15)", background: "var(--surface-card-solid)", fontSize: "0.85rem", resize: "vertical" }}
                       />
                       <button className="primary" onClick={() => handleSendReply(msg.id)} disabled={!replyText.trim() || sendingReply} style={{ fontSize: "0.8rem", padding: "8px 14px" }}>
                         {sendingReply ? "Sending..." : "Send reply"}
@@ -484,7 +484,7 @@ export default function AdminPage() {
             <p className="muted">No admin actions recorded yet. Erase/anonymize operations on users will appear here.</p>
           ) : (
             auditActions.map((action) => (
-              <div key={action.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(16,24,32,0.08)", background: "white" }}>
+              <div key={action.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(16,24,32,0.08)", background: "var(--surface-card-solid)" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontWeight: 600 }}>
                     <span className="chip" style={{ background: action.action === "erase" ? "var(--coral)" : "rgba(44,138,125,0.2)", color: action.action === "erase" ? "white" : "inherit", marginRight: 8 }}>
@@ -550,7 +550,7 @@ export default function AdminPage() {
                 <p className="muted">No spotlights yet. Create the first one above.</p>
               ) : (
                 spotlights.map((spot) => (
-                  <div key={spot.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(16,24,32,0.08)", background: "white" }}>
+                  <div key={spot.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(16,24,32,0.08)", background: "var(--surface-card-solid)" }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontWeight: 600 }}>
                         {spot.active && <span className="chip" style={{ background: "rgba(44,138,125,0.2)", marginRight: 8 }}>Active</span>}
@@ -576,7 +576,7 @@ export default function AdminPage() {
         <div style={{ display: "grid", gap: 12 }}>
           {posts.length === 0 ? <p className="muted">No posts found.</p> : (
             posts.map((post) => (
-              <div key={post.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(16,24,32,0.08)", background: "white" }}>
+              <div key={post.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(16,24,32,0.08)", background: "var(--surface-card-solid)" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{post.title}</p>
                   <p className="muted" style={{ fontSize: "0.85rem" }}>by {post.author_name} · {post.likes_count} likes · {post.comments_count} comments</p>

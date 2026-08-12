@@ -109,7 +109,7 @@ export default function MessagesInboxPage() {
                 transition={{ duration: 0.3 }}
               >
                 <Link href={`/messages/${thread.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-                  <div style={{ padding: "16px", borderRadius: "12px", border: "1px solid rgba(16,24,32,0.08)", display: "flex", gap: "16px", alignItems: "center", transition: "all 0.2s ease", cursor: "pointer", background: "white" }} className="hover-lift">
+                  <div style={{ padding: "16px", borderRadius: "12px", border: "1px solid rgba(16,24,32,0.08)", display: "flex", gap: "16px", alignItems: "center", transition: "all 0.2s ease", cursor: "pointer", background: "var(--surface-card-solid)" }} className="hover-lift">
                     <UserCircle size={40} color="var(--sage)" strokeWidth={1.5} />
                     <div style={{ flex: 1 }}>
                       <p style={{ fontWeight: 600, margin: 0, fontSize: "1.05rem" }}>{thread.other_user?.name}</p>

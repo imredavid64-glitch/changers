@@ -189,7 +189,7 @@ export default function PrivacyPage() {
                   value={confirmText}
                   onChange={(event) => setConfirmText(event.target.value)}
                   placeholder='Type "DELETE" to confirm'
-                  style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid rgba(255,111,79,0.4)", background: "white", fontSize: "0.9rem" }}
+                  style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid rgba(255,111,79,0.4)", background: "var(--surface-card-solid)", fontSize: "0.9rem" }}
                 />
                 <button
                   className="ghost"

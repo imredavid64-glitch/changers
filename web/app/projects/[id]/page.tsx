@@ -182,7 +182,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             const memberProfile = memberProfiles[memberId];
             const isOwner = project.owner_id === memberId;
             return (
-              <div key={memberId} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 14, background: "white", border: "1px solid rgba(16,24,32,0.08)" }}>
+              <div key={memberId} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 14, background: "var(--surface-card-solid)", border: "1px solid rgba(16,24,32,0.08)" }}>
                 <Link href={`/profile/${memberId}`} style={{ flex: 1, minWidth: 0, textDecoration: "none" }}>
                   <p style={{ fontWeight: 600, color: "var(--ink)" }}>
                     {memberProfile?.full_name || "Changemaker"}

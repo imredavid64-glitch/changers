@@ -292,7 +292,7 @@ export default function NetworkPage() {
           </div>
           <div style={{ display: "grid", gap: 8, marginTop: 16 }}>
             {suggestions.map(({ profile, reasons }) => (
-              <div key={profile.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 14, background: "white", border: "1px solid rgba(16,24,32,0.08)" }}>
+              <div key={profile.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 14, background: "var(--surface-card-solid)", border: "1px solid rgba(16,24,32,0.08)" }}>
                 <span style={{ width: 12, height: 12, borderRadius: 6, flexShrink: 0, background: STRAND_COLORS[profile.interests[0] || "S"] }} />
                 <Link href={`/profile/${profile.id}`} style={{ flex: 1, minWidth: 0, textDecoration: "none" }}>
                   <p style={{ fontWeight: 600, color: "var(--ink)" }}>{profile.full_name}</p>

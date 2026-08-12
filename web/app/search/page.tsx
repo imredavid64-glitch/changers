@@ -276,7 +276,7 @@ function SearchResults() {
                     display: "flex",
                     gap: "16px",
                     alignItems: "center",
-                    background: "white",
+                    background: "var(--surface-card-solid)",
                     transition: "all 0.2s ease",
                   }}
                   className="hover-lift"
