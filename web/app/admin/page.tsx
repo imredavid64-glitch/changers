@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
-import { Mail, Shield, Trash2 } from "lucide-react";
+import { Mail, Shield, Sparkles, Trash2 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { COLLECTIONS, listDocuments, updateDocument } from "@/lib/appwrite/bridge";
 import { account, Query } from "@/lib/appwrite/client";
 import type { ContactMessageRecord } from "@/lib/contact/server";
 import type { AdminActionRecord } from "@/lib/audit/server";
+import type { SpotlightRecord } from "@/lib/spotlight/server";
 import { anonymizeUserData, eraseUserData } from "@/lib/userdata/client";
 import { AppPost, AppProfile } from "@/lib/social/types";
 import { normalizePost, normalizeProfile } from "@/lib/social/utils";
@@ -18,11 +19,14 @@ export default function AdminPage() {
   const [posts, setPosts] = useState<AppPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"profiles" | "posts" | "messages" | "audit">("profiles");
+  const [activeTab, setActiveTab] = useState<"profiles" | "posts" | "messages" | "audit" | "spotlight">("profiles");
   const [messages, setMessages] = useState<ContactMessageRecord[]>([]);
   const [messagesLoaded, setMessagesLoaded] = useState(false);
   const [auditActions, setAuditActions] = useState<AdminActionRecord[]>([]);
   const [auditLoaded, setAuditLoaded] = useState(false);
+  const [spotlights, setSpotlights] = useState<SpotlightRecord[]>([]);
+  const [spotlightsLoaded, setSpotlightsLoaded] = useState(false);
+  const [spotForm, setSpotForm] = useState({ title: "", blurb: "", profileUrl: "", projectUrl: "", strand: "", active: false });
   const [replyTarget, setReplyTarget] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
@@ -126,6 +130,108 @@ export default function AdminPage() {
       void loadAuditActions();
     }
   }, [activeTab, auditLoaded, isAdmin]);
+
+  async function loadSpotlights() {
+    try {
+      const jwt = await account.createJWT();
+      const response = await fetch("/api/spotlight?all=1", {
+        headers: { Authorization: `Bearer ${jwt.jwt}` },
+      });
+      if (!response.ok) {
+        throw new Error(`Spotlight API returned ${response.status}`);
+      }
+      const data = (await response.json()) as { spotlights: SpotlightRecord[] };
+      setSpotlights(data.spotlights);
+    } catch (error) {
+      setStatus("Failed to load spotlights.");
+      console.error(error);
+    } finally {
+      setSpotlightsLoaded(true);
+    }
+  }
+
+  useEffect(() => {
+    if (activeTab === "spotlight" && !spotlightsLoaded && isAdmin) {
+      // Lazy-loads external data the first time the tab opens; every setState happens
+      // in async callbacks.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      void loadSpotlights();
+    }
+  }, [activeTab, spotlightsLoaded, isAdmin]);
+
+  async function handleSaveSpotlight(event: FormEvent) {
+    event.preventDefault();
+    setStatus(null);
+    try {
+      const jwt = await account.createJWT();
+      const response = await fetch("/api/spotlight", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${jwt.jwt}` },
+        body: JSON.stringify({
+          title: spotForm.title,
+          blurb: spotForm.blurb,
+          profileUrl: spotForm.profileUrl || null,
+          projectUrl: spotForm.projectUrl || null,
+          strand: spotForm.strand || null,
+          active: spotForm.active,
+        }),
+      });
+      if (!response.ok) {
+        const data = (await response.json()) as { error?: string };
+        throw new Error(data.error || `Spotlight API returned ${response.status}`);
+      }
+      setSpotForm({ title: "", blurb: "", profileUrl: "", projectUrl: "", strand: "", active: false });
+      await loadSpotlights();
+      setStatus("Spotlight saved.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to save spotlight.");
+    }
+  }
+
+  async function handleToggleSpotlight(spot: SpotlightRecord) {
+    setStatus(null);
+    try {
+      const jwt = await account.createJWT();
+      const response = await fetch("/api/spotlight", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${jwt.jwt}` },
+        body: JSON.stringify({
+          id: spot.id,
+          title: spot.title,
+          blurb: spot.blurb,
+          profileUrl: spot.profileUrl,
+          projectUrl: spot.projectUrl,
+          strand: spot.strand,
+          active: !spot.active,
+        }),
+      });
+      if (!response.ok) {
+        const data = (await response.json()) as { error?: string };
+        throw new Error(data.error || `Spotlight API returned ${response.status}`);
+      }
+      await loadSpotlights();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to update spotlight.");
+    }
+  }
+
+  async function handleDeleteSpotlight(id: string) {
+    setStatus(null);
+    try {
+      const jwt = await account.createJWT();
+      const response = await fetch(`/api/spotlight?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${jwt.jwt}` },
+      });
+      if (!response.ok) {
+        const data = (await response.json()) as { error?: string };
+        throw new Error(data.error || `Spotlight API returned ${response.status}`);
+      }
+      await loadSpotlights();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to delete spotlight.");
+    }
+  }
 
   function formatDate(value: string) {
     return new Date(value).toLocaleString(undefined, {
@@ -252,6 +358,9 @@ export default function AdminPage() {
           </button>
           <button className={`filter ${activeTab === "audit" ? "active" : ""}`} onClick={() => setActiveTab("audit")}>
             Audit
+          </button>
+          <button className={`filter ${activeTab === "spotlight" ? "active" : ""}`} onClick={() => setActiveTab("spotlight")}>
+            <Sparkles size={13} style={{ display: "inline", marginRight: 4, verticalAlign: "-2px" }} /> Spotlight
           </button>
         </div>
       </div>
@@ -390,6 +499,77 @@ export default function AdminPage() {
                 </div>
               </div>
             ))
+          )}
+        </div>
+      ) : activeTab === "spotlight" ? (
+        <div style={{ display: "grid", gap: 16 }}>
+          {!spotlightsLoaded ? (
+            <p className="muted">Loading spotlights...</p>
+          ) : (
+            <>
+              <form className="card" onSubmit={handleSaveSpotlight} style={{ padding: 20, display: "grid", gap: 12 }}>
+                <p className="eyebrow">Feature a changemaker</p>
+                <div style={{ display: "grid", gap: 8 }}>
+                  <label style={{ fontSize: "0.9rem" }}>Title</label>
+                  <input type="text" value={spotForm.title} onChange={(event) => setSpotForm({ ...spotForm, title: event.target.value })} placeholder="e.g. Maya's river clean-up" required />
+                </div>
+                <div style={{ display: "grid", gap: 8 }}>
+                  <label style={{ fontSize: "0.9rem" }}>Blurb (one or two sentences)</label>
+                  <textarea value={spotForm.blurb} onChange={(event) => setSpotForm({ ...spotForm, blurb: event.target.value })} placeholder="What this changemaker or project is doing." required style={{ minHeight: 80 }} />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div style={{ display: "grid", gap: 8 }}>
+                    <label style={{ fontSize: "0.9rem" }}>Profile link (optional)</label>
+                    <input type="text" value={spotForm.profileUrl} onChange={(event) => setSpotForm({ ...spotForm, profileUrl: event.target.value })} placeholder="/profile/..." />
+                  </div>
+                  <div style={{ display: "grid", gap: 8 }}>
+                    <label style={{ fontSize: "0.9rem" }}>Project link (optional)</label>
+                    <input type="text" value={spotForm.projectUrl} onChange={(event) => setSpotForm({ ...spotForm, projectUrl: event.target.value })} placeholder="/projects/..." />
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+                  <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: "0.9rem" }}>
+                    Strand
+                    <select value={spotForm.strand} onChange={(event) => setSpotForm({ ...spotForm, strand: event.target.value })} style={{ padding: "8px 10px" }}>
+                      <option value="">Any</option>
+                      <option value="N">Nature</option>
+                      <option value="E">Economy</option>
+                      <option value="S">Society</option>
+                      <option value="W">Wellbeing</option>
+                    </select>
+                  </label>
+                  <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: "0.9rem" }}>
+                    <input type="checkbox" checked={spotForm.active} onChange={(event) => setSpotForm({ ...spotForm, active: event.target.checked })} style={{ width: 18, height: 18 }} />
+                    Activate now (replaces the current one)
+                  </label>
+                  <button className="primary" type="submit">Save spotlight</button>
+                </div>
+              </form>
+
+              {spotlights.length === 0 ? (
+                <p className="muted">No spotlights yet. Create the first one above.</p>
+              ) : (
+                spotlights.map((spot) => (
+                  <div key={spot.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(16,24,32,0.08)", background: "white" }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontWeight: 600 }}>
+                        {spot.active && <span className="chip" style={{ background: "rgba(44,138,125,0.2)", marginRight: 8 }}>Active</span>}
+                        {spot.title}
+                      </p>
+                      <p className="muted" style={{ fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{spot.blurb}</p>
+                    </div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button className="ghost" onClick={() => handleToggleSpotlight(spot)} style={{ fontSize: "0.8rem" }}>
+                        {spot.active ? "Deactivate" : "Activate"}
+                      </button>
+                      <button className="ghost" onClick={() => handleDeleteSpotlight(spot.id)} style={{ color: "var(--coral)", fontSize: "0.8rem" }} title="Delete spotlight">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </>
           )}
         </div>
       ) : (

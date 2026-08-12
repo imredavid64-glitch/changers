@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import SpotlightCard from "@/components/SpotlightCard";
 import { COLLECTIONS } from "@/lib/appwrite/bridge";
 import { databases, Query } from "@/lib/appwrite/client";
 import { appwriteEnabled, appwriteConfig } from "@/lib/appwrite/config";
@@ -352,6 +353,9 @@ export default function WelcomePage() {
       </section>
 
       <section style={{ background: "white", padding: "80px 24px", textAlign: "center" }}>
+        <div style={{ maxWidth: 760, margin: "0 auto" }}>
+          <SpotlightCard />
+        </div>
         <div style={{ maxWidth: 640, margin: "0 auto" }}>
           <h2 style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)", fontFamily: "var(--font-head)", marginBottom: 16 }}>
             Ready to start building?
