@@ -3,8 +3,13 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import dynamic from "next/dynamic";
 import { NotificationsDropdown } from "@/components/NotificationsDropdown";
 import { useAuth } from "@/components/AuthProvider";
+
+// Client-only so the icon never hydrates from a different theme than the
+// no-FOUC script in app/layout.tsx already applied.
+const ThemeToggle = dynamic(() => import("@/components/ThemeToggle"), { ssr: false });
 
 export default function SharedShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -35,6 +40,7 @@ export default function SharedShell({ children }: { children: React.ReactNode })
           <input type="search" name="q" placeholder="Search people, projects, and ideas" />
         </form>
         <div className="top-actions">
+          <ThemeToggle />
           {user && <NotificationsDropdown user={user} />}
           {user ? (
             <button className="ghost" onClick={handleSignOut}>

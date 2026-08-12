@@ -12,6 +12,130 @@
   --cloud: #fdfbf7;
   --white: #ffffff;
   --shadow: 0 24px 60px rgba(16, 24, 32, 0.12);
+  /* Theme-aware tokens (flipped by [data-theme="dark"]). */
+  --text-faint: rgba(16, 24, 32, 0.6);
+  --text-soft: rgba(16, 24, 32, 0.75);
+  --text-body: rgba(16, 24, 32, 0.8);
+  --border-card: rgba(16, 24, 32, 0.08);
+  --border-control-soft: rgba(16, 24, 32, 0.12);
+  --border-control: rgba(16, 24, 32, 0.15);
+  --surface-track: rgba(16, 24, 32, 0.1);
+  --surface-card: rgba(255, 255, 255, 0.85);
+  --surface-card-strong: rgba(255, 255, 255, 0.9);
+  --surface-card-solid: rgba(255, 255, 255, 0.92);
+  --surface-ghost: rgba(255, 255, 255, 0.8);
+}
+
+/* ---- Dark theme ----
+ * Applies when the layout script (or ThemeToggle) sets data-theme="dark" on
+ * <html>. Variables flip; surfaces that hardcode a light wash get their own
+ * override below. */
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #e7f0ed;
+  --ink-soft: #d4e2dd;
+  --moss: #7fcbb4;
+  --teal: #56b8a8;
+  --sage: #9bc7b1;
+  --coral: #ff8f6f;
+  --sun: #f6c979;
+  --sand: #0e1816;
+  --cloud: #16231f;
+  --white: #1a2a25;
+  --shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  --text-faint: rgba(231, 240, 237, 0.6);
+  --text-soft: rgba(231, 240, 237, 0.78);
+  --text-body: rgba(231, 240, 237, 0.85);
+  --border-card: rgba(255, 255, 255, 0.09);
+  --border-control-soft: rgba(255, 255, 255, 0.14);
+  --border-control: rgba(255, 255, 255, 0.18);
+  --surface-track: rgba(255, 255, 255, 0.12);
+  --surface-card: rgba(23, 37, 33, 0.88);
+  --surface-card-strong: rgba(23, 37, 33, 0.92);
+  --surface-card-solid: rgba(23, 37, 33, 0.96);
+  --surface-ghost: rgba(23, 37, 33, 0.7);
+}
+
+[data-theme="dark"] body {
+  background: radial-gradient(circle at 10% 20%, rgba(31, 94, 84, 0.22) 0%, transparent 50%),
+    radial-gradient(circle at 90% 10%, rgba(44, 138, 125, 0.14) 0%, transparent 55%),
+    radial-gradient(circle at 70% 90%, rgba(255, 111, 79, 0.1) 0%, transparent 50%),
+    var(--sand);
+}
+
+[data-theme="dark"] .topbar {
+  background: rgba(14, 24, 22, 0.72);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background: #0c1513;
+  color: var(--ink);
+}
+
+[data-theme="dark"] .primary {
+  color: #0d1b1a;
+}
+
+[data-theme="dark"] .ghost {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .nav-link {
+  color: var(--text-soft);
+}
+
+[data-theme="dark"] .nav-card {
+  background: linear-gradient(160deg, rgba(44, 138, 125, 0.22), rgba(244, 184, 96, 0.14));
+}
+
+[data-theme="dark"] .orb-1,
+[data-theme="dark"] .orb-2,
+[data-theme="dark"] .orb-3 {
+  opacity: 0.28;
+}
+
+[data-theme="dark"] .hero {
+  background: linear-gradient(140deg, rgba(31, 94, 84, 0.25), rgba(244, 184, 96, 0.16));
+}
+
+[data-theme="dark"] .filter {
+  background: rgba(31, 94, 84, 0.25);
+}
+
+[data-theme="dark"] .filter.active {
+  background: rgba(31, 94, 84, 0.42);
+}
+
+[data-theme="dark"] .chip,
+[data-theme="dark"] .tag,
+[data-theme="dark"] .demo-badge {
+  background: rgba(44, 138, 125, 0.2);
+}
+
+[data-theme="dark"] .compass-item {
+  background: rgba(31, 94, 84, 0.28);
+}
+
+[data-theme="dark"] .bridge-results {
+  background: rgba(44, 138, 125, 0.15);
+}
+
+[data-theme="dark"] .strand {
+  background: rgba(255, 111, 79, 0.22);
+}
+
+[data-theme="dark"] .mini-card.highlight {
+  background: rgba(255, 111, 79, 0.2);
+}
+
+[data-theme="dark"] ::selection {
+  background: rgba(86, 184, 168, 0.35);
+  color: #e7f0ed;
 }
 
 * {
@@ -52,7 +176,7 @@ textarea {
 input,
 textarea,
 select {
-  border: 1px solid rgba(16, 24, 32, 0.15);
+  border: 1px solid var(--border-control);
   border-radius: 12px;
   padding: 12px 14px;
   background: var(--cloud);
@@ -220,8 +344,8 @@ button:disabled {
 }
 
 .ghost {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(16, 24, 32, 0.12);
+  background: var(--surface-ghost);
+  border: 1px solid var(--border-control-soft);
 }
 
 .full {
@@ -248,7 +372,7 @@ button:disabled {
   text-transform: uppercase;
   letter-spacing: 2px;
   font-size: 0.65rem;
-  color: rgba(16, 24, 32, 0.6);
+  color: var(--text-faint);
   margin-bottom: 12px;
 }
 
@@ -256,7 +380,7 @@ button:disabled {
   display: block;
   padding: 8px 12px;
   border-radius: 12px;
-  color: rgba(16, 24, 32, 0.75);
+  color: var(--text-soft);
   font-weight: 500;
 }
 
@@ -284,11 +408,11 @@ button:disabled {
 }
 
 .card {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--surface-card);
   border-radius: 24px;
   padding: 24px;
   box-shadow: var(--shadow);
-  border: 1px solid rgba(16, 24, 32, 0.08);
+  border: 1px solid var(--border-card);
 }
 
 .card.mini {
@@ -315,7 +439,7 @@ button:disabled {
 
 .lead {
   font-size: 1.05rem;
-  color: rgba(16, 24, 32, 0.8);
+  color: var(--text-body);
 }
 
 .eyebrow {
@@ -337,7 +461,7 @@ button:disabled {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: rgba(16, 24, 32, 0.6);
+  color: var(--text-faint);
 }
 
 .meta-value {
@@ -371,10 +495,10 @@ button:disabled {
 }
 
 .mini-card {
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-card-solid);
   padding: 14px 16px;
   border-radius: 16px;
-  border: 1px solid rgba(16, 24, 32, 0.08);
+  border: 1px solid var(--border-card);
 }
 
 .mini-card.highlight {
@@ -472,7 +596,7 @@ button:disabled {
 
 .post-role {
   font-size: 0.85rem;
-  color: rgba(16, 24, 32, 0.6);
+  color: var(--text-faint);
 }
 
 .strand {
@@ -536,8 +660,8 @@ button:disabled {
 .impact-card {
   padding: 16px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(16, 24, 32, 0.08);
+  background: var(--surface-card-strong);
+  border: 1px solid var(--border-card);
 }
 
 .collab-title,
@@ -566,7 +690,7 @@ button:disabled {
 
 .bar {
   height: 8px;
-  background: rgba(16, 24, 32, 0.1);
+  background: var(--surface-track);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -597,7 +721,7 @@ button:disabled {
   text-transform: uppercase;
   letter-spacing: 1.5px;
   font-size: 0.7rem;
-  color: rgba(16, 24, 32, 0.6);
+  color: var(--text-faint);
 }
 
 .impact-value {
@@ -611,7 +735,7 @@ button:disabled {
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: rgba(16, 24, 32, 0.6);
+  color: var(--text-faint);
   margin-bottom: 8px;
 }
 
@@ -637,7 +761,7 @@ button:disabled {
 }
 
 .muted {
-  color: rgba(16, 24, 32, 0.6);
+  color: var(--text-faint);
 }
 
 .hover-lift:hover {
@@ -692,7 +816,7 @@ button:disabled {
 
 .auth-card {
   width: min(420px, 90vw);
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-card-solid);
   border-radius: 24px;
   padding: 32px;
   display: grid;

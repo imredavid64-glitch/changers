@@ -43,6 +43,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        {/* Apply the saved color theme before first paint so there is no flash
+         * of the wrong theme. The ThemeToggle keeps it in sync afterwards. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("changers-theme");var dark=t==="dark"||((!t||t==="system")&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.setAttribute("data-theme",dark?"dark":"light");}catch(e){document.documentElement.setAttribute("data-theme","light");}})();`,
+          }}
+        />
         <AuthProvider>
           <AppShell>{children}</AppShell>
         </AuthProvider>
