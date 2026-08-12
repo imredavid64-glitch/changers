@@ -74,6 +74,22 @@ for f in FILES:
     s = os.path.join(src, f)
     if os.path.exists(s):
         copy_file(s, os.path.join(dst, f))
+
+# Prune stale files (deleted or renamed in the source) from the copy so a
+# removed file never keeps shadowing the real one during checks.
+for sub in SUBDIRS:
+    base = os.path.join(dst, sub)
+    if not os.path.isdir(base):
+        continue
+    for root, _dirs, names in os.walk(base):
+        for name in names:
+            full = os.path.join(root, name)
+            rel = os.path.relpath(full, dst)
+            if not os.path.exists(os.path.join(src, rel)):
+                try:
+                    os.remove(full)
+                except Exception:
+                    pass
 PY
 
 if [[ ! -d "$DST/node_modules" ]]; then

@@ -48,7 +48,9 @@ const securityHeaders = [
   },
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=()",
+    // camera/microphone use (self) so the room video calls can access the
+    // user's own devices; geolocation stays fully blocked.
+    value: "camera=(self), microphone=(self), geolocation=()",
   },
   {
     key: "X-DNS-Prefetch-Control",
