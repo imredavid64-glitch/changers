@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Download, Trash2, ShieldCheck, FileText } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { downloadMyData, deleteMyData } from "@/lib/userdata/client";
+import { TINTS } from "@/lib/theme/tints";
 
 const COLLECTION_GROUPS: { title: string; icon: string; items: string[] }[] = [
   {
@@ -110,7 +111,7 @@ export default function PrivacyPage() {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
           {COLLECTION_GROUPS.map((group) => (
-            <div key={group.title} style={{ background: "color-mix(in srgb, var(--moss) 5%, transparent)", borderRadius: 16, padding: 20 }}>
+            <div key={group.title} style={{ background: TINTS.moss5, borderRadius: 16, padding: 20 }}>
               <p style={{ fontWeight: 700, marginBottom: 10 }}>{group.icon} {group.title}</p>
               <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6, fontSize: "0.9rem", color: "var(--text-body)", lineHeight: 1.6 }}>
                 {group.items.map((item) => (
@@ -163,7 +164,7 @@ export default function PrivacyPage() {
 
         {user ? (
           <div style={{ display: "grid", gap: 20 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", justifyContent: "space-between", background: "color-mix(in srgb, var(--moss) 5%, transparent)", borderRadius: 16, padding: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", justifyContent: "space-between", background: TINTS.moss5, borderRadius: 16, padding: 20 }}>
               <div style={{ flex: 1, minWidth: 240 }}>
                 <p style={{ fontWeight: 700 }}>Export my data</p>
                 <p className="muted" style={{ fontSize: "0.85rem", lineHeight: 1.5, margin: 0 }}>
@@ -210,7 +211,7 @@ export default function PrivacyPage() {
         )}
 
         {status && (
-          <p className="notice" style={{ margin: "16px 0 0", ...(status.kind === "success" ? { background: "color-mix(in srgb, var(--teal) 12%, transparent)", color: "var(--moss)" } : {}) }}>
+          <p className="notice" style={{ margin: "16px 0 0", ...(status.kind === "success" ? { background: TINTS.teal12, color: "var(--moss)" } : {}) }}>
             {status.text}
           </p>
         )}

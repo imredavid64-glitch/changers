@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Sparkles, Wand2, FileText, ListTree, Type } from "lucide-react";
 import { AISuggestion, OutlineSection, SustainabilityAnalysis, callAnalyzeDocument, callAnalyzeSustainability, callGenerateOutline, callRewriteDocument, callSummarizeDocument, callSuggestTitles } from "@/lib/ai/tools";
+import { TINTS } from "@/lib/theme/tints";
 
 interface AIPanelProps {
   title: string;
@@ -174,7 +175,7 @@ export function AIPanel({ title, content, onApplyTitle, onApplyContent }: AIPane
           <p style={{ fontWeight: 700, marginBottom: 8 }}>Suggestions</p>
           <div style={{ display: "grid", gap: 8 }}>
             {suggestions.map((s) => (
-              <div key={s.id} style={{ padding: 12, borderRadius: 14, background: "color-mix(in srgb, var(--teal) 8%, transparent)", fontSize: "0.9rem" }}>
+              <div key={s.id} style={{ padding: 12, borderRadius: 14, background: TINTS.teal8, fontSize: "0.9rem" }}>
                 {s.text}
               </div>
             ))}
@@ -189,7 +190,7 @@ export function AIPanel({ title, content, onApplyTitle, onApplyContent }: AIPane
           </p>
           <div style={{ display: "grid", gap: 8 }}>
             {outline.map((section) => (
-              <div key={section.heading} style={{ padding: 12, borderRadius: 14, background: "color-mix(in srgb, var(--moss) 6%, transparent)" }}>
+              <div key={section.heading} style={{ padding: 12, borderRadius: 14, background: TINTS.moss6 }}>
                 <p style={{ fontWeight: 700, fontSize: "0.9rem" }}>{section.heading}</p>
                 <ul style={{ marginTop: 6, paddingLeft: 18, display: "grid", gap: 2 }}>
                   {section.subpoints.map((point) => (
@@ -222,7 +223,7 @@ export function AIPanel({ title, content, onApplyTitle, onApplyContent }: AIPane
         </div>
         {sustainability && (
           <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
-            <div style={{ padding: 12, borderRadius: 14, background: "color-mix(in srgb, var(--teal) 10%, transparent)" }}>
+            <div style={{ padding: 12, borderRadius: 14, background: TINTS.teal10 }}>
               <p style={{ fontWeight: 700, fontSize: "0.9rem" }}>
                 Sustainability score: {Math.round(sustainability.sustainabilityScore * 100)}%
               </p>
@@ -234,7 +235,7 @@ export function AIPanel({ title, content, onApplyTitle, onApplyContent }: AIPane
             {sustainability.sustainabilityTips.length > 0 && (
               <div style={{ display: "grid", gap: 6 }}>
                 {sustainability.sustainabilityTips.map((tip) => (
-                  <p key={tip} className="muted" style={{ fontSize: "0.85rem", background: "color-mix(in srgb, var(--sun) 12%, transparent)", padding: "10px 12px", borderRadius: 12 }}>{tip}</p>
+                  <p key={tip} className="muted" style={{ fontSize: "0.85rem", background: TINTS.sun12, padding: "10px 12px", borderRadius: 12 }}>{tip}</p>
                 ))}
               </div>
             )}

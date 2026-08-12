@@ -15,6 +15,7 @@ import { STRAND_LABELS, STRAND_OPTIONS, buildSearchIndex, normalizePost, parseTa
 import { FeedTab, sortPostsForTab } from "@/lib/social/feed";
 import { uploadMediaAsset } from "@/lib/media/client";
 import { refreshBadges } from "@/lib/badges/refresh";
+import { TINTS } from "@/lib/theme/tints";
 
 export default function PostsFeedPage() {
   const { user, profile } = useAuth();
@@ -260,7 +261,7 @@ export default function PostsFeedPage() {
           </div>
 
           {isPoll && (
-            <div className="composer-form" style={{ padding: 12, background: "color-mix(in srgb, var(--teal) 5%, transparent)", borderRadius: 14, display: "grid", gap: 8 }}>
+            <div className="composer-form" style={{ padding: 12, background: TINTS.teal5, borderRadius: 14, display: "grid", gap: 8 }}>
               <input type="text" value={pollQuestion} onChange={(e) => setPollQuestion(e.target.value)} placeholder="Poll question" />
               <input type="text" value={pollOptionA} onChange={(e) => setPollOptionA(e.target.value)} placeholder="Option A" />
               <input type="text" value={pollOptionB} onChange={(e) => setPollOptionB(e.target.value)} placeholder="Option B" />

@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { COLLECTIONS, watchDocument, updateDocument, deleteDocument } from "@/lib/appwrite/bridge";
 import { normalizeSlideshow, formatRelativeTime } from "@/lib/social/utils";
 import { AppSlideshow } from "@/lib/social/types";
+import { TINTS } from "@/lib/theme/tints";
 
 export default function SlideshowDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -125,9 +126,9 @@ export default function SlideshowDetailPage() {
   const bgStyle: Record<string, string> = {
     title: "linear-gradient(135deg, var(--moss), var(--teal))",
     content: "var(--surface-card-solid)",
-    "two-column": "color-mix(in srgb, var(--teal) 6%, transparent)",
-    image: "color-mix(in srgb, var(--sun) 10%, transparent)",
-    quote: "color-mix(in srgb, var(--coral) 8%, transparent)",
+    "two-column": TINTS.teal6,
+    image: TINTS.sun10,
+    quote: TINTS.coral8,
     impact: "linear-gradient(135deg, color-mix(in srgb, var(--teal) 10%, transparent), color-mix(in srgb, var(--sun) 10%, transparent))",
     cta: "linear-gradient(135deg, var(--coral), var(--sun))",
   };
@@ -202,7 +203,7 @@ export default function SlideshowDetailPage() {
                 onClick={() => { setCurrentSlide(i); setEditing(true); }}
                 style={{
                   padding: "8px 10px", borderRadius: 10, cursor: "pointer", fontSize: "0.85rem",
-                  background: i === currentSlide ? "color-mix(in srgb, var(--teal) 12%, transparent)" : "transparent",
+                  background: i === currentSlide ? TINTS.teal12 : "transparent",
                   display: "flex", justifyContent: "space-between", alignItems: "center",
                 }}
               >

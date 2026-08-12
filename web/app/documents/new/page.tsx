@@ -8,6 +8,7 @@ import { COLLECTIONS, createDocument, publicReadOwnerWritePermissions } from "@/
 import { AISuggestion } from "@/lib/ai/tools";
 import { AIPanel } from "@/components/AIPanel";
 import { buildDocumentSearchIndex } from "@/lib/social/toolSearch";
+import { TINTS } from "@/lib/theme/tints";
 
 export default function NewDocumentPage() {
   const router = useRouter();
@@ -162,10 +163,10 @@ export default function NewDocumentPage() {
                   borderRadius: 16,
                   background:
                     s.type === "suggestion"
-                      ? "color-mix(in srgb, var(--teal) 8%, transparent)"
+                      ? TINTS.teal8
                       : s.type === "rewrite"
-                        ? "color-mix(in srgb, var(--sun) 12%, transparent)"
-                        : "color-mix(in srgb, var(--coral) 10%, transparent)",
+                        ? TINTS.sun12
+                        : TINTS.coral10,
                   border: "1px solid rgba(16,24,32,0.06)",
                 }}
               >

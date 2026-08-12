@@ -9,6 +9,7 @@ import { formatRelativeTime, normalizeNotification } from "@/lib/social/utils";
 import { AppNotification } from "@/lib/social/types";
 import { COLLECTIONS, updateDocument, watchDocuments } from "@/lib/appwrite/bridge";
 import { Query } from "@/lib/appwrite/client";
+import { TINTS } from "@/lib/theme/tints";
 
 export function NotificationsDropdown({ user }: { user: Models.User<Models.Preferences> }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -91,7 +92,7 @@ export function NotificationsDropdown({ user }: { user: Models.User<Models.Prefe
                       style={{
                         padding: "12px 16px",
                         borderBottom: "1px solid rgba(16,24,32,0.04)",
-                        background: n.read ? "transparent" : "color-mix(in srgb, var(--teal) 5%, transparent)",
+                        background: n.read ? "transparent" : TINTS.teal5,
                         cursor: "pointer",
                         transition: "background 0.2s ease",
                       }}

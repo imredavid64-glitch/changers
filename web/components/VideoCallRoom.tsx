@@ -37,6 +37,7 @@ import {
   summarizePeerStats,
 } from "@/lib/call/logic";
 import { PeerManager } from "@/lib/call/peer-manager";
+import { TINTS } from "@/lib/theme/tints";
 
 const STUN_SERVERS: RTCIceServer[] = [
   { urls: "stun:stun.l.google.com:19302" },
@@ -746,7 +747,7 @@ export default function VideoCallRoom({
                   marginLeft: 8,
                   padding: "1px 8px",
                   borderRadius: 999,
-                  background: "color-mix(in srgb, var(--teal) 10%, transparent)",
+                  background: TINTS.teal10,
                 }}
                 title="Live connection quality across all participants"
               >

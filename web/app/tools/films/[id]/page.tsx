@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { COLLECTIONS, watchDocument, updateDocument, deleteDocument } from "@/lib/appwrite/bridge";
 import { normalizeFilm, formatRelativeTime } from "@/lib/social/utils";
 import { AppFilm, FilmScene } from "@/lib/social/types";
+import { TINTS } from "@/lib/theme/tints";
 
 const SHOT_TYPES: FilmScene["shot_type"][] = ["wide", "medium", "close-up", "pov", "aerial"];
 
@@ -205,7 +206,7 @@ export default function FilmDetailPage() {
           <div style={{ display: "grid", gap: 6 }}>
             {scenes.map((scene) => (
               <div key={scene.id} onClick={() => setCurrent(scene.id)}
-                style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", fontSize: "0.85rem", background: current === scene.id ? "color-mix(in srgb, var(--teal) 12%, transparent)" : "transparent", border: "1px solid rgba(16,24,32,0.06)" }}>
+                style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", fontSize: "0.85rem", background: current === scene.id ? TINTS.teal12 : "transparent", border: "1px solid rgba(16,24,32,0.06)" }}>
                 <div style={{ fontWeight: 600, marginBottom: 4 }}>Scene {scene.number}</div>
                 <div style={{ color: "var(--moss)", fontSize: "0.75rem", textTransform: "uppercase" }}>{scene.shot_type}</div>
                 <div className="muted" style={{ fontSize: "0.8rem" }}>{scene.setting.slice(0, 40)}</div>

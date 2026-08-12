@@ -14,6 +14,7 @@ import {
 import { Query } from "@/lib/appwrite/client";
 import { AppEvent, Strand } from "@/lib/social/types";
 import { STRAND_LABELS, STRAND_OPTIONS, buildSearchIndex, getDisplayName, normalizeEvent, parseTagInput, timestampToMillis } from "@/lib/social/utils";
+import { TINTS } from "@/lib/theme/tints";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -228,7 +229,7 @@ export default function EventsPage() {
                     minHeight: 84,
                     borderRadius: 12,
                     padding: 8,
-                    background: isToday ? "color-mix(in srgb, var(--teal) 12%, transparent)" : "rgba(255,255,255,0.7)",
+                    background: isToday ? TINTS.teal12 : "rgba(255,255,255,0.7)",
                     border: isToday ? "1px solid var(--teal)" : "1px solid rgba(16,24,32,0.06)",
                     display: "flex",
                     flexDirection: "column",

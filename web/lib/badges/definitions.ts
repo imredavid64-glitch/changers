@@ -1,4 +1,5 @@
 import { AppBadge, AppProfile, BadgeCategory, BadgeDefinition, UserStats } from "@/lib/social/types";
+import { TINTS } from "@/lib/theme/tints";
 
 const BADGE_DEFINITIONS: BadgeDefinition[] = [
   {
@@ -318,11 +319,11 @@ export function getCategoryLabel(category: BadgeCategory): string {
 
 export function getCategoryColor(category: BadgeCategory): string {
   const colors: Record<BadgeCategory, string> = {
-    milestone: "color-mix(in srgb, var(--teal) 15%, transparent)",
-    social: "color-mix(in srgb, var(--coral) 15%, transparent)",
+    milestone: TINTS.teal15,
+    social: TINTS.coral15,
     creation: "color-mix(in srgb, var(--sun) 15%, transparent)",
     impact: "rgba(155,199,177,0.2)",
-    streak: "color-mix(in srgb, var(--coral) 20%, transparent)",
+    streak: TINTS.coral20,
     special: "rgba(147,197,253,0.2)",
   };
   return colors[category] || "rgba(16,24,32,0.1)";

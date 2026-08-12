@@ -8,10 +8,11 @@ import SpotlightCard from "@/components/SpotlightCard";
 import { COLLECTIONS } from "@/lib/appwrite/bridge";
 import { databases, Query } from "@/lib/appwrite/client";
 import { appwriteEnabled, appwriteConfig } from "@/lib/appwrite/config";
+import { TINTS } from "@/lib/theme/tints";
 
 const STRANDS = [
-  { key: "N", label: "Nature", emoji: "🌿", color: "color-mix(in srgb, var(--teal) 14%, transparent)", description: "Climate, conservation, and regeneration projects that restore the natural world." },
-  { key: "E", label: "Economy", emoji: "💡", color: "color-mix(in srgb, var(--sun) 22%, transparent)", description: "Circular systems, ethical jobs, and fair access to opportunity and resources." },
+  { key: "N", label: "Nature", emoji: "🌿", color: TINTS.teal14, description: "Climate, conservation, and regeneration projects that restore the natural world." },
+  { key: "E", label: "Economy", emoji: "💡", color: TINTS.sun22, description: "Circular systems, ethical jobs, and fair access to opportunity and resources." },
   { key: "S", label: "Society", emoji: "🤝", color: "color-mix(in srgb, var(--coral) 14%, transparent)", description: "Community, inclusion, and justice — building belonging for everyone." },
   { key: "W", label: "Wellbeing", emoji: "🧘", color: "rgba(147,197,253,0.25)", description: "Health, safety, and belonging — for people and the planet alike." },
 ];
@@ -146,7 +147,7 @@ export default function WelcomePage() {
       </nav>
 
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "color-mix(in srgb, var(--moss) 10%, transparent)", color: "var(--moss)", padding: "8px 20px", borderRadius: 999, fontSize: "0.85rem", fontWeight: 600, marginBottom: 32 }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: TINTS.moss10, color: "var(--moss)", padding: "8px 20px", borderRadius: 999, fontSize: "0.85rem", fontWeight: 600, marginBottom: 32 }}>
           <span>🌱</span>
           <span>A changemaker community for students & young leaders</span>
         </div>
@@ -204,7 +205,7 @@ export default function WelcomePage() {
                     ["✅", "Task Board", "6 done · 2 in progress"],
                     ["📽️", "Pitch Slideshow", "8 slides ready"],
                   ].map(([icon, title, meta]) => (
-                    <div key={title} style={{ background: "color-mix(in srgb, var(--moss) 6%, transparent)", borderRadius: 12, padding: 12, marginBottom: 8 }}>
+                    <div key={title} style={{ background: TINTS.moss6, borderRadius: 12, padding: 12, marginBottom: 8 }}>
                       <p style={{ fontWeight: 600, fontSize: "0.9rem" }}>{icon} {title}</p>
                       <p className="muted" style={{ fontSize: "0.8rem" }}>{meta}</p>
                     </div>
@@ -319,7 +320,7 @@ export default function WelcomePage() {
           </p>
           <div className="feature-grid" style={{ textAlign: "left" }}>
             {PRINCIPLES.map((principle) => (
-              <div key={principle.title} className="feature" style={{ background: "color-mix(in srgb, var(--moss) 5%, transparent)", borderRadius: 20, padding: 32 }}>
+              <div key={principle.title} className="feature" style={{ background: TINTS.moss5, borderRadius: 20, padding: 32 }}>
                 <div style={{ fontSize: "2.5rem", marginBottom: 16 }}>{principle.emoji}</div>
                 <h3 style={{ fontSize: "1.3rem", fontFamily: "var(--font-head)", marginBottom: 8 }}>{principle.title}</h3>
                 <p className="muted" style={{ lineHeight: 1.7 }}>{principle.desc}</p>

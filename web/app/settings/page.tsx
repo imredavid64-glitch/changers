@@ -7,6 +7,7 @@ import { Download, KeyRound, LogOut, Settings, ShieldCheck, Trash2, UserRound } 
 import { useAuth } from "@/components/AuthProvider";
 import { account } from "@/lib/appwrite/client";
 import { getDisplayName } from "@/lib/social/utils";
+import { TINTS } from "@/lib/theme/tints";
 
 export default function SettingsPage() {
   const { user, profile, signOut } = useAuth();
@@ -112,7 +113,7 @@ export default function SettingsPage() {
               className="card hover-lift"
               style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none", color: "inherit", padding: "16px 18px", border: "1px solid rgba(16,24,32,0.08)" }}
             >
-              <span style={{ width: 38, height: 38, borderRadius: 12, background: "color-mix(in srgb, var(--teal) 10%, transparent)", color: "var(--moss)", display: "grid", placeItems: "center" }}>
+              <span style={{ width: 38, height: 38, borderRadius: 12, background: TINTS.teal10, color: "var(--moss)", display: "grid", placeItems: "center" }}>
                 {link.icon}
               </span>
               <div style={{ flex: 1 }}>
@@ -162,7 +163,7 @@ export default function SettingsPage() {
             minLength={8}
           />
           {status && (
-            <p className="notice" style={{ ...(statusKind === "success" ? { background: "color-mix(in srgb, var(--teal) 12%, transparent)", color: "var(--moss)" } : {}) }}>
+            <p className="notice" style={{ ...(statusKind === "success" ? { background: TINTS.teal12, color: "var(--moss)" } : {}) }}>
               {status}
             </p>
           )}
@@ -177,7 +178,7 @@ export default function SettingsPage() {
       <section className="card">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <span style={{ width: 38, height: 38, borderRadius: 12, background: "color-mix(in srgb, var(--coral) 10%, transparent)", color: "var(--coral)", display: "grid", placeItems: "center" }}>
+            <span style={{ width: 38, height: 38, borderRadius: 12, background: TINTS.coral10, color: "var(--coral)", display: "grid", placeItems: "center" }}>
               <Trash2 size={18} />
             </span>
             <div>

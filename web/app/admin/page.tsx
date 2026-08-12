@@ -12,6 +12,7 @@ import type { SpotlightRecord } from "@/lib/spotlight/server";
 import { anonymizeUserData, eraseUserData } from "@/lib/userdata/client";
 import { AppPost, AppProfile } from "@/lib/social/types";
 import { normalizePost, normalizeProfile } from "@/lib/social/utils";
+import { TINTS } from "@/lib/theme/tints";
 
 export default function AdminPage() {
   const { user, profile } = useAuth();
@@ -432,7 +433,7 @@ export default function AdminPage() {
                     <a href={`mailto:${msg.email}`} style={{ color: "var(--teal)", fontSize: "0.85rem" }}>{msg.email}</a>
                     {msg.organization && <span className="muted" style={{ fontSize: "0.85rem" }}> · {msg.organization}</span>}
                     {msg.repliedAt ? (
-                      <span className="chip" style={{ marginLeft: 8, background: "color-mix(in srgb, var(--teal) 20%, transparent)" }}>Replied</span>
+                      <span className="chip" style={{ marginLeft: 8, background: TINTS.teal20 }}>Replied</span>
                     ) : msg.readAt ? (
                       <span className="chip" style={{ marginLeft: 8 }}>Read</span>
                     ) : (
@@ -487,7 +488,7 @@ export default function AdminPage() {
               <div key={action.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(16,24,32,0.08)", background: "var(--surface-card-solid)" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontWeight: 600 }}>
-                    <span className="chip" style={{ background: action.action === "erase" ? "var(--coral)" : "color-mix(in srgb, var(--teal) 20%, transparent)", color: action.action === "erase" ? "white" : "inherit", marginRight: 8 }}>
+                    <span className="chip" style={{ background: action.action === "erase" ? "var(--coral)" : TINTS.teal20, color: action.action === "erase" ? "white" : "inherit", marginRight: 8 }}>
                       {action.action}
                     </span>
                     by {action.adminUserId.slice(0, 10)}... → {action.targetUserId.slice(0, 10)}...
@@ -553,7 +554,7 @@ export default function AdminPage() {
                   <div key={spot.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(16,24,32,0.08)", background: "var(--surface-card-solid)" }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontWeight: 600 }}>
-                        {spot.active && <span className="chip" style={{ background: "color-mix(in srgb, var(--teal) 20%, transparent)", marginRight: 8 }}>Active</span>}
+                        {spot.active && <span className="chip" style={{ background: TINTS.teal20, marginRight: 8 }}>Active</span>}
                         {spot.title}
                       </p>
                       <p className="muted" style={{ fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{spot.blurb}</p>

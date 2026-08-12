@@ -8,6 +8,7 @@ import { COLLECTIONS, watchDocuments } from "@/lib/appwrite/bridge";
 import { Query } from "@/lib/appwrite/client";
 import { normalizeCodeSnippet, formatRelativeTime } from "@/lib/social/utils";
 import { AppCodeSnippet } from "@/lib/social/types";
+import { TINTS } from "@/lib/theme/tints";
 
 export default function CodeSnippetsPage() {
   const { user } = useAuth();
@@ -95,7 +96,7 @@ export default function CodeSnippetsPage() {
                   borderRadius: 999,
                   fontSize: "0.7rem",
                   fontWeight: 600,
-                  background: "color-mix(in srgb, var(--teal) 12%, transparent)",
+                  background: TINTS.teal12,
                   color: "var(--moss)",
                   textTransform: "uppercase",
                 }}

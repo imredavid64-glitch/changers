@@ -8,6 +8,7 @@ import { COLLECTIONS, createDocument, deleteDocument, publicReadMemberUpdatePerm
 import { Query } from "@/lib/appwrite/client";
 import { AppProject, AppTask, TaskPriority, TaskStatus } from "@/lib/social/types";
 import { getDisplayName, normalizeTask, timestampToMillis } from "@/lib/social/utils";
+import { TINTS } from "@/lib/theme/tints";
 
 const COLUMNS: { status: TaskStatus; label: string }[] = [
   { status: "todo", label: "To do" },
@@ -22,9 +23,9 @@ const PRIORITIES: { value: TaskPriority; label: string }[] = [
 ];
 
 const PRIORITY_COLOR: Record<TaskPriority, string> = {
-  low: "color-mix(in srgb, var(--teal) 15%, transparent)",
+  low: TINTS.teal15,
   medium: "color-mix(in srgb, var(--sun) 25%, transparent)",
-  high: "color-mix(in srgb, var(--coral) 20%, transparent)",
+  high: TINTS.coral20,
 };
 
 interface TaskBoardProps {

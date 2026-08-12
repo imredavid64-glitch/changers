@@ -9,6 +9,7 @@ import { COLLECTIONS, updateDocument, watchDocuments } from "@/lib/appwrite/brid
 import { Query } from "@/lib/appwrite/client";
 import { AppNotification } from "@/lib/social/types";
 import { formatRelativeTime, normalizeNotification } from "@/lib/social/utils";
+import { TINTS } from "@/lib/theme/tints";
 
 type Tab = "inbox" | "settings";
 
@@ -228,7 +229,7 @@ export default function NotificationsPage() {
                         padding: "12px 16px",
                         borderRadius: 14,
                         border: "1px solid rgba(16,24,32,0.08)",
-                        background: notification.read ? "var(--surface-card-solid)" : "color-mix(in srgb, var(--teal) 6%, transparent)",
+                        background: notification.read ? "var(--surface-card-solid)" : TINTS.teal6,
                         display: "grid",
                         gap: 4,
                       }}

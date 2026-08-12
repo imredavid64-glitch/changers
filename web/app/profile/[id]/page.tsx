@@ -32,6 +32,7 @@ import { deleteMediaAsset, uploadMediaAsset } from "@/lib/media/client";
 import { computeImpactScore, impactLevel } from "@/lib/social/impact";
 import { BadgeDisplay } from "@/components/BadgeDisplay";
 import { refreshBadges } from "@/lib/badges/refresh";
+import { TINTS } from "@/lib/theme/tints";
 
 type ProfileFormState = {
   fullName: string;
@@ -48,7 +49,7 @@ type ProfileFormState = {
 type ThemeOption = { value: AppProfile["theme"]; label: string; swatch: string };
 
 const THEME_OPTIONS: ThemeOption[] = [
-  { value: "moss", label: "Moss", swatch: "#20796c" },
+  { value: "moss", label: "Moss", swatch: "var(--teal)" },
   { value: "ocean", label: "Ocean", swatch: "#1f5e8f" },
   { value: "sunset", label: "Sunset", swatch: "#e0784f" },
   { value: "rose", label: "Rose", swatch: "#c2547a" },
@@ -672,7 +673,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                       padding: "10px 12px",
                       borderRadius: 14,
                       background: editForm.interests.includes(strand.value)
-                        ? "color-mix(in srgb, var(--teal) 12%, transparent)"
+                        ? TINTS.teal12
                         : "rgba(16, 24, 32, 0.05)",
                     }}
                   >
@@ -694,7 +695,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                 alignItems: "center",
                 padding: "10px 12px",
                 borderRadius: 14,
-                background: "color-mix(in srgb, var(--teal) 8%, transparent)",
+                background: TINTS.teal8,
               }}
             >
               <input
@@ -729,7 +730,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                       padding: "10px 12px",
                       borderRadius: 14,
                       border: editForm.theme === themeOption.value ? "2px solid var(--teal)" : "1px solid rgba(16,24,32,0.1)",
-                      background: editForm.theme === themeOption.value ? "color-mix(in srgb, var(--teal) 8%, transparent)" : "var(--surface-card-solid)",
+                      background: editForm.theme === themeOption.value ? TINTS.teal8 : "var(--surface-card-solid)",
                       cursor: "pointer",
                       font: "inherit",
                     }}
@@ -756,7 +757,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                       padding: "10px 12px",
                       borderRadius: 14,
                       border: editForm.theme === themeOption.value ? "2px solid var(--teal)" : "1px solid rgba(16,24,32,0.1)",
-                      background: editForm.theme === themeOption.value ? "color-mix(in srgb, var(--teal) 8%, transparent)" : "var(--surface-card-solid)",
+                      background: editForm.theme === themeOption.value ? TINTS.teal8 : "var(--surface-card-solid)",
                       cursor: "pointer",
                       font: "inherit",
                     }}

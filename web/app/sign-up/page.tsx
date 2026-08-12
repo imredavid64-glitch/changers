@@ -7,6 +7,7 @@ import { z } from "zod";
 import { useAuth } from "@/components/AuthProvider";
 import { Strand } from "@/lib/social/types";
 import { STRAND_OPTIONS } from "@/lib/social/utils";
+import { TINTS } from "@/lib/theme/tints";
 
 const signUpSchema = z.object({
   fullName: z.string().min(2, "Enter your name."),
@@ -114,7 +115,7 @@ export default function SignUpPage() {
                     alignItems: "center",
                     padding: "10px 12px",
                     borderRadius: 14,
-                    background: "color-mix(in srgb, var(--teal) 8%, transparent)",
+                    background: TINTS.teal8,
                   }}
                 >
                   <input

@@ -9,6 +9,7 @@ import { Query } from "@/lib/appwrite/client";
 import { appwriteEnabled } from "@/lib/appwrite/config";
 import { normalizeCodeSnippet, normalizeDesign, normalizeDocument, normalizeEvent, normalizeFilm, normalizePost, normalizeProfile, normalizeProject, normalizeRoom, normalizeSlideshow, normalizeTable } from "@/lib/social/utils";
 import { buildCodeSearchIndex, buildDesignSearchIndex, buildDocumentSearchIndex, buildSlideshowSearchIndex, buildTableSearchIndex, buildFilmSearchIndex } from "@/lib/social/toolSearch";
+import { TINTS } from "@/lib/theme/tints";
 
 type SearchType = "all" | "profiles" | "posts" | "rooms" | "projects" | "events" | "tools";
 
@@ -283,7 +284,7 @@ function SearchResults() {
                 >
                   <div
                     style={{
-                      background: "color-mix(in srgb, var(--teal) 10%, transparent)",
+                      background: TINTS.teal10,
                       padding: "12px",
                       borderRadius: "8px",
                       color: "var(--moss)",
