@@ -174,7 +174,10 @@ export async function assertMediaFreeSpace() {
 
 export async function getAuthenticatedAppwriteUser(request: Request) {
   if (!appwriteEnabled) {
-    throw new Error("Appwrite is not configured.");
+    // Not configured → there is no authenticated user; callers treat null as
+    // "unauthenticated" and return 401. Throwing here would surface as a 500
+    // for every gated route when the env vars are missing.
+    return null;
   }
 
   const authorization = request.headers.get("authorization") || "";
