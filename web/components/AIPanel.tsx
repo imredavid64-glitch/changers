@@ -203,7 +203,7 @@ export function AIPanel({ title, content, onApplyTitle, onApplyContent }: AIPane
         </div>
       )}
 
-      <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(16,24,32,0.08)" }}>
+      <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--border-card)" }}>
         <p style={{ fontWeight: 700, marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
           🌍 Sustainability Analyzer
         </p>

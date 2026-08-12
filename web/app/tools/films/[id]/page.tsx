@@ -206,7 +206,7 @@ export default function FilmDetailPage() {
           <div style={{ display: "grid", gap: 6 }}>
             {scenes.map((scene) => (
               <div key={scene.id} onClick={() => setCurrent(scene.id)}
-                style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", fontSize: "0.85rem", background: current === scene.id ? TINTS.teal12 : "transparent", border: "1px solid rgba(16,24,32,0.06)" }}>
+                style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", fontSize: "0.85rem", background: current === scene.id ? TINTS.teal12 : "transparent", border: "1px solid color-mix(in srgb, var(--ink) 6%, transparent)" }}>
                 <div style={{ fontWeight: 600, marginBottom: 4 }}>Scene {scene.number}</div>
                 <div style={{ color: "var(--moss)", fontSize: "0.75rem", textTransform: "uppercase" }}>{scene.shot_type}</div>
                 <div className="muted" style={{ fontSize: "0.8rem" }}>{scene.setting.slice(0, 40)}</div>
@@ -222,14 +222,14 @@ export default function FilmDetailPage() {
                 <h3 style={{ fontFamily: "var(--font-head)", margin: 0 }}>Scene {currentScene.number}</h3>
                 <button className="ghost" onClick={() => removeScene(currentScene.id)} style={{ color: "var(--coral)", fontSize: "0.8rem" }}>Remove</button>
               </div>
-              <label style={{ fontSize: "0.85rem", fontWeight: 600 }}>Setting <input type="text" value={currentScene.setting} onChange={(e) => updateScene(currentScene.id, { setting: e.target.value })} style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(16,24,32,0.15)", marginTop: 4, fontSize: "0.9rem" }} /></label>
-              <label style={{ fontSize: "0.85rem", fontWeight: 600 }}>Description <textarea value={currentScene.description} onChange={(e) => updateScene(currentScene.id, { description: e.target.value })} style={{ width: "100%", minHeight: 80, padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(16,24,32,0.15)", marginTop: 4, fontSize: "0.9rem", resize: "vertical" }} /></label>
-              <label style={{ fontSize: "0.85rem", fontWeight: 600 }}>Dialogue <textarea value={currentScene.dialogue} onChange={(e) => updateScene(currentScene.id, { dialogue: e.target.value })} style={{ width: "100%", minHeight: 80, padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(16,24,32,0.15)", marginTop: 4, fontSize: "0.9rem", resize: "vertical" }} /></label>
+              <label style={{ fontSize: "0.85rem", fontWeight: 600 }}>Setting <input type="text" value={currentScene.setting} onChange={(e) => updateScene(currentScene.id, { setting: e.target.value })} style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border-control)", marginTop: 4, fontSize: "0.9rem" }} /></label>
+              <label style={{ fontSize: "0.85rem", fontWeight: 600 }}>Description <textarea value={currentScene.description} onChange={(e) => updateScene(currentScene.id, { description: e.target.value })} style={{ width: "100%", minHeight: 80, padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border-control)", marginTop: 4, fontSize: "0.9rem", resize: "vertical" }} /></label>
+              <label style={{ fontSize: "0.85rem", fontWeight: 600 }}>Dialogue <textarea value={currentScene.dialogue} onChange={(e) => updateScene(currentScene.id, { dialogue: e.target.value })} style={{ width: "100%", minHeight: 80, padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border-control)", marginTop: 4, fontSize: "0.9rem", resize: "vertical" }} /></label>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <label style={{ fontSize: "0.85rem", fontWeight: 600 }}>Shot type <select value={currentScene.shot_type} onChange={(e) => updateScene(currentScene.id, { shot_type: e.target.value as FilmScene["shot_type"] })} style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(16,24,32,0.15)", marginTop: 4, fontSize: "0.9rem" }}>
+                <label style={{ fontSize: "0.85rem", fontWeight: 600 }}>Shot type <select value={currentScene.shot_type} onChange={(e) => updateScene(currentScene.id, { shot_type: e.target.value as FilmScene["shot_type"] })} style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border-control)", marginTop: 4, fontSize: "0.9rem" }}>
                   {SHOT_TYPES.map((st) => <option key={st} value={st}>{st}</option>)}
                 </select></label>
-                <label style={{ fontSize: "0.85rem", fontWeight: 600 }}>Duration (sec) <input type="number" value={currentScene.duration_secs} onChange={(e) => updateScene(currentScene.id, { duration_secs: Number(e.target.value) })} min={1} style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(16,24,32,0.15)", marginTop: 4, fontSize: "0.9rem" }} /></label>
+                <label style={{ fontSize: "0.85rem", fontWeight: 600 }}>Duration (sec) <input type="number" value={currentScene.duration_secs} onChange={(e) => updateScene(currentScene.id, { duration_secs: Number(e.target.value) })} min={1} style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border-control)", marginTop: 4, fontSize: "0.9rem" }} /></label>
               </div>
             </div>
           ) : (

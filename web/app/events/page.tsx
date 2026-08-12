@@ -230,7 +230,7 @@ export default function EventsPage() {
                     borderRadius: 12,
                     padding: 8,
                     background: isToday ? TINTS.teal12 : "rgba(255,255,255,0.7)",
-                    border: isToday ? "1px solid var(--teal)" : "1px solid rgba(16,24,32,0.06)",
+                    border: isToday ? "1px solid var(--teal)" : "1px solid color-mix(in srgb, var(--ink) 6%, transparent)",
                     display: "flex",
                     flexDirection: "column",
                     gap: 4,

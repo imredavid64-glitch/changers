@@ -273,7 +273,7 @@ function SearchResults() {
                   style={{
                     padding: "16px",
                     borderRadius: "12px",
-                    border: "1px solid rgba(16,24,32,0.08)",
+                    border: "1px solid var(--border-card)",
                     display: "flex",
                     gap: "16px",
                     alignItems: "center",

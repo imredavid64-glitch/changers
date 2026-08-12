@@ -174,7 +174,7 @@ export default function NewSlideshowPage() {
                     <select
                       value={slides[currentSlide].layout}
                       onChange={(e) => updateSlide(currentSlide, { layout: e.target.value as SlideDefinition["layout"] })}
-                      style={{ marginBottom: 16, padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(16,24,32,0.15)", width: "100%" }}
+                      style={{ marginBottom: 16, padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border-control)", width: "100%" }}
                     >
                       {["title", "content", "two-column", "image", "quote", "impact", "cta"].map(l => (
                         <option key={l} value={l}>{l.charAt(0).toUpperCase() + l.slice(1).replace("-", " ")}</option>
@@ -187,7 +187,7 @@ export default function NewSlideshowPage() {
                       placeholder="Heading"
                       style={{
                         width: "100%", fontSize: "1.4rem", fontWeight: 700,
-                        border: "none", background: "rgba(16,24,32,0.05)", padding: 12,
+                        border: "none", background: "color-mix(in srgb, var(--ink) 5%, transparent)", padding: 12,
                         borderRadius: 8, marginBottom: 12, outline: "none",
                       }}
                     />
@@ -197,7 +197,7 @@ export default function NewSlideshowPage() {
                       placeholder="Slide content"
                       style={{
                         width: "100%", minHeight: 120, border: "none",
-                        background: "rgba(16,24,32,0.03)", padding: 12,
+                        background: "color-mix(in srgb, var(--ink) 3%, transparent)", padding: 12,
                         borderRadius: 8, outline: "none", resize: "vertical", fontSize: "1rem",
                       }}
                     />
@@ -210,7 +210,7 @@ export default function NewSlideshowPage() {
                 )}
               </div>
 
-              <div style={{ display: "flex", justifyContent: "space-between", padding: 16, borderTop: "1px solid rgba(16,24,32,0.08)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: 16, borderTop: "1px solid var(--border-card)" }}>
                 <button className="ghost" onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))} disabled={currentSlide === 0}>
                   ← Previous
                 </button>

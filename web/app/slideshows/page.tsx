@@ -107,7 +107,7 @@ export default function SlideshowsPage() {
               </p>
               <div style={{ display: "flex", gap: 4 }}>
                 {template.slides.map((_, i) => (
-                  <div key={i} style={{ width: 24, height: 4, borderRadius: 2, background: i < template.slides.length ? "var(--moss)" : "rgba(16,24,32,0.1)" }} />
+                  <div key={i} style={{ width: 24, height: 4, borderRadius: 2, background: i < template.slides.length ? "var(--moss)" : "var(--surface-track)" }} />
                 ))}
               </div>
               <p style={{ fontSize: "0.8rem", color: "var(--moss)", marginTop: 8 }}>{template.slides.length} slides</p>

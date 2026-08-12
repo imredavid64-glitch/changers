@@ -132,7 +132,7 @@ export default function WelcomePage() {
       <nav style={{
         position: "sticky", top: 0, zIndex: 50,
         background: "rgba(255,255,255,0.8)", backdropFilter: "blur(12px)",
-        borderBottom: "1px solid rgba(16,24,32,0.08)",
+        borderBottom: "1px solid var(--border-card)",
       }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "16px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -260,7 +260,7 @@ export default function WelcomePage() {
                   key={item.name}
                   href={item.href}
                   className="feature hover-lift"
-                  style={{ display: "block", background: "rgba(255,255,255,0.85)", borderRadius: 20, padding: 28, textDecoration: "none", color: "inherit", border: "1px solid rgba(16,24,32,0.06)" }}
+                  style={{ display: "block", background: "rgba(255,255,255,0.85)", borderRadius: 20, padding: 28, textDecoration: "none", color: "inherit", border: "1px solid color-mix(in srgb, var(--ink) 6%, transparent)" }}
                 >
                   <div style={{ fontSize: "2.2rem", marginBottom: 14 }}>{item.emoji}</div>
                   <h3 style={{ fontSize: "1.2rem", fontFamily: "var(--font-head)", marginBottom: 8, color: "var(--ink)" }}>{item.name}</h3>
@@ -299,7 +299,7 @@ export default function WelcomePage() {
                 key={title as string}
                 href={href as string}
                 className="feature hover-lift"
-                style={{ display: "block", background: "rgba(255,255,255,0.85)", borderRadius: 20, padding: 28, textDecoration: "none", color: "inherit", border: "1px solid rgba(16,24,32,0.06)" }}
+                style={{ display: "block", background: "rgba(255,255,255,0.85)", borderRadius: 20, padding: 28, textDecoration: "none", color: "inherit", border: "1px solid color-mix(in srgb, var(--ink) 6%, transparent)" }}
               >
                 <div style={{ fontSize: "2.2rem", marginBottom: 14 }}>{emoji}</div>
                 <h3 style={{ fontSize: "1.2rem", fontFamily: "var(--font-head)", marginBottom: 8, color: "var(--ink)" }}>{title}</h3>

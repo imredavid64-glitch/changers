@@ -111,7 +111,7 @@ export default function SettingsPage() {
               key={link.href}
               href={link.href}
               className="card hover-lift"
-              style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none", color: "inherit", padding: "16px 18px", border: "1px solid rgba(16,24,32,0.08)" }}
+              style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none", color: "inherit", padding: "16px 18px", border: "1px solid var(--border-card)" }}
             >
               <span style={{ width: 38, height: 38, borderRadius: 12, background: TINTS.teal10, color: "var(--moss)", display: "grid", placeItems: "center" }}>
                 {link.icon}

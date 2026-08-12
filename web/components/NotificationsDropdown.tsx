@@ -52,9 +52,9 @@ export function NotificationsDropdown({ user }: { user: Models.User<Models.Prefe
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            style={{ position: "absolute", top: "100%", right: 0, width: "320px", background: "var(--surface-card-solid)", borderRadius: "12px", boxShadow: "0 12px 32px rgba(16,24,32,0.15)", border: "1px solid rgba(16,24,32,0.08)", zIndex: 100, overflow: 'hidden' }}
+            style={{ position: "absolute", top: "100%", right: 0, width: "320px", background: "var(--surface-card-solid)", borderRadius: "12px", boxShadow: "0 12px 32px var(--border-control)", border: "1px solid var(--border-card)", zIndex: 100, overflow: 'hidden' }}
           >
-            <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(16,24,32,0.08)", fontWeight: 600 }}>Notifications</div>
+            <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border-card)", fontWeight: 600 }}>Notifications</div>
             <div style={{ maxHeight: "400px", overflowY: "auto" }}>
               {notifications.length === 0 ? (
                 <p className="muted" style={{ padding: "20px", textAlign: "center", margin: 0, fontSize: "0.9rem" }}>You have no notifications right now.</p>
@@ -91,7 +91,7 @@ export function NotificationsDropdown({ user }: { user: Models.User<Models.Prefe
                       }}
                       style={{
                         padding: "12px 16px",
-                        borderBottom: "1px solid rgba(16,24,32,0.04)",
+                        borderBottom: "1px solid color-mix(in srgb, var(--ink) 4%, transparent)",
                         background: n.read ? "transparent" : TINTS.teal5,
                         cursor: "pointer",
                         transition: "background 0.2s ease",

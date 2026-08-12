@@ -228,7 +228,7 @@ export default function NotificationsPage() {
                       style={{
                         padding: "12px 16px",
                         borderRadius: 14,
-                        border: "1px solid rgba(16,24,32,0.08)",
+                        border: "1px solid var(--border-card)",
                         background: notification.read ? "var(--surface-card-solid)" : TINTS.teal6,
                         display: "grid",
                         gap: 4,
@@ -260,7 +260,7 @@ export default function NotificationsPage() {
               transition={{ duration: 0.2 }}
               style={{ display: "grid", gap: 16, marginTop: 6 }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "16px 20px", borderRadius: 16, border: "1px solid rgba(16,24,32,0.08)", background: "var(--surface-card-solid)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "16px 20px", borderRadius: 16, border: "1px solid var(--border-card)", background: "var(--surface-card-solid)" }}>
                 <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                   {pushEnabled ? <Bell size={24} color="var(--teal)" /> : <BellOff size={24} />}
                   <div>
@@ -273,7 +273,7 @@ export default function NotificationsPage() {
                 </button>
               </div>
 
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "16px 20px", borderRadius: 16, border: "1px solid rgba(16,24,32,0.08)", background: "var(--surface-card-solid)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "16px 20px", borderRadius: 16, border: "1px solid var(--border-card)", background: "var(--surface-card-solid)" }}>
                 <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                   <Mail size={24} />
                   <div>

@@ -15,7 +15,7 @@ const inputStyle = {
   width: "100%",
   padding: "6px 10px",
   borderRadius: 8,
-  border: "1px solid rgba(16,24,32,0.15)",
+  border: "1px solid var(--border-control)",
   fontSize: "0.85rem",
   marginTop: 2,
   background: "var(--surface-card-solid)",

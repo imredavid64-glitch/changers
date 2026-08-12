@@ -167,7 +167,7 @@ export default function NewDocumentPage() {
                       : s.type === "rewrite"
                         ? TINTS.sun12
                         : TINTS.coral10,
-                  border: "1px solid rgba(16,24,32,0.06)",
+                  border: "1px solid color-mix(in srgb, var(--ink) 6%, transparent)",
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>

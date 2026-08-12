@@ -674,7 +674,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                       borderRadius: 14,
                       background: editForm.interests.includes(strand.value)
                         ? TINTS.teal12
-                        : "rgba(16, 24, 32, 0.05)",
+                        : "color-mix(in srgb, var(--ink) 5%, transparent)",
                     }}
                   >
                     <input
@@ -729,7 +729,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                       alignItems: "center",
                       padding: "10px 12px",
                       borderRadius: 14,
-                      border: editForm.theme === themeOption.value ? "2px solid var(--teal)" : "1px solid rgba(16,24,32,0.1)",
+                      border: editForm.theme === themeOption.value ? "2px solid var(--teal)" : "1px solid var(--surface-track)",
                       background: editForm.theme === themeOption.value ? TINTS.teal8 : "var(--surface-card-solid)",
                       cursor: "pointer",
                       font: "inherit",
@@ -756,7 +756,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                       alignItems: "center",
                       padding: "10px 12px",
                       borderRadius: 14,
-                      border: editForm.theme === themeOption.value ? "2px solid var(--teal)" : "1px solid rgba(16,24,32,0.1)",
+                      border: editForm.theme === themeOption.value ? "2px solid var(--teal)" : "1px solid var(--surface-track)",
                       background: editForm.theme === themeOption.value ? TINTS.teal8 : "var(--surface-card-solid)",
                       cursor: "pointer",
                       font: "inherit",

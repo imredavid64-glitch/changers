@@ -12,7 +12,7 @@ const INPUT_STYLE: React.CSSProperties = {
   width: "100%",
   padding: "12px 14px",
   borderRadius: 12,
-  border: "1px solid rgba(16,24,32,0.15)",
+  border: "1px solid var(--border-control)",
   background: "var(--surface-card-solid)",
   fontSize: "0.95rem",
   color: "var(--ink)",

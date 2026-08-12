@@ -376,7 +376,7 @@ export function PostCard({
                 height: 48,
                 borderRadius: 24,
                 objectFit: "cover",
-                border: "1px solid rgba(16, 24, 32, 0.08)",
+                border: "1px solid var(--border-card)",
               }}
             />
           ) : (
@@ -483,7 +483,7 @@ export function PostCard({
                 height: "auto",
                 objectFit: "cover",
                 borderRadius: 18,
-                border: "1px solid rgba(16, 24, 32, 0.08)",
+                border: "1px solid var(--border-card)",
               }}
             />
           )}
@@ -496,7 +496,7 @@ export function PostCard({
                 width: "100%",
                 maxHeight: 380,
                 borderRadius: 18,
-                border: "1px solid rgba(16, 24, 32, 0.08)",
+                border: "1px solid var(--border-card)",
               }}
             >
               Your browser does not support video playback.
@@ -521,7 +521,7 @@ export function PostCard({
                       gap: 10,
                       padding: "10px 14px",
                       borderRadius: 12,
-                      border: `1px solid ${voted ? "var(--teal)" : "rgba(16,24,32,0.12)"}`,
+                      border: `1px solid ${voted ? "var(--teal)" : "var(--border-control-soft)"}`,
                       background: voted ? TINTS.teal10 : "var(--cloud)",
                       cursor: userPollVote && !voted ? "default" : "pointer",
                       textAlign: "left",
@@ -569,7 +569,7 @@ export function PostCard({
         style={{
           marginTop: 18,
           paddingTop: 14,
-          borderTop: "1px solid rgba(16, 24, 32, 0.08)",
+          borderTop: "1px solid var(--border-card)",
           justifyContent: "space-between",
           flexWrap: "wrap",
         }}
@@ -647,7 +647,7 @@ export function PostCard({
                 padding: 18,
                 borderRadius: 18,
                 background: "rgba(253, 251, 247, 0.95)",
-                border: "1px solid rgba(16, 24, 32, 0.06)",
+                border: "1px solid color-mix(in srgb, var(--ink) 6%, transparent)",
               }}
             >
               <div style={{ display: "grid", gap: 12 }}>
@@ -668,7 +668,7 @@ export function PostCard({
                             height: 36,
                             borderRadius: 18,
                             objectFit: "cover",
-                            border: "1px solid rgba(16, 24, 32, 0.08)",
+                            border: "1px solid var(--border-card)",
                           }}
                         />
                       ) : (

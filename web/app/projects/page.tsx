@@ -266,7 +266,7 @@ export default function ProjectsPage() {
                   {ideas.map((idea) => (
                     <div
                       key={idea.title}
-                      style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", padding: 14, borderRadius: 14, background: "var(--surface-card-solid)", border: "1px solid rgba(16,24,32,0.08)" }}
+                      style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", padding: 14, borderRadius: 14, background: "var(--surface-card-solid)", border: "1px solid var(--border-card)" }}
                     >
                       <div>
                         <p style={{ fontWeight: 700, fontSize: "0.95rem" }}>{idea.title}</p>

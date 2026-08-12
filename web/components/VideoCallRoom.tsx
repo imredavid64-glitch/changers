@@ -93,7 +93,7 @@ function qualityColor(quality: CallQuality) {
     case "poor":
       return "var(--coral)";
     default:
-      return "rgba(16,24,32,0.4)";
+      return "color-mix(in srgb, var(--ink) 40%, transparent)";
   }
 }
 
@@ -945,7 +945,7 @@ export default function VideoCallRoom({
               <div style={{ display: "grid", gap: 8, overflowY: "auto", alignContent: "start" }}>
                 {chatMessages.length === 0 && <p className="muted" style={{ fontSize: "0.9rem" }}>No messages yet. Say hello!</p>}
                 {chatMessages.map((message) => (
-                  <div key={message.id} style={{ background: "rgba(16,24,32,0.04)", borderRadius: 10, padding: "8px 12px" }}>
+                  <div key={message.id} style={{ background: "color-mix(in srgb, var(--ink) 4%, transparent)", borderRadius: 10, padding: "8px 12px" }}>
                     <p style={{ fontWeight: 600, fontSize: "0.8rem", margin: 0 }}>
                       {message.sender}
                       {message.breakout !== null ? <span className="muted" style={{ fontWeight: 400 }}> · room {message.breakout + 1}</span> : null}
@@ -960,7 +960,7 @@ export default function VideoCallRoom({
                   onChange={(event) => setChatInput(event.target.value)}
                   onKeyDown={(event) => { if (event.key === "Enter") sendChat(); }}
                   placeholder="Message the call..."
-                  style={{ flex: 1, padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(16,24,32,0.15)", fontSize: "0.9rem" }}
+                  style={{ flex: 1, padding: "10px 12px", borderRadius: 10, border: "1px solid var(--border-control)", fontSize: "0.9rem" }}
                 />
                 <button className="primary" onClick={sendChat}>Send</button>
               </div>
@@ -1053,7 +1053,7 @@ export default function VideoCallRoom({
               value={timerCustom}
               onChange={(event) => setTimerCustom(event.target.value)}
               placeholder="Custom seconds"
-              style={{ flex: 1, padding: "8px 10px", borderRadius: 10, border: "1px solid rgba(16,24,32,0.15)", fontSize: "0.85rem" }}
+              style={{ flex: 1, padding: "8px 10px", borderRadius: 10, border: "1px solid var(--border-control)", fontSize: "0.85rem" }}
             />
             <button className="ghost" onClick={startCustomTimer} style={{ fontSize: "0.85rem" }}>Set</button>
             {timer.running ? (
@@ -1076,7 +1076,7 @@ export default function VideoCallRoom({
             max={8}
             value={breakoutRooms}
             onChange={(event) => setBreakoutRooms(Math.max(2, Math.min(8, Number(event.target.value) || 2)))}
-            style={{ width: 56, padding: "6px 8px", borderRadius: 10, border: "1px solid rgba(16,24,32,0.15)", fontSize: "0.85rem" }}
+            style={{ width: 56, padding: "6px 8px", borderRadius: 10, border: "1px solid var(--border-control)", fontSize: "0.85rem" }}
             aria-label="Number of breakout rooms"
           />
           <button className="primary" onClick={startBreakout} style={{ fontSize: "0.85rem" }}>Start</button>

@@ -261,7 +261,7 @@ export default function RoomWorkspace({ params }: { params: Promise<{ id: string
                       color: isMe ? "white" : "var(--ink)",
                       padding: "12px 16px",
                       borderRadius: isMe ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
-                      boxShadow: "0 4px 12px rgba(16, 24, 32, 0.05)",
+                      boxShadow: "0 4px 12px color-mix(in srgb, var(--ink) 5%, transparent)",
                       maxWidth: "80%",
                     }}
                   >
@@ -279,7 +279,7 @@ export default function RoomWorkspace({ params }: { params: Promise<{ id: string
           <div ref={endOfMessagesRef} />
         </div>
 
-        <div style={{ padding: 16, borderTop: "1px solid rgba(16, 24, 32, 0.08)", background: "var(--white)" }}>
+        <div style={{ padding: 16, borderTop: "1px solid var(--border-card)", background: "var(--white)" }}>
           <form onSubmit={handleSendMessage} style={{ display: "flex", gap: 12 }}>
             <input
               type="text"

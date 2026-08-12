@@ -7,7 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { COLLECTIONS, createDocument, publicReadOwnerWritePermissions } from "@/lib/appwrite/bridge";
 import { buildTableSearchIndex } from "@/lib/social/toolSearch";
 
-const cellStyle = { border: "1px solid rgba(16,24,32,0.12)", padding: 0, background: "var(--surface-card-solid)" };
+const cellStyle = { border: "1px solid var(--border-control-soft)", padding: 0, background: "var(--surface-card-solid)" };
 const inputStyle = { border: "none", background: "transparent", padding: "8px 12px", width: 120, outline: "none", fontSize: "0.9rem" };
 
 function resizeGrid(grid: string[][], newRows: number, newCols: number) {

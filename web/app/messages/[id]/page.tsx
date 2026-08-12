@@ -272,7 +272,7 @@ export default function DirectMessageThread({ params }: { params: Promise<{ id: 
                     color: isMe ? "white" : "var(--ink)",
                     padding: "10px 16px",
                     borderRadius: isMe ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
-                    boxShadow: "0 4px 12px rgba(16, 24, 32, 0.05)",
+                    boxShadow: "0 4px 12px color-mix(in srgb, var(--ink) 5%, transparent)",
                     maxWidth: "75%"
                   }}>
                     <p style={{ margin: 0, fontSize: "0.95rem", lineHeight: 1.5 }}>{msg.text}</p>
@@ -284,7 +284,7 @@ export default function DirectMessageThread({ params }: { params: Promise<{ id: 
           <div ref={endOfMessagesRef} />
         </div>
         
-        <div style={{ padding: "16px", borderTop: "1px solid rgba(16, 24, 32, 0.08)", background: "var(--white)" }}>
+        <div style={{ padding: "16px", borderTop: "1px solid var(--border-card)", background: "var(--white)" }}>
           {isBlocked ? (
             <p className="notice" style={{ padding: "12px 16px", textAlign: "center" }}>This user has blocked you. You cannot send messages.</p>
           ) : (
@@ -294,7 +294,7 @@ export default function DirectMessageThread({ params }: { params: Promise<{ id: 
                 placeholder="Write a message..."
                 value={newMessage}
                 onChange={e => setNewMessage(e.target.value)}
-                style={{ flex: 1, padding: "12px 16px", borderRadius: "999px", background: "var(--cloud)", border: "1px solid rgba(16,24,32,0.1)" }}
+                style={{ flex: 1, padding: "12px 16px", borderRadius: "999px", background: "var(--cloud)", border: "1px solid var(--surface-track)" }}
               />
               <button type="submit" className="primary" disabled={!newMessage.trim()} style={{ width: 48, height: 48, padding: 0, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 24, flexShrink: 0 }}>
                 <Send size={20} />

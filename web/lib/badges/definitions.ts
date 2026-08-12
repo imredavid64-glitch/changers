@@ -326,5 +326,5 @@ export function getCategoryColor(category: BadgeCategory): string {
     streak: TINTS.coral20,
     special: "rgba(147,197,253,0.2)",
   };
-  return colors[category] || "rgba(16,24,32,0.1)";
+  return colors[category] || "var(--surface-track)";
 }

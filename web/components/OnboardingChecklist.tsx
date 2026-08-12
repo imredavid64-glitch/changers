@@ -128,7 +128,7 @@ export function OnboardingChecklist() {
           marginTop: 14,
           height: 8,
           borderRadius: 999,
-          background: "rgba(16,24,32,0.08)",
+          background: "var(--border-card)",
           overflow: "hidden",
         }}
       >
@@ -157,8 +157,8 @@ export function OnboardingChecklist() {
               gap: 12,
               padding: "10px 12px",
               borderRadius: 12,
-              border: "1px solid rgba(16,24,32,0.08)",
-              background: step.complete ? "rgba(16,24,32,0.03)" : "var(--surface-card-solid)",
+              border: "1px solid var(--border-card)",
+              background: step.complete ? "color-mix(in srgb, var(--ink) 3%, transparent)" : "var(--surface-card-solid)",
               opacity: step.complete ? 0.6 : 1,
               textDecoration: "none",
               color: "inherit",
@@ -172,7 +172,7 @@ export function OnboardingChecklist() {
                 flexShrink: 0,
                 display: "grid",
                 placeItems: "center",
-                border: `2px solid ${step.complete ? "var(--moss)" : "rgba(16,24,32,0.25)"}`,
+                border: `2px solid ${step.complete ? "var(--moss)" : "color-mix(in srgb, var(--ink) 25%, transparent)"}`,
                 background: step.complete ? "var(--moss)" : "transparent",
                 color: "white",
               }}

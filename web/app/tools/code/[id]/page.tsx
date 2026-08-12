@@ -193,7 +193,7 @@ export default function CodeSnippetDetailPage() {
             width: "100%",
             padding: "10px 16px",
             borderRadius: 12,
-            border: "1px solid rgba(16,24,32,0.1)",
+            border: "1px solid var(--surface-track)",
             background: "transparent",
             fontSize: "0.9rem",
             marginBottom: 16,
