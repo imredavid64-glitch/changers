@@ -43,3 +43,36 @@ jobs:
       - name: Build
         working-directory: web
         run: npm run build
+
+  e2e:
+    name: Web — signed-out smoke (Playwright)
+    runs-on: ubuntu-latest
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: web
+        run: npx playwright install --with-deps chromium
+
+      - name: Build the app (minimal env — signed-out pages only)
+        working-directory: web
+        run: npm run build
+
+      # Playwright's webServer config starts `next start -p 3010`; the smoke
+      # suite covers the signed-out flows that work without a backend
+      # (navigation, contact-form validation, search state, spotlight hiding).
+      - name: Run the smoke suite
+        working-directory: web
+        run: npx playwright test
