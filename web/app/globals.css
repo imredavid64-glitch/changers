@@ -64,6 +64,46 @@ textarea {
   resize: vertical;
 }
 
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(44, 138, 125, 0.18);
+  outline: none;
+}
+
+/* ---- Typographic scale ----
+ * The serif display face is the brand's heading font; pages that need a
+ * different size or face still override inline. text-wrap: balance keeps
+ * multi-line headings even (progressive enhancement). */
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-head), "Times New Roman", serif;
+  color: var(--ink);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp(1.9rem, 2.4vw, 2.6rem);
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: clamp(1.4rem, 1.8vw, 1.8rem);
+}
+
+h3 {
+  font-size: clamp(1.15rem, 1.4vw, 1.3rem);
+}
+
+h4 {
+  font-size: 1.02rem;
+}
+
 .bg-orb {
   position: fixed;
   border-radius: 999px;
@@ -730,6 +770,37 @@ html {
   outline: 2px solid var(--teal);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+::selection {
+  background: rgba(44, 138, 125, 0.28);
+  color: var(--ink);
+}
+
+/* Subtle themed scrollbars (progressive enhancement). */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(44, 138, 125, 0.35) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(44, 138, 125, 0.35);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(44, 138, 125, 0.55);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 button:active {

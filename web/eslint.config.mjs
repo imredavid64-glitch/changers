@@ -15,6 +15,12 @@ const eslintConfig = defineConfig([
       // handlers, which React explicitly permits (disabled with justification).
       "react-hooks/purity": "error",
       "react-hooks/set-state-in-effect": "error",
+      // Underscore-prefixed parameters document intentionally unused args
+      // (e.g. interface params a store implementation doesn't consult).
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" },
+      ],
     },
   },
   // Override default ignores of eslint-config-next.

@@ -45,7 +45,9 @@ export class InMemoryThrottleStore implements ThrottleStore {
     return entry.count;
   }
 
-  async peek(key: string, windowMs: number): Promise<number> {
+  async peek(key: string, _windowMs: number): Promise<number> {
+    // _windowMs is intentionally unused: this store tracks each entry's own
+    // expiry, so the interface parameter is accepted but not consulted.
     const now = Date.now();
     const entry = this.counts.get(key);
     if (!entry || entry.expiresAt <= now) return 0;

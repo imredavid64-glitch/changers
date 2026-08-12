@@ -48,9 +48,9 @@ This repo lives on iCloud-synced storage where bulk reads make `tsc`, `eslint`, 
 - `npm --prefix web run check:local:build` — `tsc --noEmit && next build`
 - `npm --prefix web run check:local` — all three in sequence
 
-The sync is file-by-file with per-file timeouts (slow iCloud reads can never hang the run) and skips already-copied files; dependencies install automatically on first use. See `web/scripts/check-local.sh`. All checks pass green (lint: 0 errors; `react-hooks/purity` and `react-hooks/set-state-in-effect` are intentionally warnings — see the comment in `web/eslint.config.mjs`).
+The sync is file-by-file with per-file timeouts (slow iCloud reads can never hang the run) and skips already-copied files; dependencies install automatically on first use. See `web/scripts/check-local.sh`. All checks pass green (lint: 0 problems — `react-hooks/purity` and `react-hooks/set-state-in-effect` are enforced as errors, so any regression fails the gate; see the comment in `web/eslint.config.mjs`).
 
-`check:local` also runs the unit test suite (`npm run test`, vitest): 46 tests cover the user-data erase/anonymize flows against a mocked Appwrite fetch layer, the call-signaling flow (validation, breakout assignment, route auth, connection-quality summarizer), contact-route validation/honeypot/rate-limiting, email-forwarding gating, and media storage safety — all without a live backend. The same checks run in CI on a clean machine via `.github/workflows/ci.yml` (Node 24, `npm ci`, then `npm run type-check`, `npm run lint`, `npm run test`, `npm run build`).
+`check:local` also runs the unit test suite (`npm run test`, vitest): 99 tests cover the user-data erase/anonymize flows, call-signaling (validation, breakout assignment, route auth, connection-quality summarizer), contact-route validation/honeypot/rate-limiting, email-forwarding gating, digest composition, CAS reflection generation, badge progress, onboarding-checklist logic, login throttling, and media storage safety — all without a live backend. The same checks run in CI on a clean machine via `.github/workflows/ci.yml` (Node 24, `npm ci`, then `npm run type-check`, `npm run lint`, `npm run test`, `npm run build`).
 
 ## Live backend
 
@@ -130,3 +130,37 @@ The platform runs on Appwrite + Postgres; the `mobile/` app is now a WebView she
 - `legacy-static/` — static assets from before the Appwrite migration.
 
 These can be removed once nothing references them.
+
+## Roadmap
+
+Prioritized by (a) what unblocks everything else, (b) impact per unit of effort, (c) uniqueness.
+
+### Phase 0 — Unblock the live backend (prerequisite for signed-in work)
+1. **Unpause the Appwrite project** (cloud.appwrite.io console). The whole signed-in surface is currently dark: feeds, rooms, calls, messages, tools storage, badges, admin.
+2. **Add SMTP env vars** (`SMTP_HOST`/`SMTP_USER`/`SMTP_PASS`) — activates contact forwarding, the weekly impact digest, and admin reply-by-email in one step.
+3. **Add TURN credentials** (`NEXT_PUBLIC_TURN_URL`/`USERNAME`/`CREDENTIAL`) — makes group video calls work behind restrictive NATs (free: Open Relay Project).
+4. **Set `DATABASE_URL`** — enables contact-message storage, the admin inbox, and the erase audit log.
+
+### Phase 1 — Finish the security pass
+5. **HTTP-only auth cookies** — move Appwrite sessions from localStorage to a server-side cookie proxy; neutralizes XSS session theft. Highest-risk refactor, validated only against a live backend.
+6. **Enforce login throttling** — wire the built `web/lib/auth/throttle.ts` (per-IP + per-account, sliding window) into the server-side auth flow once cookies land.
+7. **Rate-limit the contact form** publicly (IP-based) on top of the existing honeypot.
+8. **Bot protection upgrade** — Turnstile/reCAPTCHA when the contact form goes public.
+
+### Phase 2 — High-value product features
+9. **Changer Spotlight** — weekly featured changemaker/project on the landing page + feed (editable by admins); drives recognition and retention.
+10. **Event RSVP + reminders** — push/browser notifications for upcoming events the user RSVP'd to.
+11. **Mentorship matching** — surface mentors whose strands/tags overlap the user's, with a "request intro" flow.
+12. **Gamification depth** — weekly challenges (e.g. "post 3 nature-strand updates"), streaks, and a leaderboard-free "impact growth" chart on the profile.
+13. **AI helpers** — post/pitch composer drafts and project-idea generator using the existing AIPanel infrastructure.
+14. **Dark mode** — a `prefers-color-scheme`-aware theme plus manual toggle (the accent swatches on profiles already exist; extend to the chrome).
+
+### Phase 3 — Platform & scale
+15. **E2E tests** — Playwright smoke suite over the core flows (auth, post, room call join) to complement the 99 unit tests.
+16. **Realtime presence** — who's online in a room, typing indicators in messages.
+17. **Observability** — structured logging + error tracking (e.g. Sentry) for the API routes.
+18. **Localization** — the audience is international (AISB); i18n routing would widen adoption significantly.
+
+### Known debt (fix when convenient)
+- `mobile/`, `desktop/`, and `functions/` (Firebase-era) are thin shells or dead weight — the README documents the Firebase remnants for removal.
+- Tailwind is an unused dependency (`tailwindcss` in `web/package.json`, no config/directives) — remove or adopt, but don't leave both.
