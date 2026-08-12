@@ -1,0 +1,207 @@
+import { expect, test, type Page } from "@playwright/test";
+
+/**
+ * WCAG contrast audit — the CI styling net.
+ *
+ * Walks every visible text element on every route (in both themes and both
+ * auth modes), computes the real WCAG contrast ratio against the effective
+ * background (alpha-blended up the ancestor chain), and fails the test on any
+ * element below its threshold (4.5:1 small text, 3:1 large/bold).
+ *
+ * Unlike visual.spec.ts this is computed-style based, so it has no screenshot
+ * baselines and runs identically on any platform — including CI. The signed-in
+ * mode uses the QA seam (localStorage["changers-fake-user"]), which is
+ * client-side only; every API route still requires a real JWT.
+ */
+test.describe("contrast audit", () => {
+  const ROUTES = [
+    "/",
+    "/posts",
+    "/projects",
+    "/rooms",
+    "/events",
+    "/network",
+    "/mentors",
+    "/impact",
+    "/badges",
+    "/cas",
+    "/settings",
+    "/notifications",
+    "/documents",
+    "/tools",
+    "/tools/code",
+    "/tools/design",
+    "/tools/films",
+    "/tools/tables",
+    "/slideshows",
+    "/search?q=plastic",
+    "/contact",
+    "/privacy",
+    "/dashboard",
+    "/admin",
+    "/sign-in",
+    "/sign-up",
+    "/setup-admin",
+  ];
+
+  const THEMES = [
+    {
+      name: "light",
+      storage: "light",
+      colorScheme: "light" as const,
+      defaultBg: [255, 255, 255, 1] as [number, number, number, number],
+    },
+    {
+      name: "dark",
+      storage: "dark",
+      colorScheme: "dark" as const,
+      defaultBg: [23, 37, 33, 0.96] as [number, number, number, number],
+    },
+  ];
+
+  const MODES = [
+    { name: "signed-out", fakeUser: false },
+    { name: "signed-in", fakeUser: true },
+  ];
+
+  async function seed(page: Page, theme: string, fakeUser: boolean) {
+    await page.addInitScript(
+      ({ theme: t, fakeUser: f }) => {
+        localStorage.setItem("changers-theme", t);
+        if (f) localStorage.setItem("changers-fake-user", "1");
+      },
+      { theme, fakeUser },
+    );
+  }
+
+  for (const theme of THEMES) {
+    for (const mode of MODES) {
+      test(`${mode.name} · ${theme.name} theme`, async ({ page }) => {
+        await seed(page, theme.storage, mode.fakeUser);
+        await page.emulateMedia({ reducedMotion: "reduce", colorScheme: theme.colorScheme });
+
+        const violations: { route: string; el: string; ratio: number; fg: string; bg: string }[] = [];
+
+        for (const route of ROUTES) {
+          await page.goto(route);
+          // Let client-side rendering settle (the app renders empty/sign-in
+          // states without a backend — the audit covers whatever renders).
+          await page.waitForTimeout(700);
+
+          const found = await page.evaluate((dflt) => {
+            function lum(r: number, g: number, b: number) {
+              const f = (c: number) => {
+                c /= 255;
+                return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+              };
+              return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+            }
+            function blend(
+              fg: [number, number, number, number],
+              bg: [number, number, number, number],
+            ): [number, number, number, number] {
+              const a = fg[3] + bg[3] * (1 - fg[3]);
+              if (a === 0) return [0, 0, 0, 0];
+              return [
+                (fg[0] * fg[3] + bg[0] * bg[3] * (1 - fg[3])) / a,
+                (fg[1] * fg[3] + bg[1] * bg[3] * (1 - fg[3])) / a,
+                (fg[2] * fg[3] + bg[2] * bg[3] * (1 - fg[3])) / a,
+                a,
+              ];
+            }
+            function parse(s: string): [number, number, number, number] | null {
+              const m = s.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+              if (!m) return null;
+              return [+m[1], +m[2], +m[3], m[4] === undefined ? 1 : +m[4]];
+            }
+
+            const out: { el: string; ratio: number; fg: string; bg: string }[] = [];
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
+            const els: Element[] = [];
+            while (walker.nextNode()) els.push(walker.currentNode as Element);
+
+            for (const el of els) {
+              const text = (el.textContent || "").trim();
+              if (!text || text.length < 2) continue;
+              // Only leaf text owners (the element whose own text this is).
+              const owns = el.children.length === 0 || (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3);
+              if (!owns) continue;
+
+              const cs = getComputedStyle(el);
+              // Walk ancestors collecting translucent layers, stopping at the
+              // first opaque one. Gradient/image backgrounds are invisible to
+              // backgroundColor, so an element sitting on one (or on glass over
+              // one) can't be audited and is skipped — e.g. the .primary
+              // coral→sun buttons (dark text on a light gradient, sampled ~9:1)
+              // and white text on the moss→teal CTA band.
+              let gradientBlocked = false;
+              const layers: [number, number, number, number][] = [];
+              let node: Element | null = el;
+              while (node) {
+                const ncs = getComputedStyle(node);
+                if (ncs.backgroundImage !== "none") {
+                  const b = parse(ncs.backgroundColor);
+                  if (!b || b[3] <= 0.02) {
+                    gradientBlocked = true;
+                    break;
+                  }
+                }
+                const b = parse(ncs.backgroundColor);
+                if (b && b[3] > 0.02) {
+                  layers.push(b);
+                  if (b[3] >= 0.95) break; // opaque — nothing above matters
+                }
+                node = node.parentElement;
+              }
+              if (gradientBlocked) continue;
+              // Composite farthest layer first so the nearest sits on top.
+              let bg: [number, number, number, number] = dflt;
+              for (let i = layers.length - 1; i >= 0; i -= 1) bg = blend(layers[i], bg);
+
+              const fg = parse(cs.color);
+              if (!fg) continue;
+              const fs = parseFloat(cs.fontSize);
+              const bold = parseInt(cs.fontWeight, 10) >= 700;
+              const need = fs >= 18.66 || (fs >= 14 && bold) ? 3 : 4.5;
+
+              // Correct WCAG: text color = fg alpha-blended over the effective
+              // background, then luminance-compared against that background.
+              const final = blend(fg, bg);
+              const l1 = lum(final[0], final[1], final[2]);
+              const l2 = lum(bg[0], bg[1], bg[2]);
+              const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+              if (ratio < need) {
+                out.push({
+                  el: `${el.tagName.toLowerCase()}.${String(el.className).split(" ")[0]}`,
+                  ratio: +ratio.toFixed(2),
+                  fg: cs.color,
+                  bg: `rgb(${bg.slice(0, 3).map(Math.round).join(",")})`,
+                });
+              }
+            }
+            return out;
+          }, theme.defaultBg);
+
+          for (const v of found) {
+            violations.push({ route, ...v });
+          }
+        }
+
+        // De-duplicate identical (route, element, color) findings so one bad
+        // token doesn't drown the report, then fail with the worst first.
+        const unique = new Map<string, typeof violations[number]>();
+        for (const v of violations) {
+          unique.set(`${v.route}|${v.el}|${v.fg}`, v);
+        }
+        const sorted = [...unique.values()].sort((a, b) => a.ratio - b.ratio);
+        if (sorted.length > 0) {
+          const detail = sorted
+            .slice(0, 40)
+            .map((v) => `${v.ratio.toFixed(2)}:1 ${v.route} ${v.el} fg=${v.fg} bg=${v.bg}`)
+            .join("\n");
+          expect(sorted, `WCAG contrast violations (${sorted.length} unique):\n${detail}`).toEqual([]);
+        }
+      });
+    }
+  }
+});

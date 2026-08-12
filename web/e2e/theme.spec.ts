@@ -51,6 +51,38 @@ test.describe("Theme toggle (signed-in shell)", () => {
     expect(await page.evaluate(() => localStorage.getItem("changers-theme"))).toBe("light");
   });
 
+  test("system mode follows live OS color-scheme changes", async ({ page }) => {
+    // Start in system mode (seeded pre-paint, like the no-FOUC script path).
+    await page.addInitScript(() => {
+      localStorage.setItem("changers-theme", "system");
+    });
+    await page.goto("/messages");
+    const toggle = page.getByRole("button", { name: /Color theme:/i });
+    await expect(toggle).toBeVisible({ timeout: 10_000 });
+    await expect(toggle).toContainText("System");
+
+    // Flip the emulated OS preference and assert the attribute reacts
+    // (exercises the matchMedia change listener in ThemeToggle).
+    await page.emulateMedia({ colorScheme: "dark" });
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.dataset.theme))
+      .toBe("dark");
+
+    await page.emulateMedia({ colorScheme: "light" });
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.dataset.theme))
+      .toBe("light");
+
+    // Storage stays "system" throughout — the OS drives the attribute.
+    expect(await page.evaluate(() => localStorage.getItem("changers-theme"))).toBe("system");
+
+    // And a reload re-resolves against the current OS preference.
+    await page.emulateMedia({ colorScheme: "dark" });
+    await page.reload();
+    await expect(page.getByRole("button", { name: /Color theme:/i })).toBeVisible({ timeout: 10_000 });
+    expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe("dark");
+  });
+
   test("theme choice persists across a reload", async ({ page }) => {
     await page.goto("/messages");
     const toggle = page.getByRole("button", { name: /Color theme:/i });
