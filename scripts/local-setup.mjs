@@ -18,7 +18,7 @@ async function waitForReady() {
   for (let i = 0; i < 60; i++) {
     try {
       const res = await fetch(`${ENDPOINT}/health`);
-      if (res.ok) {
+      if (res.status !== 0) {
         console.log("Appwrite is ready!");
         return;
       }
@@ -29,26 +29,31 @@ async function waitForReady() {
 }
 
 async function checkOrDoSetup() {
-  const res = await fetch(`${ENDPOINT}/console/setup`);
-  const data = await res.json();
-  if (data.completed) {
-    console.log("Console setup already completed.");
+  console.log("Checking admin login...");
+  const loginRes = await fetch(`${ENDPOINT}/account/sessions/email`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Appwrite-Project": "console" },
+    body: JSON.stringify({ email: ADMIN.email, password: ADMIN.password }),
+  });
+  if (loginRes.ok) {
+    console.log("Admin user already exists.");
     return;
   }
-  console.log("Running initial console setup (creating admin user)...");
-  const setupRes = await fetch(`${ENDPOINT}/console/setup`, {
+  console.log("Creating admin user...");
+  const setupRes = await fetch(`${ENDPOINT}/account`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "X-Appwrite-Project": "console" },
     body: JSON.stringify({
       name: ADMIN.name,
       email: ADMIN.email,
       password: ADMIN.password,
+      userId: "unique()",
       terms: true,
     }),
   });
   if (!setupRes.ok) {
-    const err = await setupRes.json();
-    throw new Error(`Setup failed: ${err.message} (${setupRes.status})`);
+    const err = await setupRes.json().catch(() => ({}));
+    throw new Error(`Setup failed: ${err.message || setupRes.status}`);
   }
   console.log("Admin user created.");
 }
@@ -57,7 +62,7 @@ async function getSessionCookie() {
   console.log("Logging in as admin...");
   const res = await fetch(`${ENDPOINT}/account/sessions/email`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "X-Appwrite-Project": "console" },
     body: JSON.stringify({ email: ADMIN.email, password: ADMIN.password }),
   });
   if (!res.ok) {
@@ -75,7 +80,7 @@ async function getSessionCookie() {
 
 async function getOrCreateProject(cookie) {
   const listRes = await fetch(`${ENDPOINT}/projects`, {
-    headers: { Cookie: cookie },
+    headers: { Cookie: cookie, "X-Appwrite-Project": "console" },
   });
   const listData = await listRes.json();
   const existing = listData.projects?.find((p) => p.name === PROJECT_NAME);
@@ -85,21 +90,33 @@ async function getOrCreateProject(cookie) {
   }
 
   const teamsRes = await fetch(`${ENDPOINT}/teams`, {
-    headers: { Cookie: cookie },
+    headers: { Cookie: cookie, "X-Appwrite-Project": "console" },
   });
   const teamsData = await teamsRes.json();
-  const teamId = teamsData.teams?.[0]?.$id;
+  let teamId = teamsData.teams?.[0]?.$id;
   if (!teamId) {
-    throw new Error("No team found. Console setup may not have created a personal team.");
+    console.log("No team found — creating one...");
+    const teamRes = await fetch(`${ENDPOINT}/teams`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: cookie, "X-Appwrite-Project": "console" },
+      body: JSON.stringify({ teamId: "unique()", name: "Changers Team" }),
+    });
+    if (!teamRes.ok) {
+      const err = await teamRes.json();
+      throw new Error(`Team creation failed: ${err.message} (${teamRes.status})`);
+    }
+    const team = await teamRes.json();
+    teamId = team.$id;
   }
   console.log(`Using team ID: ${teamId}`);
 
   console.log(`Creating project "${PROJECT_NAME}"...`);
   const createRes = await fetch(`${ENDPOINT}/projects`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Cookie: cookie },
+    headers: { "Content-Type": "application/json", Cookie: cookie, "X-Appwrite-Project": "console" },
     body: JSON.stringify({
       name: PROJECT_NAME,
+      projectId: "unique()",
       teamId,
       description: "Changemaker social platform",
       region: "default",
@@ -116,7 +133,7 @@ async function getOrCreateProject(cookie) {
 
 async function getOrCreateApiKey(projectId, cookie) {
   const listRes = await fetch(`${ENDPOINT}/projects/${projectId}/keys`, {
-    headers: { Cookie: cookie },
+    headers: { Cookie: cookie, "X-Appwrite-Project": "console" },
   });
   const listData = await listRes.json();
   const existing = listData.keys?.find((k) => k.name === "Changers Dev Key");
@@ -127,33 +144,56 @@ async function getOrCreateApiKey(projectId, cookie) {
 
   console.log("Creating API key...");
   const scopes = [
+    "project.read", "project.write",
+    "keys.read", "keys.write",
+    "platforms.read", "platforms.write",
+    "mocks.read", "mocks.write",
+    "policies.read", "policies.write",
+    "project.policies.read", "project.policies.write",
+    "templates.read", "templates.write",
+    "oauth2.read", "oauth2.write",
     "users.read", "users.write",
+    "sessions.read", "sessions.write",
     "teams.read", "teams.write",
     "databases.read", "databases.write",
+    "tables.read", "tables.write",
+    "columns.read", "columns.write",
+    "indexes.read", "indexes.write",
+    "rows.read", "rows.write",
     "collections.read", "collections.write",
     "attributes.read", "attributes.write",
-    "indexes.read", "indexes.write",
     "documents.read", "documents.write",
     "buckets.read", "buckets.write",
     "files.read", "files.write",
-    "projects.read", "projects.write",
-    "platforms.read", "platforms.write",
-    "keys.read", "keys.write",
-    "webhooks.read", "webhooks.write",
-    "smtp.read", "smtp.write",
-    "migrations.read", "migrations.write",
+    "tokens.read", "tokens.write",
     "functions.read", "functions.write",
-    "stats.read",
+    "executions.read", "executions.write",
+    "execution.read", "execution.write",
+    "sites.read", "sites.write",
+    "log.read", "log.write",
+    "providers.read", "providers.write",
+    "topics.read", "topics.write",
+    "subscribers.read", "subscribers.write",
+    "targets.read", "targets.write",
+    "messages.read", "messages.write",
+    "rules.read", "rules.write",
+    "webhooks.read", "webhooks.write",
+    "locale.read", "avatars.read",
     "health.read",
-    "locale.read",
-    "avatars.read",
-    "security.read", "security.write",
+    "assistant.read",
+    "migrations.read", "migrations.write",
+    "schedules.read", "schedules.write",
+    "vcs.read", "vcs.write",
+    "insights.read", "insights.write",
+    "reports.read", "reports.write",
+    "presences.read", "presences.write",
   ];
   const createRes = await fetch(`${ENDPOINT}/projects/${projectId}/keys`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Cookie: cookie },
+    headers: { "Content-Type": "application/json", Cookie: cookie, "X-Appwrite-Project": "console" },
     body: JSON.stringify({
       name: "Changers Dev Key",
+      keyId: "unique()",
       scopes,
     }),
   });
