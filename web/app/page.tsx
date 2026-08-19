@@ -336,7 +336,7 @@ export default function WelcomePage() {
             Join a community that&apos;s building something better
           </h2>
           <p style={{ fontSize: "1.1rem", opacity: 0.9, marginBottom: 40, lineHeight: 1.7 }}>
-            Your first post, project, or document takes under a minute. We'll just confirm your email first.
+            Your first post, project, or document takes under a minute. We&apos;ll just confirm your email first.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24, maxWidth: 480, margin: "0 auto" }}>
             {[
