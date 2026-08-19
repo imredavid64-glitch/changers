@@ -8,7 +8,7 @@ import { useAuth } from "@/components/AuthProvider";
 
 const signInSchema = z.object({
   email: z.string().email("Enter a valid email."),
-  password: z.string().min(8, "Password must be at least 8 characters."),
+  password: z.string().min(1, "Enter your password."),
 });
 
 export default function SignInPage() {
@@ -73,7 +73,8 @@ export default function SignInPage() {
           {status && <p className="notice">{status}</p>}
         </form>
         <p className="muted">
-          New here? <Link href="/sign-up">Create an account</Link>
+          New here? <Link href="/sign-up">Create an account</Link> ·{" "}
+          <Link href="/forgot-password">Forgot password?</Link>
         </p>
       </div>
     </div>

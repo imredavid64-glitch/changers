@@ -3,27 +3,46 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Download, KeyRound, LogOut, Settings, ShieldCheck, Trash2, UserRound } from "lucide-react";
+import { Download, KeyRound, LogOut, MailCheck, Settings, ShieldCheck, Trash2, UserRound } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { account } from "@/lib/appwrite/client";
 import { getDisplayName } from "@/lib/social/utils";
 import { TINTS } from "@/lib/theme/tints";
+import { PASSWORD_HINT, validatePassword } from "@/lib/auth/password";
 
 export default function SettingsPage() {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, sendVerificationEmail } = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [statusKind, setStatusKind] = useState<"success" | "error">("success");
   const [changing, setChanging] = useState(false);
+  const [verifyStatus, setVerifyStatus] = useState<string | null>(null);
+  const [verifyStatusKind, setVerifyStatusKind] = useState<"success" | "error">("success");
+  const [verifying, setVerifying] = useState(false);
+
+  async function handleResendVerification() {
+    setVerifying(true);
+    setVerifyStatus(null);
+    const errorMessage = await sendVerificationEmail();
+    if (errorMessage) {
+      setVerifyStatus(errorMessage);
+      setVerifyStatusKind("error");
+    } else {
+      setVerifyStatus("Verification email sent. Check your inbox (and spam folder).");
+      setVerifyStatusKind("success");
+    }
+    setVerifying(false);
+  }
 
   async function handleChangePassword(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!user) return;
 
-    if (newPassword.length < 8) {
-      setStatus("New password must be at least 8 characters.");
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      setStatus(passwordError);
       setStatusKind("error");
       return;
     }
@@ -130,9 +149,39 @@ export default function SettingsPage() {
         <div className="section-header">
           <div>
             <h3 style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "var(--font-head)" }}>
+              <MailCheck size={20} style={{ color: "var(--moss)" }} /> Email verification
+            </h3>
+            <p className="muted">
+              {user.emailVerification
+                ? `${user.email} is verified.`
+                : `${user.email} is not verified yet. Some features may require a verified email.`}
+            </p>
+          </div>
+          {!user.emailVerification && (
+            <button className="ghost" onClick={handleResendVerification} disabled={verifying}>
+              {verifying ? "Sending..." : "Resend verification email"}
+            </button>
+          )}
+        </div>
+        {verifyStatus && (
+          <p className="notice" style={{ ...(verifyStatusKind === "success" ? { background: TINTS.teal12, color: "var(--moss)" } : {}) }}>
+            {verifyStatus}
+          </p>
+        )}
+        {!user.emailVerification && (
+          <p className="muted" style={{ fontSize: "0.85rem" }}>
+            Not received? Check your spam folder, or open the link in the email we sent at sign-up.
+          </p>
+        )}
+      </section>
+
+      <section className="card">
+        <div className="section-header">
+          <div>
+            <h3 style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "var(--font-head)" }}>
               <KeyRound size={20} style={{ color: "var(--moss)" }} /> Change password
             </h3>
-            <p className="muted">Use a unique password — at least 8 characters.</p>
+            <p className="muted">{PASSWORD_HINT}</p>
           </div>
         </div>
 
@@ -148,10 +197,10 @@ export default function SettingsPage() {
             type="password"
             value={newPassword}
             onChange={(event) => setNewPassword(event.target.value)}
-            placeholder="New password (min 8 characters)"
+            placeholder="New password"
             autoComplete="new-password"
             required
-            minLength={8}
+            minLength={10}
           />
           <input
             type="password"
@@ -160,7 +209,7 @@ export default function SettingsPage() {
             placeholder="Repeat new password"
             autoComplete="new-password"
             required
-            minLength={8}
+            minLength={10}
           />
           {status && (
             <p className="notice" style={{ ...(statusKind === "success" ? { background: TINTS.teal12, color: "var(--moss)" } : {}) }}>

@@ -1,5 +1,25 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// Mock heavy native modules so vi.resetModules() doesn't re-transform them
+// on every beforeEach. The pg Pool and sharp native addon are the main cost.
+vi.mock("sharp", () => ({ default: {} }));
+vi.mock("pg", () => ({
+  Pool: vi.fn().mockImplementation(() => ({
+    query: vi.fn().mockRejectedValue(new Error("no database")),
+    end: vi.fn(),
+  })),
+}));
+vi.mock("appwrite", () => ({
+  Client: vi.fn().mockImplementation(() => ({
+    setEndpoint: vi.fn().mockReturnThis(),
+    setProject: vi.fn().mockReturnThis(),
+    setJWT: vi.fn().mockReturnThis(),
+  })),
+  Account: vi.fn().mockImplementation(() => ({
+    get: vi.fn().mockRejectedValue(new Error("not authenticated")),
+  })),
+}));
+
 // The Appwrite fetch layer is mocked below; the modules under test run against
 // canned document collections so the erase/anonymize flows can be asserted
 // without a live backend. Postgres parts are intentionally skipped (no

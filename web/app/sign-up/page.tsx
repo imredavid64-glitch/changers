@@ -8,6 +8,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { Strand } from "@/lib/social/types";
 import { STRAND_OPTIONS } from "@/lib/social/utils";
 import { TINTS } from "@/lib/theme/tints";
+import { PASSWORD_HINT, validatePassword } from "@/lib/auth/password";
 
 const signUpSchema = z.object({
   fullName: z.string().min(2, "Enter your name."),
@@ -15,7 +16,8 @@ const signUpSchema = z.object({
   headline: z.string().max(90, "Keep the headline under 90 characters.").optional(),
   location: z.string().max(90, "Keep the location under 90 characters.").optional(),
   email: z.string().email("Enter a valid email."),
-  password: z.string().min(8, "Password must be at least 8 characters."),
+  password: z.string().min(1, "Enter a password."),
+  confirmPassword: z.string().min(1, "Repeat your password."),
   interests: z.array(z.enum(["N", "E", "S", "W"])).min(1, "Pick at least one strand."),
 });
 
@@ -37,6 +39,7 @@ export default function SignUpPage() {
       location: String(formData.get("location") || "").trim(),
       email: String(formData.get("email") || "").trim(),
       password: String(formData.get("password") || "").trim(),
+      confirmPassword: String(formData.get("confirmPassword") || "").trim(),
       interests: formData
         .getAll("interests")
         .map((value) => String(value))
@@ -46,6 +49,17 @@ export default function SignUpPage() {
     const parsed = signUpSchema.safeParse(payload);
     if (!parsed.success) {
       setStatus(parsed.error.issues[0]?.message || "Check the form details.");
+      return;
+    }
+
+    if (parsed.data.password !== parsed.data.confirmPassword) {
+      setStatus("Passwords do not match.");
+      return;
+    }
+
+    const passwordError = validatePassword(parsed.data.password);
+    if (passwordError) {
+      setStatus(passwordError);
       return;
     }
 
@@ -137,10 +151,18 @@ export default function SignUpPage() {
             Password
             <input type="password" name="password" placeholder="Create a password" required />
           </label>
+          <label>
+            Confirm password
+            <input type="password" name="confirmPassword" placeholder="Repeat your password" required />
+          </label>
+          <p className="muted" style={{ fontSize: "0.85rem" }}>{PASSWORD_HINT}</p>
           <button type="submit" className="primary" disabled={loading}>
             {loading ? "Creating..." : "Create account"}
           </button>
           {status && <p className="notice">{status}</p>}
+          <p className="muted" style={{ fontSize: "0.85rem" }}>
+            We&apos;ll send a verification email to confirm your address.
+          </p>
         </form>
         <p className="muted">
           Already have an account? <Link href="/sign-in">Sign in</Link>

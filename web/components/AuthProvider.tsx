@@ -34,6 +34,7 @@ type AuthContextValue = {
   ) => Promise<string | null>;
   signOut: () => Promise<void>;
   syncProfileName: (nextName: string) => Promise<void>;
+  sendVerificationEmail: () => Promise<string | null>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -189,6 +190,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         nextUser.$id,
       );
 
+      try {
+        await account.createVerification(`${window.location.origin}/verify-email`);
+      } catch {
+        // Verification email is best-effort; never fail account creation over it.
+      }
+
       await refreshAuth();
       return null;
     } catch (error) {
@@ -205,6 +212,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setProfile(null);
       setLoading(false);
+    }
+  }
+
+  async function sendVerificationEmail() {
+    if (!appwriteEnabled) return "Appwrite is not configured.";
+
+    try {
+      await account.createVerification(`${window.location.origin}/verify-email`);
+      return null;
+    } catch (error) {
+      return error instanceof Error ? error.message : "Unable to send a verification email.";
     }
   }
 
@@ -230,7 +248,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, profile, loading, refreshAuth, signIn, signUp, signOut, syncProfileName }}
+      value={{ user, profile, loading, refreshAuth, signIn, signUp, signOut, syncProfileName, sendVerificationEmail }}
     >
       {children}
     </AuthContext.Provider>

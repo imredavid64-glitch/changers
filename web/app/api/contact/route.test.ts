@@ -1,6 +1,25 @@
 import { NextRequest } from "next/server";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
+// Mock heavy native modules so vi.resetModules() doesn't re-transform them.
+vi.mock("sharp", () => ({ default: {} }));
+vi.mock("pg", () => ({
+  Pool: vi.fn().mockImplementation(() => ({
+    query: vi.fn().mockRejectedValue(new Error("no database")),
+    end: vi.fn(),
+  })),
+}));
+vi.mock("appwrite", () => ({
+  Client: vi.fn().mockImplementation(() => ({
+    setEndpoint: vi.fn().mockReturnThis(),
+    setProject: vi.fn().mockReturnThis(),
+    setJWT: vi.fn().mockReturnThis(),
+  })),
+  Account: vi.fn().mockImplementation(() => ({
+    get: vi.fn().mockRejectedValue(new Error("not authenticated")),
+  })),
+}));
+
 type RouteModule = { POST: (request: NextRequest) => Promise<Response> };
 
 function postRequest(body: Record<string, unknown>) {

@@ -57,6 +57,27 @@ export default function SharedShell({ children }: { children: React.ReactNode })
         </div>
       </header>
 
+      {user && user.emailVerification !== true && pathname !== "/verify-email" && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+            flexWrap: "wrap",
+            padding: "8px 16px",
+            background: "linear-gradient(135deg, #f59e0b, #d97706)",
+            color: "#fff",
+            fontSize: "0.9rem",
+          }}
+        >
+          <span>Your email isn&apos;t verified yet.</span>
+          <Link href="/verify-email" style={{ color: "#fff", fontWeight: 700, textDecoration: "underline" }}>
+            Verify now
+          </Link>
+        </div>
+      )}
+
       <div className="layout">
         <aside className="side-nav">
           <div className="nav-group">
