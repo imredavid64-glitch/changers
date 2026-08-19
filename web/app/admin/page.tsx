@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
-import { Mail, Shield, Sparkles, Trash2 } from "lucide-react";
+import { Activity, Mail, Shield, Sparkles, Trash2 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { COLLECTIONS, listDocuments, updateDocument } from "@/lib/appwrite/bridge";
 import { account, Query } from "@/lib/appwrite/client";
@@ -14,19 +14,36 @@ import { AppPost, AppProfile } from "@/lib/social/types";
 import { normalizePost, normalizeProfile } from "@/lib/social/utils";
 import { TINTS } from "@/lib/theme/tints";
 
+interface HealthCheckView {
+  key: string;
+  label: string;
+  status: "ok" | "warn" | "fail";
+  detail: string;
+}
+
+interface PlatformHealthView {
+  ok: boolean;
+  endpoint: string;
+  databaseId: string;
+  checkedAt: string;
+  checks: HealthCheckView[];
+}
+
 export default function AdminPage() {
   const { user, profile } = useAuth();
   const [profiles, setProfiles] = useState<AppProfile[]>([]);
   const [posts, setPosts] = useState<AppPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"profiles" | "posts" | "messages" | "audit" | "spotlight">("profiles");
+  const [activeTab, setActiveTab] = useState<"profiles" | "posts" | "messages" | "audit" | "spotlight" | "health">("profiles");
   const [messages, setMessages] = useState<ContactMessageRecord[]>([]);
   const [messagesLoaded, setMessagesLoaded] = useState(false);
   const [auditActions, setAuditActions] = useState<AdminActionRecord[]>([]);
   const [auditLoaded, setAuditLoaded] = useState(false);
   const [spotlights, setSpotlights] = useState<SpotlightRecord[]>([]);
   const [spotlightsLoaded, setSpotlightsLoaded] = useState(false);
+  const [health, setHealth] = useState<PlatformHealthView | null>(null);
+  const [healthLoaded, setHealthLoaded] = useState(false);
   const [spotForm, setSpotForm] = useState({ title: "", blurb: "", profileUrl: "", projectUrl: "", strand: "", active: false });
   const [replyTarget, setReplyTarget] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
@@ -159,6 +176,35 @@ export default function AdminPage() {
       void loadSpotlights();
     }
   }, [activeTab, spotlightsLoaded, isAdmin]);
+
+  async function loadHealth() {
+    try {
+      const jwt = await account.createJWT();
+      const response = await fetch("/api/health", {
+        headers: { Authorization: `Bearer ${jwt.jwt}` },
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        throw new Error(`Health API returned ${response.status}`);
+      }
+      const data = (await response.json()) as PlatformHealthView;
+      setHealth(data);
+    } catch (error) {
+      setStatus("Failed to run platform health checks.");
+      console.error(error);
+    } finally {
+      setHealthLoaded(true);
+    }
+  }
+
+  useEffect(() => {
+    if (activeTab === "health" && !healthLoaded && isAdmin) {
+      // Lazy-loads the health report the first time the tab opens; every setState
+      // happens in async callbacks.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      void loadHealth();
+    }
+  }, [activeTab, healthLoaded, isAdmin]);
 
   async function handleSaveSpotlight(event: FormEvent) {
     event.preventDefault();
@@ -362,6 +408,9 @@ export default function AdminPage() {
           </button>
           <button className={`filter ${activeTab === "spotlight" ? "active" : ""}`} onClick={() => setActiveTab("spotlight")}>
             <Sparkles size={13} style={{ display: "inline", marginRight: 4, verticalAlign: "-2px" }} /> Spotlight
+          </button>
+          <button className={`filter ${activeTab === "health" ? "active" : ""}`} onClick={() => setActiveTab("health")}>
+            <Activity size={13} style={{ display: "inline", marginRight: 4, verticalAlign: "-2px" }} /> Health
           </button>
         </div>
       </div>
@@ -570,6 +619,81 @@ export default function AdminPage() {
                   </div>
                 ))
               )}
+            </>
+          )}
+        </div>
+      ) : activeTab === "health" ? (
+        <div style={{ display: "grid", gap: 12 }}>
+          {!healthLoaded ? (
+            <p className="muted">Running platform health checks...</p>
+          ) : !health ? (
+            <p className="muted">Health checks could not be run right now.</p>
+          ) : (
+            <>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  padding: "14px 16px",
+                  borderRadius: 12,
+                  border: `1px solid ${
+                    health.ok ? "var(--border-card)" : "color-mix(in srgb, var(--coral) 40%, transparent)"
+                  }`,
+                  background: health.ok ? "var(--surface-card-solid)" : "color-mix(in srgb, var(--coral) 8%, transparent)",
+                }}
+              >
+                <span
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: "50%",
+                    background: health.ok ? "var(--moss)" : "var(--coral)",
+                    flexShrink: 0,
+                  }}
+                />
+                <div>
+                  <p style={{ fontWeight: 600 }}>
+                    {health.ok ? "Platform healthy" : "Platform issues detected"}
+                  </p>
+                  <p className="muted" style={{ fontSize: "0.85rem" }}>
+                    {health.endpoint} · database &quot;{health.databaseId}&quot; · checked {new Date(health.checkedAt).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              {health.checks.map((check) => (
+                <div
+                  key={check.key}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 12,
+                    padding: "12px 16px",
+                    borderRadius: 12,
+                    border: "1px solid var(--border-card)",
+                    background: "var(--surface-card-solid)",
+                  }}
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontWeight: 600 }}>{check.label}</p>
+                    <p className="muted" style={{ fontSize: "0.85rem" }}>{check.detail}</p>
+                  </div>
+                  <span
+                    className="chip"
+                    style={{
+                      background:
+                        check.status === "ok" ? TINTS.teal20 : check.status === "warn" ? "var(--sun)" : "var(--coral)",
+                      color: check.status === "fail" ? "white" : "inherit",
+                    }}
+                  >
+                    {check.status}
+                  </span>
+                </div>
+              ))}
+              <button className="ghost" onClick={() => { setHealthLoaded(false); }} style={{ justifySelf: "start", fontSize: "0.85rem" }}>
+                Re-run checks
+              </button>
             </>
           )}
         </div>
