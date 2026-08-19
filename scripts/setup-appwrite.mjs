@@ -35,7 +35,7 @@ const storage = new Storage(client);
 const DATABASE_ID = process.env.APPWRITE_DATABASE_ID || "changers";
 const BUCKET_ID = process.env.APPWRITE_MEDIA_BUCKET_ID || "changers-media";
 
-const COLLECTIONS = {
+export const COLLECTIONS = {
   profiles: {
     documentId: (userId) => userId,
     attributes: [
@@ -552,7 +552,11 @@ async function main() {
   console.log(`4. After signing up, set is_admin=true on your profile in Appwrite Console > Database > bridge > profiles`);
 }
 
-main().catch((e) => {
-  console.error("Fatal error:", e);
-  process.exit(1);
-});
+import { pathToFileURL } from "url";
+
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((e) => {
+    console.error("Fatal error:", e);
+    process.exit(1);
+  });
+}
