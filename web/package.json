@@ -17,6 +17,7 @@
     "build:analyze": "ANALYZE=true next build"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "appwrite": "^13.0.0",
     "bcryptjs": "^2.4.3",
     "framer-motion": "^11.0.0",

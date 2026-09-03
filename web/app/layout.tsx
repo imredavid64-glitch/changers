@@ -3,6 +3,7 @@ import "./globals.css";
 import AppShell from "@/components/AppShell";
 import { AuthProvider } from "@/components/AuthProvider";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import { Analytics } from "@vercel/analytics/next";
 
 import { Viewport } from "next";
 
@@ -54,6 +55,7 @@ export default function RootLayout({
           <AppShell>{children}</AppShell>
         </AuthProvider>
         <ServiceWorkerRegister />
+        <Analytics />
       </body>
     </html>
   );
