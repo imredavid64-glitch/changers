@@ -2,6 +2,7 @@
   "name": "changers-platform",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Changers is a cross-platform changemaker social network spanning web, desktop, and mobile.",
   "scripts": {
     "start": "npm run desktop:dev",
@@ -21,6 +22,7 @@
   },
   "dependencies": {
     "appwrite": "^26.1.0",
+    "dotenv": "^17.4.2",
     "node-appwrite": "^26.2.0"
   }
 }

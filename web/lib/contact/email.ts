@@ -72,15 +72,15 @@ export async function sendReplyEmail(
       ``,
       replyText.trim(),
       ``,
-      `— The Changers team`,
+      `\u2014 The Changers team`,
     ].join("\n");
 
     const html = [
       `<p>Hi ${escapeHtml(record.name)},</p>`,
       `<p style="white-space: pre-wrap;">${escapeHtml(replyText.trim()).replace(/\n/g, "<br>")}</p>`,
-      `<p>— The Changers team</p>`,
+      `<p>\u2014 The Changers team</p>`,
       `<hr>`,
-      `<p style="color: #666; font-size: 0.85rem;">Re: ${escapeHtml(record.subject || "Your message to Changers")} · Reference: ${escapeHtml(record.id)}</p>`,
+      `<p style="color: #666; font-size: 0.85rem;">Re: ${escapeHtml(record.subject || "Your message to Changers")} \u00b7 Reference: ${escapeHtml(record.id)}</p>`,
     ].join("\n");
 
     await transporter.sendMail({
@@ -168,9 +168,46 @@ export async function forwardContactMessage(
 
 function escapeHtml(value: string) {
   return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+    .replace(/&/g, "&")
+    .replace(/</g, "<")
+    .replace(/>/g, ">")
+    .replace(/"/g, "\"")
+    .replace(/'/g, "'");
+}
+
+export interface EmailOptions {
+  to: string;
+  from: string;
+  subject: string;
+  html: string;
+  text: string;
+}
+
+export async function sendEmail(options: EmailOptions): Promise<{ sent: boolean; reason?: string }> {
+  const config = getSmtpConfig();
+  if (!config) {
+    return { sent: false, reason: "SMTP is not configured." };
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host: config.host,
+      port: config.port,
+      secure: config.port === 465,
+      auth: { user: config.user, pass: config.pass },
+    });
+
+    await transporter.sendMail({
+      from: options.from,
+      to: options.to,
+      subject: options.subject,
+      text: options.text,
+      html: options.html,
+    });
+
+    return { sent: true };
+  } catch (error) {
+    console.error("Email send failed:", error);
+    return { sent: false, reason: error instanceof Error ? error.message : "Unknown SMTP error." };
+  }
 }
