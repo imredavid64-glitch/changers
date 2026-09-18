@@ -136,7 +136,6 @@ export const REQUIRED_INDEXES = [
   { collectionId: "saved-posts", key: "post_id", type: "key" as const, attributes: ["post_id"] },
   { collectionId: "room-messages", key: "room_id", type: "key" as const, attributes: ["room_id"] },
   { collectionId: "room-messages", key: "created_at_ms", type: "key" as const, attributes: ["created_at_ms"] },
-  { collectionId: "threads", key: "participants", type: "key" as const, attributes: ["participants"] },
   { collectionId: "threads", key: "updated_at_ms", type: "key" as const, attributes: ["updated_at_ms"] },
   { collectionId: "thread-messages", key: "thread_id", type: "key" as const, attributes: ["thread_id"] },
   { collectionId: "thread-messages", key: "created_at_ms", type: "key" as const, attributes: ["created_at_ms"] },

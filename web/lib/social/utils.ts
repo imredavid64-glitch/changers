@@ -311,14 +311,26 @@ export function normalizePost(id: string, data: Record<string, unknown>): AppPos
     poll_options: Array.isArray(data.poll_options)
       ? data.poll_options.filter((v): v is string => typeof v === "string")
       : [],
-    poll_votes: typeof data.poll_votes === "object" && data.poll_votes !== null
-      ? Object.fromEntries(
-          Object.entries(data.poll_votes).map(([k, v]) => [
-            k,
-            Array.isArray(v) ? v.filter((vi): vi is string => typeof vi === "string") : [],
-          ])
-        )
-      : {},
+    poll_votes: (() => {
+      const raw =
+        typeof data.poll_votes === "string"
+          ? (() => {
+              try {
+                return JSON.parse(data.poll_votes);
+              } catch {
+                return null;
+              }
+            })()
+          : data.poll_votes;
+      return typeof raw === "object" && raw !== null
+        ? Object.fromEntries(
+            Object.entries(raw).map(([k, v]) => [
+              k,
+              Array.isArray(v) ? v.filter((vi): vi is string => typeof vi === "string") : [],
+            ])
+          )
+        : {};
+    })(),
     video_file_id: typeof data.video_file_id === "string" ? data.video_file_id : "",
     video_media_id: typeof data.video_media_id === "string" ? data.video_media_id : "",
     video_media_storage_key: videoMediaStorageKey,

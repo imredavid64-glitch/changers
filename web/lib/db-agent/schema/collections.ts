@@ -25,7 +25,6 @@ export const COLLECTION_DEFINITIONS = {
       { key: "theme", type: "string", size: 10, required: false, enum: ["moss", "ocean", "sunset", "rose"] },
       { key: "email_notifications", type: "boolean", required: false, default: false },
       { key: "impact_score", type: "integer", required: false },
-      { key: "strand_counts", type: "json", required: false },
       { key: "push_subscription", type: "string", size: 5000, required: false },
       { key: "search_index", type: "string", size: 10000, required: true },
       { key: "created_at_ms", type: "integer", required: false },
@@ -62,7 +61,7 @@ export const COLLECTION_DEFINITIONS = {
       { key: "is_poll", type: "boolean", required: false, default: false },
       { key: "poll_question", type: "string", size: 500, required: false },
       { key: "poll_options", type: "string", size: 255, required: false, array: true },
-      { key: "poll_votes", type: "json", required: false },
+      { key: "poll_votes", type: "string", size: 4096, required: false },
       { key: "video_file_id", type: "string", size: 255, required: false },
       { key: "video_media_id", type: "string", size: 255, required: false },
       { key: "video_media_storage_key", type: "string", size: 500, required: false },
@@ -208,7 +207,6 @@ export const COLLECTION_DEFINITIONS = {
       { key: "updated_at_ms", type: "integer", required: false },
     ],
     indexes: [
-      { key: "participants", type: "key" as const, attributes: ["participants"] },
       { key: "updated_at_ms", type: "key" as const, attributes: ["updated_at_ms"] },
     ],
   },
@@ -322,7 +320,7 @@ export const COLLECTION_DEFINITIONS = {
       { key: "badge_icon", type: "string", size: 255, required: true },
       { key: "badge_category", type: "string", size: 20, required: true, enum: ["milestone", "social", "creation", "impact", "streak", "special"] },
       { key: "earned_at_ms", type: "integer", required: false },
-      { key: "metadata", type: "json", required: false },
+      { key: "metadata", type: "string", size: 4096, required: false },
     ],
     indexes: [
       { key: "user_id", type: "key" as const, attributes: ["user_id"] },
@@ -403,7 +401,6 @@ export const COLLECTION_DEFINITIONS = {
       { key: "user_id", type: "string", size: 255, required: true },
       { key: "title", type: "string", size: 255, required: true },
       { key: "template_id", type: "string", size: 255, required: false },
-      { key: "slides", type: "json", required: false },
       { key: "slide_count", type: "integer", required: false, default: 0 },
       { key: "created_at_ms", type: "integer", required: false },
       { key: "updated_at_ms", type: "integer", required: false },
@@ -423,7 +420,6 @@ export const COLLECTION_DEFINITIONS = {
       { key: "title", type: "string", size: 255, required: true },
       { key: "rows", type: "integer", required: false, default: 0 },
       { key: "cols", type: "integer", required: false, default: 0 },
-      { key: "data", type: "json", required: false },
       { key: "created_at_ms", type: "integer", required: false },
       { key: "updated_at_ms", type: "integer", required: false },
     ],
@@ -459,7 +455,6 @@ export const COLLECTION_DEFINITIONS = {
     attributes: [
       { key: "user_id", type: "string", size: 255, required: true },
       { key: "title", type: "string", size: 255, required: true },
-      { key: "elements", type: "json", required: false },
       { key: "canvas_width", type: "integer", required: false, default: 1920 },
       { key: "canvas_height", type: "integer", required: false, default: 1080 },
       { key: "created_at_ms", type: "integer", required: false },
@@ -478,7 +473,6 @@ export const COLLECTION_DEFINITIONS = {
     attributes: [
       { key: "user_id", type: "string", size: 255, required: true },
       { key: "title", type: "string", size: 255, required: true },
-      { key: "scenes", type: "json", required: false },
       { key: "scene_count", type: "integer", required: false, default: 0 },
       { key: "created_at_ms", type: "integer", required: false },
       { key: "updated_at_ms", type: "integer", required: false },
@@ -513,7 +507,6 @@ export const COLLECTION_DEFINITIONS = {
     permissions: ["read(\"users\")", "write(\"users\")"],
     attributes: [
       { key: "user_id", type: "string", size: 255, required: true },
-      { key: "settings", type: "json", required: false },
       { key: "updated_at_ms", type: "integer", required: false },
     ],
     indexes: [

@@ -34,13 +34,13 @@ async function appwriteRequest<T>(path: string): Promise<{ status: number; data:
 
 export async function checkEndpointReachable(): Promise<HealthCheck> {
   try {
-    const { status, data } = await appwriteRequest<{ version: string }>("/health/version");
+    const { status, data } = await appwriteRequest<{ status?: string }>("/health");
     if (status >= 200 && status < 300) {
       return {
         key: "endpoint",
         label: "Appwrite reachable",
         status: "ok",
-        detail: `${dbAgentConfig.appwrite.endpoint} (version ${String(data?.version ?? "?")})`,
+        detail: `${dbAgentConfig.appwrite.endpoint} (health: ${String(data?.status ?? "?")})`,
       };
     }
     return {
@@ -218,29 +218,29 @@ export async function checkAttributeLimits(): Promise<HealthCheck[]> {
       if (limitStatus.atLimit) {
         checks.push({
           key: `attr-limit-${col.$id}`,
-          label: `Attribute limit: ${col.$name}`,
+          label: `Attribute limit: ${col.name}`,
           status: "fail",
-          detail: `Collection "${col.$name}" at attribute limit (${limitStatus.currentCount}/${limitStatus.maxCount}). Cannot add new attributes.`,
+          detail: `Collection "${col.name}" at attribute limit (${limitStatus.currentCount}/${limitStatus.maxCount}). Cannot add new attributes.`,
         });
       } else if (pct >= dbAgentConfig.limits.attributeLimitWarningThreshold) {
         checks.push({
           key: `attr-limit-${col.$id}`,
-          label: `Attribute limit: ${col.$name}`,
+          label: `Attribute limit: ${col.name}`,
           status: "warn",
-          detail: `Collection "${col.$name}" at ${pct.toFixed(0)}% attribute capacity (${limitStatus.currentCount}/${limitStatus.maxCount}).`,
+          detail: `Collection "${col.name}" at ${pct.toFixed(0)}% attribute capacity (${limitStatus.currentCount}/${limitStatus.maxCount}).`,
         });
       } else {
         checks.push({
           key: `attr-limit-${col.$id}`,
-          label: `Attribute limit: ${col.$name}`,
+          label: `Attribute limit: ${col.name}`,
           status: "ok",
-          detail: `Collection "${col.$name}" has ${limitStatus.remaining} attribute slots available.`,
+          detail: `Collection "${col.name}" has ${limitStatus.remaining} attribute slots available.`,
         });
       }
     } catch {
       checks.push({
         key: `attr-limit-${col.$id}`,
-        label: `Attribute limit: ${col.$name}`,
+        label: `Attribute limit: ${col.name}`,
         status: "warn",
         detail: "Could not check attribute limit.",
       });
@@ -263,21 +263,21 @@ export async function checkIndexStatus(): Promise<HealthCheck[]> {
       if (failed.length > 0) {
         checks.push({
           key: `index-status-${col.$id}`,
-          label: `Index status: ${col.$name}`,
+          label: `Index status: ${col.name}`,
           status: "fail",
           detail: `${failed.length} index(es) failed: ${failed.map((i) => i.key).join(", ")}.`,
         });
       } else if (processing.length > 0) {
         checks.push({
           key: `index-status-${col.$id}`,
-          label: `Index status: ${col.$name}`,
+          label: `Index status: ${col.name}`,
           status: "warn",
           detail: `${processing.length} index(es) still processing: ${processing.map((i) => i.key).join(", ")}.`,
         });
       } else if (indexes.length > 0) {
         checks.push({
           key: `index-status-${col.$id}`,
-          label: `Index status: ${col.$name}`,
+          label: `Index status: ${col.name}`,
           status: "ok",
           detail: `All ${indexes.length} index(es) available.`,
         });

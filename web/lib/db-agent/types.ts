@@ -24,7 +24,7 @@ export interface PlatformHealthReport {
 
 export interface CollectionInfo {
   $id: string;
-  $name: string;
+  name: string;
   $permissions: string[];
   documentSecurity: boolean;
   enabled: boolean;

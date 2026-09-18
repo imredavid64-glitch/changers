@@ -285,50 +285,7 @@ export async function fixEnumAttributes(): Promise<Record<string, { created: str
 }
 
 export async function fixJsonAttributes(): Promise<Record<string, { created: string[]; failed: string[] }>> {
-  const jsonFixes: Record<string, AttributeDefinition[]> = {
-    badges: [
-      { key: "metadata", type: "json", required: false },
-    ],
-    slideshows: [
-      { key: "slides", type: "json", required: false },
-    ],
-    tables: [
-      { key: "data", type: "json", required: false },
-    ],
-    designs: [
-      { key: "elements", type: "json", required: false },
-    ],
-    films: [
-      { key: "scenes", type: "json", required: false },
-    ],
-    "privacy-settings": [
-      { key: "settings", type: "json", required: false },
-    ],
-    profiles: [
-      { key: "strand_counts", type: "json", required: false },
-    ],
-    posts: [
-      { key: "poll_votes", type: "json", required: false },
-    ],
-  };
-
-  const results: Record<string, { created: string[]; failed: string[] }> = {};
-
-  for (const [collectionId, attrs] of Object.entries(jsonFixes)) {
-    results[collectionId] = { created: [], failed: [] };
-    console.log(`\n📝 Adding JSON attributes for ${collectionId}...`);
-    
-    for (const attr of attrs) {
-      const success = await addMissingAttribute(collectionId, attr);
-      if (success) {
-        results[collectionId].created.push(attr.key);
-      } else {
-        results[collectionId].failed.push(attr.key);
-      }
-    }
-  }
-
-  return results;
+  return {};
 }
 
 export async function addSearchIndexAttributes(): Promise<Record<string, { created: string[]; failed: string[] }>> {
