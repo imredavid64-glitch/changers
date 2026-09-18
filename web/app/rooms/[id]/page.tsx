@@ -139,6 +139,8 @@ export default function RoomWorkspace({ params }: { params: Promise<{ id: string
           room_id: roomId,
           author_id: currentUser.$id,
           author_name: profile?.full_name || getDisplayName(currentUser),
+          sender_id: currentUser.$id,
+          sender_name: profile?.full_name || getDisplayName(currentUser),
           text,
           created_at_ms: Date.now(),
         },
