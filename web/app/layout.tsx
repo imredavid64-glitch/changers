@@ -41,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
         {/* Apply the saved color theme before first paint so there is no flash
          * of the wrong theme. The ThemeToggle keeps it in sync afterwards. */}
