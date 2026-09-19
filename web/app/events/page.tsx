@@ -30,6 +30,14 @@ export default function EventsPage() {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
+  const [mounted, setMounted] = useState(false);
+  const [todayKey, setTodayKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    const now = new Date();
+    setTodayKey(`${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`);
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     return watchDocuments(
@@ -192,7 +200,7 @@ export default function EventsPage() {
               <ChevronLeft size={16} /> Prev
             </button>
             <h3 style={{ fontFamily: "var(--font-head)", textAlign: "center" }}>
-              {MONTHS[calendarDate.getMonth()]} {calendarDate.getFullYear()}
+              {mounted ? `${MONTHS[calendarDate.getMonth()]} ${calendarDate.getFullYear()}` : "\u00A0"}
             </h3>
             <button className="ghost" onClick={() => moveMonth(1)} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
               Next <ChevronRight size={16} />
@@ -208,19 +216,17 @@ export default function EventsPage() {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }}>
-            {calendarCells.map((day, index) => {
-              if (day === null) {
-                return <div key={`empty-${index}`} style={{ minHeight: 84 }} />;
-              }
+            {mounted ? (
+              calendarCells.map((day, index) => {
+                if (day === null) {
+                  return <div key={`empty-${index}`} style={{ minHeight: 84 }} />;
+                }
 
-              const year = calendarDate.getFullYear();
-              const month = calendarDate.getMonth();
-              const key = `${year}-${month}-${day}`;
-              const dayEvents = eventsByDay[key] || [];
-              const isToday =
-                new Date().getFullYear() === year &&
-                new Date().getMonth() === month &&
-                new Date().getDate() === day;
+                const year = calendarDate.getFullYear();
+                const month = calendarDate.getMonth();
+                const key = `${year}-${month}-${day}`;
+                const dayEvents = eventsByDay[key] || [];
+                const isToday = todayKey === key;
 
               return (
                 <div
@@ -251,7 +257,10 @@ export default function EventsPage() {
                   )}
                 </div>
               );
-            })}
+            })
+            ) : (
+              Array.from({ length: 7 }).map((_, i) => <div key={`skeleton-${i}`} style={{ minHeight: 84, borderRadius: 12, background: "var(--surface-ghost)" }} />)
+            )}
           </div>
         </div>
       )}
