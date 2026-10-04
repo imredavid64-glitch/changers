@@ -3,7 +3,6 @@ import "./globals.css";
 import AppShell from "@/components/AppShell";
 import { AuthProvider } from "@/components/AuthProvider";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
-
 import { Viewport } from "next";
 
 export const viewport: Viewport = {
@@ -40,6 +39,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Enable demo mode for prototype deployments
+  if (typeof window !== "undefined") {
+    const isPrototype = 
+      window.location.hostname.includes("vercel.app") ||
+      window.location.hostname.includes("trycloudflare.com") ||
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
+    
+    if (isPrototype && !localStorage.getItem("changers-fake-user")) {
+      localStorage.setItem("changers-fake-user", "1");
+    }
+  }
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
