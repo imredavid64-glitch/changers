@@ -1,0 +1,6 @@
+Next steps:
+- Make tutorial
+- Import Luke's UI
+- Get the new servers hooked up
+- Get the new domains pointed
+- Implement new features
