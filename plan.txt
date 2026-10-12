@@ -4,3 +4,6 @@ Next steps:
 - Get the new servers hooked up
 - Get the new domains pointed
 - Implement new features
+- We need a virtual We-Will-Wall!
+- Show Changemaking process
+- 
