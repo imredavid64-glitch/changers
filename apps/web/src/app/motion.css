@@ -1,0 +1,315 @@
+/* ═══════════════════════ v4 · v2's page with v3's motion (Luke, 2 Oct 2026) ═══════════════════════
+   "now i want a mixed version of the original with some of these animations in the new version".
+   The page and look are v2 (globals.css). This file adds v3's motion to v2's sections, and the network map.
+   Backups: work/backups/site-v2-2026-10-01 (the original), work/backups/site-v3-2026-10-02 (the all-out version).
+   The animated layer is under html[data-motion="on"] (set before first paint unless the DEMO pill turned it off),
+   inside prefers-reduced-motion: no-preference. Without it, every section is v2 exactly.
+   Measured (work/refs3, 1 Oct): Cuberto: 0.8–1.2s cubic-bezier(.16,1,.3,1), the CTA ripple .5s cubic-bezier(.4,0,0,1),
+   Lenis. Locomotive: the 0.9s preloader on cubic-bezier(.215,.61,.355,1), Lenis. Hack Club: back-out
+   cubic-bezier(.34,1.56,.64,1) for the stickers. Ours: the choreography and the globe. */
+:root {
+  --expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --back-out: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ripple: cubic-bezier(0.4, 0, 0, 1);
+}
+
+/* ═══════════ Still forms ═══════════ */
+.kx__line { display: block; }
+.kx__w { display: inline-block; white-space: nowrap; }
+.kx__c { display: inline-block; }
+.kx__w.squiggle { position: relative; }
+.roll { display: inline-flex; overflow: hidden; line-height: 1.3; vertical-align: top; }
+.roll > span { display: block; }
+
+/* ── The network map (Luke, 4 Oct): v1's dark globe on an ink band, zoomed in on Europe, cities you can press ──
+   The stage runs to the band's bottom edge, so the Earth's curve rises above Europe and the rest of the planet
+   sinks behind the final call. Secondary text on ink uses the ticker's rgb(200 200 210) (11.6:1). */
+.network { background: var(--ink); color: var(--on-ink); border-top: var(--stroke) solid var(--ink); padding-top: 72px; overflow: clip; }
+@media (min-width: 1024px) { .network { padding-top: 104px; } }
+.network__head { display: grid; gap: 16px; justify-items: start; }
+.network .t-lead { color: rgb(200 200 210); max-width: 46ch; }
+.network__note { color: rgb(200 200 210); max-width: 60ch; margin: 0; }
+.network .link { color: var(--on-ink); }
+.network__list { margin: 8px 0 20px; }
+.network__list summary { display: inline-flex; align-items: center; min-height: 44px; font-weight: 800; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; cursor: pointer; }
+.network__list > div { columns: 3 220px; column-gap: 32px; margin: 8px 0 12px; }
+.network__country { break-inside: avoid; margin: 0 0 14px; }
+.network__country h3 { font-family: var(--font-poster), sans-serif; font-weight: 900; font-size: 16px; text-transform: uppercase; letter-spacing: .04em; color: rgb(200 200 210); margin: 0 0 4px; }
+.network__country ul { list-style: none; margin: 0; padding: 0; }
+.network__country li { font-size: 16px; line-height: 1.4; padding-block: 2px; }
+
+.gmap { position: relative; }
+/* The stage runs edge to edge (the map isn't cut off at the content column); its controls line up with the column. */
+.gmap__stage { position: relative; height: clamp(480px, 62vw, 780px); margin-inline: calc(50% - 50vw); overflow: hidden; background: var(--ink); }
+/* ── v6 (Luke, 4 Oct: "more detailed … more zoomed in … more interactive"): a real map. MapLibre draws OpenStreetMap
+   tiles on a globe; the city and school names are buttons laid over it, each beside its own dot. ── */
+/* Two classes, so MapLibre's own .maplibregl-map { position: relative } (loaded later) can't collapse the box to 0 px. */
+.nmap__stage > .nmap__gl { position: absolute; inset: 0; width: 100%; height: 100%; }
+.nmap__gl .maplibregl-canvas { outline: none; }
+.nmap__gl .maplibregl-canvas:focus-visible { outline: 3px solid var(--economy); outline-offset: -3px; }
+/* The OpenStreetMap credit (MapLibre's own control, required by the data's licence): the site's font, not MapLibre's
+   Helvetica, and links tall enough to tap (24 px). */
+.nmap__stage > .nmap__gl.maplibregl-map, .nmap__gl .maplibregl-ctrl { font-family: var(--font-text), sans-serif; }
+.nmap__gl .maplibregl-ctrl-attrib { font-size: 13px; line-height: 1; }
+.nmap__gl .maplibregl-ctrl-attrib a { display: inline-block; padding-block: 6px; min-height: 24px; }
+.nmap__fallback { position: absolute; inset: auto 0 50% 0; translate: 0 50%; margin: 0 auto; max-width: 46ch; padding: 0 var(--gutter); color: rgb(200 200 210); text-align: center; }
+.nmap__marks { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+/* The map's own controls always sit above the names (the names' layer is z-index 1). The motion layer's
+   .btn { position: relative } would otherwise pull "Back to Europe" into the flow. */
+.gmap__stage > :is(.nmap__top, .gmap__next, .nmap__controls) { position: absolute; z-index: 3; }
+.nmap__mark { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+.nmap__mark[data-visible="0"] { display: none; }
+.nmap__stage:not(.is-ready) .nmap__mark { visibility: hidden; }
+.nmap__dot { position: absolute; left: -6px; top: -6px; width: 12px; height: 12px; border-radius: 50%; background: rgb(236 238 245); box-shadow: 0 0 0 2px var(--ink); }
+.nmap__mark.is-host > .nmap__dot { background: var(--economy); }
+.nmap__mark.is-next > .nmap__dot { left: -8px; top: -8px; width: 16px; height: 16px; background: var(--wellbeing); }
+:is(.nmap__mark.is-selected, .nmap__mark.is-hot) > .nmap__dot { box-shadow: 0 0 0 2px var(--ink), 0 0 0 6px var(--economy); }
+/* A name touches its own dot: beside it (e, w), at a corner (ne, se, nw, sw), or above or below it (n, s). */
+.nmap__label { position: absolute; display: flex; align-items: center; gap: 4px; pointer-events: auto; }
+.nmap__mark:is([data-side="e"], [data-side="none"]) .nmap__label { left: 10px; top: 0; translate: 0 -50%; }
+.nmap__mark[data-side="w"] .nmap__label { right: 10px; top: 0; translate: 0 -50%; flex-direction: row-reverse; }
+.nmap__mark[data-side="ne"] .nmap__label { left: 2px; bottom: 8px; }
+.nmap__mark[data-side="se"] .nmap__label { left: 2px; top: 8px; }
+.nmap__mark[data-side="nw"] .nmap__label { right: 2px; bottom: 8px; flex-direction: row-reverse; }
+.nmap__mark[data-side="sw"] .nmap__label { right: 2px; top: 8px; flex-direction: row-reverse; }
+.nmap__mark[data-side="n"] .nmap__label { left: 0; bottom: 12px; translate: -50% 0; }
+.nmap__mark[data-side="s"] .nmap__label { left: 0; top: 12px; translate: -50% 0; }
+.nmap__mark[data-side="none"] .nmap__label { visibility: hidden; pointer-events: none; }
+/* A dot without room for its name: pointing at it shows the name (and a click opens it). */
+.nmap__dot { cursor: pointer; pointer-events: auto; }
+.nmap__dot::before { content: ''; position: absolute; inset: -8px; border-radius: 50%; }
+.nmap__mark:not([data-side="none"]) { z-index: 2; } /* a name sits above other places' dots */
+.nmap__mark:hover { z-index: 4; }
+.nmap__mark[data-side="none"]:hover .nmap__label { visibility: visible; pointer-events: auto; }
+/* A name: a 44 px pill with the year its city hosted (yellow) or "Next" (orange). */
+.gname, .gchip, .nmap__more { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: var(--r-pill); border: 2px solid rgb(255 255 255 / 0.24);
+  color: var(--on-ink); font: inherit; font-size: 16px; font-weight: 700; white-space: nowrap; cursor: pointer; }
+.gname, .nmap__more { background: rgb(23 23 29 / 0.88); }
+.gchip { background: transparent; }
+.nmap__more { justify-content: center; min-width: 46px; padding: 0 10px; font-weight: 800; }
+.nmap__more:not([data-n]) { display: none; }
+:is(.gname, .gchip, .nmap__more):hover, :is(.gname, .gchip).is-selected, .nmap__mark.is-hot .gname { border-color: var(--economy); }
+.gname__tag { font-size: 16px; font-weight: 800; line-height: 1; padding: 4px 8px; border-radius: var(--r-pill); background: var(--economy); color: var(--ink); }
+.is-next > .gname__tag { background: var(--wellbeing); }
+/* Zoom buttons, on the right (left of the card when it's open). */
+.nmap__controls { position: absolute; right: max(var(--gutter), calc((100vw - 1240px) / 2 + var(--gutter))); bottom: 44px; display: grid; gap: 8px; }
+/* With a city's card open (it covers the right of the map), the zoom buttons move to the left, above the chip. */
+@media (min-width: 900px) { .has-card .nmap__controls { right: auto; left: max(var(--gutter), calc((100vw - 1240px) / 2 + var(--gutter))); bottom: 84px; } }
+.nmap__ctl { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; border: 2px solid rgb(255 255 255 / 0.3); background: rgb(23 23 29 / 0.88); color: var(--on-ink); cursor: pointer; }
+.nmap__ctl:hover { border-color: var(--economy); }
+/* Phones: every city is also a chip under the map (the map's own labels can only fit a few). */
+/* Every city as a button under the map, at every width: the keyboard's quickest way in, and the way to Columbus,
+   which sits far from Europe. */
+.gmap__chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+/* v6.2 (Luke, 11 Oct: "improve … general navigating of the map"): a bar along the top of the map, "Back to Europe" on
+   the left and "Explore the map" on the right, lined up with the content column. */
+.nmap__top { top: 16px; left: max(var(--gutter), calc((100vw - 1240px) / 2 + var(--gutter))); right: max(var(--gutter), calc((100vw - 1240px) / 2 + var(--gutter)));
+  display: flex; align-items: flex-start; gap: 8px; pointer-events: none; }
+.nmap__top > * { pointer-events: auto; }
+.gmap__back, .nmap__explore { display: inline-flex; gap: 8px; }
+.nmap__explore { margin-left: auto; }
+.gmap__next { position: absolute; left: max(var(--gutter), calc((100vw - 1240px) / 2 + var(--gutter))); bottom: 16px; margin-right: 72px; display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 18px;
+  border-radius: var(--r-pill); border: 2px solid var(--wellbeing); background: rgb(23 23 29 / 0.85); color: var(--on-ink); font: inherit; font-size: 16px; font-weight: 800; text-align: left; cursor: pointer; }
+.gmap__pulse { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--wellbeing); }
+
+.gcard { background: var(--paper); color: var(--ink); border-radius: var(--r-card); box-shadow: var(--shadow-lift); padding: 18px 20px 14px; margin: 12px 0 32px; }
+.gcard[hidden] { display: none; }
+/* Wide screens: the card sits on the map's right, under the top bar. */
+@media (min-width: 900px) { .gcard { position: absolute; top: 76px; right: 16px; width: 360px; max-height: calc(100% - 92px); overflow: auto; margin: 0; } }
+/* The card's arrows: the city before and after this one (alphabetical, as the city buttons). */
+.gcard__steps { display: flex; justify-content: space-between; gap: 8px; margin: 2px 0 6px; }
+.gcard__nav { display: inline-flex; align-items: center; gap: 6px; min-width: 0; max-width: calc(50% - 4px); min-height: 44px; padding: 0 14px; border-radius: var(--r-pill);
+  border: 2px solid var(--ink); background: var(--paper); color: var(--ink); font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.gcard__nav > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gcard__nav > svg { flex: none; }
+.gcard__nav:hover { background: var(--economy); }
+
+/* "Explore the map": the map fills the screen, above the header. A plain scroll or one finger moves it; every city
+   sits in a strip along the bottom; the card is a panel on the right (wide) or rises from the bottom (phones). */
+.gmap.is-exploring .gmap__stage { position: fixed; inset: 0; z-index: 70; height: auto; margin: 0; }
+.gmap.is-exploring .nmap__top { top: max(16px, env(safe-area-inset-top)); left: 16px; right: 16px; }
+.gmap.is-exploring .nmap__controls { right: 16px; bottom: 96px; }
+.gmap.is-exploring .gmap__next { left: 16px; bottom: 96px; }
+.gmap.is-exploring .gmap__chips { position: fixed; left: 0; right: 0; bottom: 0; z-index: 71; margin: 0; flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain;
+  padding: 14px 16px max(14px, env(safe-area-inset-bottom)); background: rgb(23 23 29 / 0.94); border-top: 1px solid rgb(255 255 255 / 0.16); }
+.gmap.is-exploring .gchip { flex: none; }
+@media (min-width: 900px) {
+  .gmap.is-exploring .gcard { position: fixed; z-index: 72; top: 76px; right: 16px; max-height: calc(100dvh - 76px - 96px); }
+  .gmap.is-exploring.has-card .nmap__controls { left: 16px; right: auto; bottom: 156px; }
+}
+@media (max-width: 899px) {
+  .gmap.is-exploring .gcard { position: fixed; z-index: 72; left: 8px; right: 8px; bottom: 8px; max-height: 58dvh; overflow: auto; margin: 0; }
+  .gmap.is-exploring.has-card :is(.gmap__chips, .nmap__controls, .gmap__next) { display: none; }
+}
+.gcard .link { color: var(--ink); display: inline-flex; align-items: center; gap: 2px; padding-block: 10px; }
+.gcard__head { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+.gcard__title { font-family: var(--font-display), serif; font-weight: 400; font-size: 30px; line-height: 1.1; margin: 4px 0 0; outline-offset: 4px; }
+.gcard__country { display: block; font-family: var(--font-text), sans-serif; font-size: 16px; font-weight: 700; color: var(--dim); margin-top: 4px; }
+.gcard__close { flex: none; width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); display: grid; place-items: center; cursor: pointer; }
+.gcard__conf { display: grid; gap: 2px; margin: 14px 0 0; padding: 10px 14px 0; border-radius: 14px; background: rgb(255 207 64 / 0.24); font-size: 16px; }
+.gcard__conf.is-next { background: rgb(255 106 65 / 0.16); }
+/* The conference's journey: the host before and after, one full-width button each (side by side they wrapped). */
+.gcard__journey { display: grid; gap: 8px; margin: 10px 0 0; }
+.gcard__journey > span:empty { display: none; }
+.gcard__step { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: var(--r-pill); border: 2px solid var(--ink); background: var(--paper); color: var(--ink); font: inherit; font-size: 16px; font-weight: 700; text-align: left; cursor: pointer; }
+.gcard__step svg { flex: none; }
+.gcard__step--after { justify-content: space-between; }
+.gcard__step:hover { background: var(--economy); }
+.gcard__badge { font-weight: 800; }
+.gcard__count { font-family: var(--font-poster), sans-serif; font-weight: 900; font-size: 16px; text-transform: uppercase; letter-spacing: .04em; color: var(--dim); margin: 18px 0 0; }
+.gcard__schools { list-style: none; margin: 0; padding: 0; }
+.gcard__schools li { padding: 12px 0 2px; border-bottom: 2px solid var(--line); }
+.gcard__schools li:last-child { border-bottom: 0; }
+.gcard__school { font-weight: 800; margin: 0; }
+.gcard__meta { font-size: 16px; color: var(--dim); margin: 2px 0 0; }
+.gcard__label { font-size: 16px; font-weight: 800; margin: 8px 0 0; }
+.gcard__facts { list-style: disc; margin: 2px 0 0; padding-left: 20px; }
+.gcard__fact { font-size: 16px; margin: 4px 0 0; }
+.gcard__conf p { margin: 0; }
+
+.gcard .gcard__source { display: inline; padding-block: 0; white-space: nowrap; }
+.gcard .gcard__source svg { display: inline-block; vertical-align: -2px; } /* preflight makes svg a block, which broke the line */
+
+/* Nothing an animation enlarges may widen the page (a phone would zoom out): the how band clips its stamps, and
+   the body never scrolls sideways (clip, not hidden, so the sticky header still sticks). */
+.how { overflow: clip; }
+body { overflow-x: clip; }
+
+/* Intro and page wipe exist only in the animated version. */
+.intro, .wipe { display: none; }
+
+/* ═══════════ The animated version ═══════════ */
+@keyframes m-char { from { opacity: 0; translate: 0 0.95em; rotate: 14deg; } to { opacity: 1; translate: 0 0; rotate: 0deg; } }
+@keyframes m-rise { from { opacity: 0; translate: 0 36px; } to { opacity: 1; translate: 0 0; } }
+@keyframes m-slap { from { opacity: 0; scale: 1.4; rotate: 16deg; } 55% { opacity: 1; } to { opacity: 1; scale: 1; rotate: 0deg; } }
+@keyframes m-pop { from { opacity: 0; scale: 0.2; } to { opacity: 1; scale: 1; } }
+@keyframes m-bob { from { translate: 0 -6px; } to { translate: 0 7px; } }
+@keyframes m-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes m-marquee { to { translate: -50% 0; } }
+@keyframes m-intro-out { to { translate: 0 -100%; } }
+@keyframes m-wipe { from { translate: 0 0; } to { translate: 0 -101%; } }
+@keyframes m-letter { from { opacity: 0; translate: 0 55%; scale: 0.6; } to { opacity: 0.9; translate: 0 0; scale: 1; } }
+@keyframes m-slide { from { opacity: 0; translate: -48px 0; } to { opacity: 1; translate: 0 0; } }
+@keyframes m-stamp { from { opacity: 0; scale: 2.5; rotate: -16deg; } to { opacity: 1; scale: 1; rotate: 0deg; } }
+@keyframes m-up { from { opacity: 0; translate: 0 48px; } to { opacity: 1; translate: 0 0; } }
+@keyframes m-page { from { opacity: 0; translate: 0 26px; } to { opacity: 1; translate: 0 0; } }
+@keyframes m-grow { from { scale: 0 1; } to { scale: 1 1; } }
+@keyframes m-pulse { 0% { box-shadow: 0 0 0 0 rgb(255 106 65 / 0.7); } 70%, 100% { box-shadow: 0 0 0 14px rgb(255 106 65 / 0); } }
+@keyframes m-hero-letter { from { opacity: 0; translate: 40% 0; rotate: 14deg; } to { opacity: .9; translate: 0 0; rotate: 0deg; } }
+@keyframes m-parallax-up { to { translate: 0 -30%; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Luke, 12 Oct: "the animations take a little too long to pop up". Every delay and duration below is about half
+     of v4's: the first visit shows the whole hero by ~1.3 s (was 2.8 s), a repeat visit by ~0.9 s (was 1.4 s). */
+  html[data-motion="on"][data-intro="1"] { --intro: 0.45s; }
+
+  /* ── Intro (first landing visit per session): the dots bounce in, the name rises, the curtain lifts ── */
+  html[data-motion="on"][data-intro="1"] .intro { display: grid; place-items: center; align-content: center; gap: 22px; position: fixed; inset: 0; z-index: 200; background: var(--ink); color: var(--on-ink); pointer-events: none; animation: m-intro-out 0.55s var(--cubic) 0.4s forwards; }
+  .intro__dots { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 92px; height: 92px; rotate: -8deg; }
+  .intro__dots i { border-radius: 50%; animation: m-pop 0.35s var(--back-out) both; }
+  .intro__dots i:nth-child(2) { animation-delay: 60ms; } .intro__dots i:nth-child(3) { animation-delay: 120ms; } .intro__dots i:nth-child(4) { animation-delay: 180ms; }
+  .intro__word { font-family: var(--font-display), serif; font-size: clamp(36px, 5vw, 56px); animation: m-rise 0.45s var(--expo) 0.1s both; }
+
+  /* ── Page wipe on every page: four strand stripes sweep up ── */
+  html[data-motion="on"] .wipe { display: grid; grid-template-columns: repeat(4, 1fr); position: fixed; inset: 0; z-index: 150; pointer-events: none; }
+  html[data-motion="on"] .wipe i { animation: m-wipe 0.6s var(--cubic) both; }
+  html[data-motion="on"] .wipe i:nth-child(2) { animation-delay: 45ms; } html[data-motion="on"] .wipe i:nth-child(3) { animation-delay: 90ms; } html[data-motion="on"] .wipe i:nth-child(4) { animation-delay: 135ms; }
+
+  /* ── Headings fly in letter by letter (below-the-fold ones wait until they scroll in: Fx adds .kx--late/.is-in) ── */
+  html[data-motion="on"] .kx__c { animation: m-char 0.55s var(--expo) both; animation-delay: calc(var(--intro, 0s) + 0.1s + var(--i) * 12ms); }
+  html[data-motion="on"] .kx--late .kx__c { opacity: 0; animation: none; }
+  html[data-motion="on"] .kx--late.is-in .kx__c { animation: m-char 0.55s var(--expo) both; animation-delay: calc(var(--i) * 12ms); }
+  html[data-motion="on"] .squiggle path { stroke-dasharray: 1; animation: m-draw 0.6s ease-out both; animation-delay: calc(var(--intro, 0s) + 0.6s); }
+
+  /* ── Hero: the words rise, the cards and stickers slap onto the wall ── */
+  html[data-motion="on"] .hero .t-lead { animation: m-rise 0.6s var(--expo) both; animation-delay: calc(var(--intro, 0s) + 0.25s); }
+  html[data-motion="on"] .hero__doors { animation: m-rise 0.6s var(--expo) both; animation-delay: calc(var(--intro, 0s) + 0.32s); }
+  html[data-motion="on"] .hero__inner > .link { animation: m-rise 0.6s var(--expo) both; animation-delay: calc(var(--intro, 0s) + 0.4s); }
+  html[data-motion="on"] :is(.hero__collage, .hero__phone-cards) > * { animation: m-slap 0.4s var(--back-out) both; }
+  html[data-motion="on"] :is(.hero__collage, .hero__phone-cards) > :nth-child(1) { animation-delay: calc(var(--intro, 0s) + 0.15s); }
+  html[data-motion="on"] :is(.hero__collage, .hero__phone-cards) > :nth-child(2) { animation-delay: calc(var(--intro, 0s) + 0.25s); }
+  html[data-motion="on"] :is(.hero__collage, .hero__phone-cards) > :nth-child(3) { animation-delay: calc(var(--intro, 0s) + 0.35s); }
+  html[data-motion="on"] .hero__collage > :nth-child(4) { animation-delay: calc(var(--intro, 0s) + 0.2s); }
+  html[data-motion="on"] .hero__collage > :nth-child(5) { animation-delay: calc(var(--intro, 0s) + 0.3s); }
+  html[data-motion="on"] .hero__collage > :nth-child(6) { animation-delay: calc(var(--intro, 0s) + 0.4s); }
+  html[data-motion="on"] .sticker { animation: m-pop 0.45s var(--back-out) both, m-bob 2.6s ease-in-out infinite alternate; transition: rotate 0.7s var(--back-out); }
+  html[data-motion="on"] .sticker:nth-child(1) { animation-delay: calc(var(--intro, 0s) + 0.45s), 1.4s; }
+  html[data-motion="on"] .sticker:nth-child(2) { animation-delay: calc(var(--intro, 0s) + 0.5s), 2.1s; }
+  html[data-motion="on"] .sticker:nth-child(3) { animation-delay: calc(var(--intro, 0s) + 0.55s), 1.7s; }
+  html[data-motion="on"] .sticker:nth-child(4) { animation-delay: calc(var(--intro, 0s) + 0.6s), 2.4s; }
+  html[data-motion="on"] .sticker:hover { rotate: 360deg; }
+
+  /* ── Buttons: magnetic, a ripple fill (Cuberto's CTA), the label rolls up ── */
+  html[data-motion="on"] .btn { position: relative; overflow: hidden; isolation: isolate; translate: var(--mag-x, 0px) var(--mag-y, 0px); transition: color 0.4s ease, background-color 0.4s ease, translate 0.8s var(--expo), transform 0.25s var(--back-out), box-shadow 0.2s ease, scale 0.12s ease; }
+  html[data-motion="on"] .btn::after { content: ''; position: absolute; z-index: -1; left: 50%; top: 100%; width: 180%; aspect-ratio: 1; border-radius: 50%; background: var(--fill, var(--economy)); translate: -50% 0; transition: translate 0.5s var(--ripple), border-radius 0.5s var(--ripple); }
+  html[data-motion="on"] .btn:hover::after { translate: -50% -70%; border-radius: 30%; }
+  html[data-motion="on"] .btn-primary:hover { color: var(--ink); }
+  html[data-motion="on"] .btn-secondary { --fill: var(--ink); }
+  html[data-motion="on"] .btn-secondary:hover { color: var(--on-ink); }
+  html[data-motion="on"] .btn-quiet::after { display: none; }
+  html[data-motion="on"] .btn:active { scale: 0.94; }
+  html[data-motion="on"] .roll > span { text-shadow: 0 1.3em currentColor; transition: translate 0.8s var(--expo); }
+  html[data-motion="on"] :is(a, button):hover > .roll > span { translate: 0 -1.3em; }
+  html[data-motion="on"] .wordmark .mark { transition: rotate 0.6s var(--back-out); }
+  html[data-motion="on"] .wordmark:hover .mark { rotate: 190deg; }
+
+  /* ── Cards and tiles lean toward the pointer (Fx sets --tilt-x/--tilt-y) ── */
+  html[data-motion="on"] :is(.sticker-card, .learn-card, .list-card, .project-card, .resource-block, .tile) { transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) rotate(var(--r, 0deg)); transition: transform 0.6s var(--expo), box-shadow 0.3s ease, filter 0.2s ease; }
+  html[data-motion="on"] :is(a.sticker-card, a.learn-card, a.list-card, a.card):hover { transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) rotate(0deg) translateY(-6px) scale(1.02); box-shadow: var(--shadow-sticker); }
+  html[data-motion="on"] .tile__letter { transition: rotate 0.4s var(--back-out), scale 0.4s var(--back-out); }
+  html[data-motion="on"] .tile:hover .tile__letter { rotate: -10deg; scale: 1.08; }
+  html[data-motion="on"] .learn-card svg { transition: translate 0.6s var(--expo); }
+  html[data-motion="on"] .learn-card:hover svg { translate: 10px 0; }
+  html[data-motion="on"] .chip { transition: scale 0.3s var(--back-out); }
+  html[data-motion="on"] a:hover .chip { scale: 1.08; }
+  html[data-motion="on"] .date-card { transition: rotate 0.4s var(--back-out); }
+  html[data-motion="on"] a:hover .date-card { rotate: -10deg; }
+
+  /* (Luke, 4 Oct: "only the thing you're hovering over should move": the wall no longer follows the mouse as a whole;
+     only the card or sticker under the pointer tilts, lifts or spins.) */
+
+  /* ── The events strip becomes a marquee (it stops under the pointer or keyboard focus) ── */
+  html[data-motion="on"] .ticker__viewport { overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
+  html[data-motion="on"] .ticker__track { display: flex; width: max-content; animation: m-marquee 36s linear infinite; }
+  html[data-motion="on"] .ticker__dup { display: flex !important; }
+  html[data-motion="on"] .ticker__list { display: flex; }
+  html[data-motion="on"] .ticker__list li { flex: none; width: 340px; }
+  html[data-motion="on"] .ticker__list li a { border-bottom: 0; border-left: 2px solid rgba(255, 255, 255, 0.25); flex-direction: column; align-items: flex-start; justify-content: center; gap: 4px; padding-inline: 24px; }
+  html[data-motion="on"] .ticker:hover .ticker__track, html[data-motion="on"] .ticker:focus-within .ticker__track { animation-play-state: paused; }
+
+  /* ── The network map: the next conference's dot and chip pulse; the names fade in once the map has flown in ── */
+  html[data-motion="on"] :is(.gmap__pulse, .nmap__mark.is-next > .nmap__dot) { animation: m-pulse 1.8s var(--cubic) infinite; }
+  html[data-motion="on"] .nmap__label { transition: opacity 0.25s ease; }
+
+  /* ── App pages: the page rises in, lists follow in steps ── */
+  html[data-motion="on"] main > .page, html[data-motion="on"] main > div > .page { animation: m-page 0.9s var(--expo) 0.25s both; }
+  html[data-motion="on"] :is(.club-list, .event-list, .grid-projects, .grid-resources, .update-list, .approval-list, .steps, .project-sections) > * { animation: m-rise 0.9s var(--expo) both; animation-delay: 0.4s; }
+  html[data-motion="on"] :is(.club-list, .event-list, .grid-projects, .grid-resources, .update-list, .approval-list, .steps, .project-sections) > :nth-child(2) { animation-delay: 0.47s; }
+  html[data-motion="on"] :is(.club-list, .event-list, .grid-projects, .grid-resources, .update-list, .approval-list, .steps, .project-sections) > :nth-child(3) { animation-delay: 0.54s; }
+  html[data-motion="on"] :is(.club-list, .event-list, .grid-projects, .grid-resources, .update-list, .approval-list, .steps, .project-sections) > :nth-child(4) { animation-delay: 0.61s; }
+  html[data-motion="on"] :is(.club-list, .event-list, .grid-projects, .grid-resources, .update-list, .approval-list, .steps, .project-sections) > :nth-child(n+5) { animation-delay: 0.68s; }
+  html[data-motion="on"] .strand-hero__letter { animation: m-hero-letter 1.2s var(--expo) 0.3s both; }
+  html[data-motion="on"] .strand-strip span { animation: m-grow 0.9s var(--expo) both; transform-origin: left; }
+
+  /* ── Scroll-driven (Chrome, Edge, Safari 26; elsewhere everything simply shows) ── */
+  @supports (animation-timeline: view()) {
+    /* The strand tiles: the big letters rise into place and the names slide in as the tiles scroll into view. */
+    html[data-motion="on"] .tile__letter { animation: m-letter linear both; animation-timeline: view(); animation-range: entry 0% cover 45%; }
+    html[data-motion="on"] .tile__name { animation: m-slide linear both; animation-timeline: view(); animation-range: entry 10% cover 40%; }
+    /* How a club works: the numbers stamp down. Principles and the learn cards rise. */
+    html[data-motion="on"] .how__steps b { animation: m-stamp linear both; animation-timeline: view(); animation-range: entry 5% cover 35%; }
+    html[data-motion="on"] .principles li { animation: m-up linear both; animation-timeline: view(); animation-range: entry 0% cover 30%; }
+    html[data-motion="on"] .grid-learn > li { animation: m-up linear both; animation-timeline: view(); animation-range: entry 0% cover 30%; }
+    /* The strand page's big letter floats up as the page scrolls. */
+    html[data-motion="on"] .strand-hero__letter { animation: m-hero-letter 1.2s var(--expo) 0.3s both, m-parallax-up linear both; animation-timeline: auto, scroll(root); animation-range: normal, 0 70vh; }
+  }
+}
+
+/* The cursor (Fx adds it on mouse devices): a dot that follows and grows over links and cards. */
+.cursor { position: fixed; left: 0; top: 0; z-index: 300; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: #fff; mix-blend-mode: difference; pointer-events: none; transition: width 0.4s var(--expo), height 0.4s var(--expo), margin 0.4s var(--expo), scale 0.15s ease; }
+.cursor.is-link { width: 58px; height: 58px; margin: -29px 0 0 -29px; }
+.cursor.is-card { width: 92px; height: 92px; margin: -46px 0 0 -46px; }
+.cursor.is-down { scale: 0.8; }
+@media (prefers-reduced-motion: reduce) { .cursor { display: none; } }
+html[data-motion="off"] .cursor { display: none; }

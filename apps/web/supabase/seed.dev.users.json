@@ -1,0 +1,92 @@
+[
+ {
+  "id": "a06be9e1-75c4-53a1-99da-2bff395d3434",
+  "email": "u-adv1@example.test",
+  "persona": "u-adv1"
+ },
+ {
+  "id": "74866792-0bc7-5140-8f41-5e3d1088d070",
+  "email": "u-lead1@example.test",
+  "persona": "u-lead1"
+ },
+ {
+  "id": "93693c56-8685-5796-a901-f5ca77420a1b",
+  "email": "u-mem1@example.test",
+  "persona": "u-mem1"
+ },
+ {
+  "id": "de7a1715-d541-557a-a5ce-d131abb68ced",
+  "email": "u-mem2@example.test",
+  "persona": "u-mem2"
+ },
+ {
+  "id": "a756970b-fe3b-5eb2-aa9e-47439ab03ee1",
+  "email": "u-adv2@example.test",
+  "persona": "u-adv2"
+ },
+ {
+  "id": "29ca66fc-d2fe-5033-83b5-afaad859763c",
+  "email": "u-lead2@example.test",
+  "persona": "u-lead2"
+ },
+ {
+  "id": "0511dcd0-2af6-5008-b955-22c66a91dc0f",
+  "email": "u-mem3@example.test",
+  "persona": "u-mem3"
+ },
+ {
+  "id": "952ad586-de0f-52e9-93ea-c6f501f3acc6",
+  "email": "u-adv3@example.test",
+  "persona": "u-adv3"
+ },
+ {
+  "id": "9a5ee445-3b0d-5bdb-910c-e29366c425a9",
+  "email": "u-mem4@example.test",
+  "persona": "u-mem4"
+ },
+ {
+  "id": "fc1ad2b4-745f-5fbb-b2f1-160ff34b7267",
+  "email": "u-adv4@example.test",
+  "persona": "u-adv4"
+ },
+ {
+  "id": "7f83cc75-ce0a-5fb8-ab6d-784439e1b42d",
+  "email": "u-mem5@example.test",
+  "persona": "u-mem5"
+ },
+ {
+  "id": "19d6ed01-30ed-5407-aa17-68efc0419cf9",
+  "email": "u-adv5@example.test",
+  "persona": "u-adv5"
+ },
+ {
+  "id": "81504807-66d6-5705-9091-b8a288258b9f",
+  "email": "u-mem6@example.test",
+  "persona": "u-mem6"
+ },
+ {
+  "id": "72c53e2b-8a94-5c83-bf18-7028c423536b",
+  "email": "u-adv6@example.test",
+  "persona": "u-adv6"
+ },
+ {
+  "id": "0aca4e59-d199-52d8-8938-c4e328a567ef",
+  "email": "u-mem7@example.test",
+  "persona": "u-mem7"
+ },
+ {
+  "id": "d8cdd08c-d6fd-534d-b531-1c65fc5aab85",
+  "email": "u-adv7@example.test",
+  "persona": "u-adv7"
+ },
+ {
+  "id": "6f3f30e3-323e-5c3b-88b3-a610e9a94481",
+  "email": "u-adv8@example.test",
+  "persona": "u-adv8"
+ },
+ {
+  "id": "b463fd17-e4a6-5094-a9b9-80a5c8d7aa54",
+  "email": "u-admin@example.test",
+  "persona": "u-admin"
+ }
+]

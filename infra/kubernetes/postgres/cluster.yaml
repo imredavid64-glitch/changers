@@ -1,0 +1,68 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: changers-db
+  namespace: database
+spec:
+  instances: 3
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.4
+  primaryUpdateStrategy: unsupervised
+  bootstrap:
+    initdb:
+      database: changers
+      owner: changers
+      secret:
+        name: changers-db-credentials
+  postgresql:
+    parameters:
+      max_connections: "200"
+      shared_buffers: "2GB"
+      effective_cache_size: "6GB"
+      maintenance_work_mem: "512MB"
+      work_mem: "16MB"
+      wal_level: logical
+      max_wal_senders: "10"
+      max_replication_slots: "10"
+      hot_standby: "on"
+      synchronous_commit: "on"
+      archive_mode: "on"
+      archive_command: "true"
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "2"
+    limits:
+      memory: "8Gi"
+      cpu: "4"
+  storage:
+    size: 100Gi
+    storageClass: local-nvme
+  affinity:
+    podAntiAffinityType: preferred
+    topologyKey: topology.kubernetes.io/zone
+  monitoring:
+    enabled: true
+    podMonitor:
+      enabled: true
+  backup:
+    retentionPolicy: "30d"
+    barmanObjectStore:
+      destinationPath: s3://changers-backups/postgres
+      endpointURL: https://minio.changers.internal:9000
+      s3Credentials:
+        accessKeyId:
+          name: minio-credentials
+          key: accessKeyId
+        secretAccessKey:
+          name: minio-credentials
+          key: secretAccessKey
+  externalClusters:
+    - name: changers-db-replica
+      connectionParameters:
+        host: changers-db-rw.database.svc.cluster.local
+        user: changers
+        dbname: changers
+      password:
+        name: changers-db-credentials
+        key: password
+---

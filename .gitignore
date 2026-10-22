@@ -1,0 +1,13 @@
+# dependencies
+/node_modules
+
+# workspace build artifacts
+/apps/api/.data
+/apps/api/dist
+/apps/web/.next
+/apps/web/out
+/apps/web/node_modules
+
+# env
+.env
+.env.local

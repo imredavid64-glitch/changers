@@ -1,0 +1,25 @@
+{
+  "name": "changers",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Changemakers — the network for young people who make change happen. Next.js frontend (apps/web) on a PostgREST-compatible API (apps/api) over Postgres with row-level security.",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @changers/api & npm run dev --workspace changemakers-site",
+    "dev:api": "npm run dev --workspace @changers/api",
+    "dev:web": "npm run dev --workspace changemakers-site",
+    "build": "npm run build --workspace @changers/api && npm run build --workspace changemakers-site",
+    "start": "npm run start --workspace @changers/api",
+    "lint": "npm run lint --workspace changemakers-site",
+    "typecheck": "npm run typecheck --workspace @changers/api && npm run typecheck --workspace changemakers-site",
+    "test": "npm run test --workspace @changers/api",
+    "test:rls": "npm run test:rls:local --workspace changemakers-site",
+    "db:migrate": "npm run db:migrate --workspace @changers/api",
+    "db:seed": "npm run seed:dev --workspace changemakers-site"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
