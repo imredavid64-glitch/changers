@@ -1,9 +1,9 @@
 Next steps:
 - Make tutorial
-- Import Luke's UI
+- Import Luke's UI (DONE)
 - Get the new servers hooked up
 - Get the new domains pointed
 - Implement new features
 - We need a virtual We-Will-Wall!
 - Show Changemaking process
-- 
+- Plan new features
